@@ -293,19 +293,15 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
    a new dark section is right without anyone remembering the incantation.
    Opaque, not translucent — a route table wants a solid ground. */
 .section--ink .card {
-    background: color-mix(in srgb, #FFF 6%, var(--am-navy));
-    border-color: rgba(255, 255, 255, .13);
+    background: none; border: 0; border-top: 1px solid rgba(255, 255, 255, .2);
 }
 .section--ink .card p       { color: #9DB0CE; }
-.section--ink .card__icon   { background: rgba(255, 255, 255, .1); color: #fff; }
-.section--ink .card--hover:hover { border-color: rgba(255, 255, 255, .34); }
+.section--ink .card__icon   { color: #fff; }
+.section--ink .card--hover:hover { border-top-color: rgba(255, 255, 255, .55); }
 
-.section--ink .table-scroll {
-    background: color-mix(in srgb, #FFF 5%, var(--am-navy));
-    border-color: rgba(255, 255, 255, .14);
-}
+.section--ink .table-scroll { background: none; border: 0; }
 .section--ink thead th {
-    background: color-mix(in srgb, #FFF 9%, var(--am-navy)); color: #B7C6DE;
+    background: none; color: #B7C6DE; border-bottom-color: rgba(255, 255, 255, .28);
     border-bottom-color: rgba(255, 255, 255, .14);
 }
 .section--ink tbody td       { border-bottom-color: rgba(255, 255, 255, .09); }
@@ -360,35 +356,35 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 
 .btn--sm { padding: .6rem 1.2rem; font-size: .86rem; }
 
-/* --- Cards --- */
+/* --- Cards ---
+   NOT cards. Every piece of information on this site used to sit in a
+   bordered, rounded, shadowed box — six of them in a grid for "why fly with
+   us", three for the hubs, four for the stats, one per aircraft. A page built
+   entirely from rounded boxes is the most generic layout there is, and it made
+   a magazine's worth of copy read like a settings screen.
+
+   An item is now opened by a hairline and set in type, the way a print column
+   is. The class name stays because the pages already use it. There is no
+   background, no border box, no radius and no shadow here on purpose — if you
+   are adding one back, add it to something that is genuinely a surface (a
+   table, a framed embed), not to a paragraph. */
 .card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: clamp(1.4rem, 2.4vw, 1.85rem);
-    transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+    background: none; border: 0; border-radius: 0; padding: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 1.3rem;
+    transition: border-color .3s var(--ease);
 }
-.card--hover:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
-    box-shadow: var(--shadow);
-}
-.card__icon {
-    width: 2.8rem; height: 2.8rem; border-radius: var(--radius-sm);
-    display: grid; place-items: center; margin-bottom: 1.15rem;
-    background: color-mix(in srgb, var(--accent) 11%, transparent); color: var(--accent);
-}
-.card__icon svg { width: 1.35rem; height: 1.35rem; }
+.card--hover:hover { border-top-color: var(--accent); }
 .card h3 { margin-bottom: .5rem; }
 .card p  { color: var(--muted); font-size: .96rem; }
 
-/* Icon tiles cycle through the Quetzalcóatl glyph colours. A grid of six
-   identical pale-blue squares is the flattest thing on a page; six flat
-   colours off the aircraft makes the same grid read as a set. Cards inside a
-   navy section opt out above — polychrome on navy just muddies. */
-.section:not(.section--ink) .grid > .card:nth-child(6n+2) .card__icon { background: color-mix(in srgb, var(--am-jade) 14%, transparent);      color: var(--am-jade); }
-.section:not(.section--ink) .grid > .card:nth-child(6n+3) .card__icon { background: color-mix(in srgb, var(--am-clay) 14%, transparent);      color: var(--am-clay); }
-.section:not(.section--ink) .grid > .card:nth-child(6n+4) .card__icon { background: color-mix(in srgb, var(--am-turquoise) 15%, transparent); color: #0A7C89; }
-.section:not(.section--ink) .grid > .card:nth-child(6n+5) .card__icon { background: color-mix(in srgb, var(--am-rosa) 13%, transparent);      color: var(--am-rosa); }
-.section:not(.section--ink) .grid > .card:nth-child(6n+6) .card__icon { background: color-mix(in srgb, var(--am-red) 12%, transparent);       color: var(--am-red); }
+/* The icon was a tinted rounded square — another small block. It is just the
+   glyph now, in the accent, sitting above the heading. */
+.card__icon {
+    width: auto; height: auto; background: none; border-radius: 0;
+    display: block; margin-bottom: .85rem; color: var(--accent);
+}
+.card__icon svg { width: 1.45rem; height: 1.45rem; }
 
 /* --- Chips / pills --- */
 .chip {
@@ -448,17 +444,19 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 }
 
 /* --- Table --- */
-.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+/* Scroll container only. The table rules itself with hairlines; wrapping it in
+   a rounded bordered panel just puts a box round a box. */
+.table-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 40rem; }
 thead th {
     text-align: left; padding: .95rem 1.15rem; white-space: nowrap;
     font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em;
-    color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line);
+    color: var(--muted); border-bottom: 1px solid var(--ink);
 }
 tbody td { padding: .95rem 1.15rem; border-bottom: 1px solid var(--line-soft); font-size: .94rem; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr { transition: background .2s var(--ease); }
-tbody tr:hover { background: var(--surface-2); }
+tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
 
 /* ============================ NAV ======================================== */
 .nav {
@@ -470,10 +468,19 @@ tbody tr:hover { background: var(--surface-2); }
 }
 .nav.is-stuck { border-bottom-color: var(--line); }
 .nav__inner { display: flex; align-items: center; gap: 1.5rem; height: 4.5rem; }
-.nav__brand { display: flex; align-items: center; gap: .75rem; margin-right: auto; min-width: 0; }
-/* The mark is 1300 x 730. Width only — a fixed square height squashes
-   the profile flat. Same rule wherever else it is sized. */
-.nav__brand .mark { width: 3rem; height: auto; flex: none; color: var(--am-blue); }
+.nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
+/* The mark, painted through assets/img/mark.svg as a mask so ONE file serves
+   every placement and both themes — nav, footer, watermark. Set --mark-ratio
+   to the artwork's real width/height when the logo lands. Nothing renders it
+   today: site.js has HAS_MARK = false until the real artwork is committed. */
+.mark {
+    display: block; flex: none;
+    aspect-ratio: var(--mark-ratio, 16 / 9);
+    background: currentColor;
+    -webkit-mask: url('/assets/img/mark.svg') no-repeat center / contain;
+            mask: url('/assets/img/mark.svg') no-repeat center / contain;
+}
+.nav__brand .mark { width: 3rem; color: var(--am-blue); }
 :root[data-theme="dark"] .nav__brand .mark { color: var(--am-blue-300); }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .nav__brand .mark { color: var(--am-blue-300); }
@@ -542,12 +549,13 @@ tbody tr:hover { background: var(--surface-2); }
 .hero h1 { margin-block: 1.3rem; max-width: 16ch; }
 .hero .lede { color: #C3D0E4; max-width: 50ch; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.3rem; }
-/* Keep the whole head in frame — the hooked beak is the shape that makes the
-   mark read as a raptor, and clipping it is what makes it read as an insect. */
+/* The hero watermark. Empty until the real logo is committed — site.js renders
+   nothing into it, so it collapses and the hero is simply the depth wash. */
 .hero__mark {
     position: absolute; right: 2%; top: 50%; translate: 0 -50%;
     width: min(40vw, 26rem); opacity: .13; z-index: -1; pointer-events: none;
 }
+.hero__mark:empty { display: none; }
 @media (max-width: 48rem) { .hero__mark { right: -14%; opacity: .09; } }
 
 /* The greca runs along the bottom edge of the hero, where the navy meets the
@@ -558,38 +566,62 @@ tbody tr:hover { background: var(--surface-2); }
             mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
 }
 
-/* Stat strip under the hero */
-.strip { border-top: 1px solid rgba(255, 255, 255, .12); background: rgba(0, 0, 0, .22); }
-.strip__inner {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 1px; background: rgba(255, 255, 255, .1);
+/* Under the hero this was four boxed cells counting up four big numbers, three
+   of which were invented. It is one line of facts now, each of them counted off
+   the arrays in data.js so it cannot overstate the airline. Same class is used
+   on the fleet page over white, so the colour comes from context. */
+.strip { border-top: 1px solid rgba(255, 255, 255, .14); background: rgba(0, 0, 0, .2); }
+.strip__facts {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1.2rem;
+    padding-block: 1.15rem;
+    font-size: .88rem; color: var(--muted);
 }
-.strip__cell { background: var(--am-navy); padding: 1.6rem clamp(1.15rem, 4vw, 2rem); }
-.strip .stat__num   { color: #fff; }
-.strip .stat__label { color: #93A8C8; }
-@media (min-width: 48rem) { .strip__inner { grid-template-columns: repeat(4, 1fr); } }
+.strip .strip__facts { color: #B7C6DE; padding-block: 1.25rem; }
+.strip__facts span { display: inline-flex; align-items: center; gap: 1.2rem; }
+.strip__facts span + span::before {
+    content: ""; width: 4px; height: 4px; border-radius: 50%;
+    background: currentColor; opacity: .45;
+}
 
-/* ============================ FLEET / ROUTE BITS ========================= */
-.fleet-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
-/* Every fleet panel used to be the same pink gradient. They are now flat
-   livery-and-glyph colours cycled per card, so a grid of aircraft reads as a
-   set. Flat and unpatterned on purpose — this is the one place on the site
-   with six saturated blocks side by side, and texture on top made them noisy. */
+/* ============================ FLEET / ROUTE BITS =========================
+   An aircraft used to be a card: a saturated colour panel with the mark on it,
+   over a bordered rounded box. Six of those in a grid is six blocks. Each type
+   is now a column opened by a RULE in its own livery colour, with the mark
+   small above the name — the colour survives, the block does not. Same move as
+   the ornament: a band along an edge instead of a filled field. */
+.fleet-card {
+    display: flex; flex-direction: column; gap: .35rem;
+    background: none; border: 0; border-radius: 0; padding: 0;
+    border-top: 3px solid var(--am-blue);
+    padding-top: 1.2rem;
+}
+.fleet-card:nth-child(6n+2) { border-top-color: var(--am-jade); }
+.fleet-card:nth-child(6n+3) { border-top-color: var(--am-clay); }
+.fleet-card:nth-child(6n+4) { border-top-color: var(--am-turquoise); }
+.fleet-card:nth-child(6n+5) { border-top-color: var(--am-rosa); }
+.fleet-card:nth-child(6n+6) { border-top-color: var(--am-cobalt); }
+.fleet-card--hover:hover, .fleet-card.card--hover:hover { border-top-color: inherit; }
+
+/* Holds the mark once there is one. Collapses while there isn't, so the
+   coloured rule and the type carry the entry on their own. */
 .fleet-card__media {
-    aspect-ratio: 16 / 9; position: relative; isolation: isolate; overflow: hidden;
-    display: grid; place-items: center;
-    background: var(--am-blue);
+    background: none; aspect-ratio: auto; display: block; overflow: visible;
 }
-.fleet-card__media img { width: 100%; height: 100%; object-fit: cover; position: relative; }
-.fleet-card__media .mark { width: 52%; opacity: .42; color: #fff; }
-.fleet-card:nth-child(6n+2) .fleet-card__media { background: var(--am-jade); }
-.fleet-card:nth-child(6n+3) .fleet-card__media { background: var(--am-clay); }
-.fleet-card:nth-child(6n+4) .fleet-card__media { background: var(--am-turquoise); }
-.fleet-card:nth-child(6n+5) .fleet-card__media { background: var(--am-rosa); }
-.fleet-card:nth-child(6n+6) .fleet-card__media { background: var(--am-cobalt); }
+.fleet-card__media:empty { display: none; }
+.fleet-card__media:not(:empty) { margin-bottom: .9rem; }
+.fleet-card__media .mark { width: 3.4rem; opacity: 1; color: var(--am-blue); }
+.fleet-card:nth-child(6n+2) .fleet-card__media .mark { color: var(--am-jade); }
+.fleet-card:nth-child(6n+3) .fleet-card__media .mark { color: var(--am-clay); }
+.fleet-card:nth-child(6n+4) .fleet-card__media .mark { color: var(--am-turquoise); }
+.fleet-card:nth-child(6n+5) .fleet-card__media .mark { color: var(--am-rosa); }
+.fleet-card:nth-child(6n+6) .fleet-card__media .mark { color: var(--am-cobalt); }
+.fleet-card__media img { width: 100%; height: auto; }
 
-.fleet-card__body { padding: 1.35rem 1.45rem 1.55rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
-.fleet-card__body .type { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em; color: var(--accent); font-weight: 700; }
+.fleet-card__body { padding: 0; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+.fleet-card__body .type {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
+    color: var(--muted); font-weight: 700; text-transform: uppercase;
+}
 .fleet-card__specs {
     display: flex; flex-wrap: wrap; gap: .35rem 1.15rem; margin-top: auto; padding-top: 1rem;
     font-size: .8rem; color: var(--muted);
@@ -618,13 +650,15 @@ tbody tr:hover { background: var(--surface-2); }
 .rank__name { font-family: var(--font-display); font-weight: 700; font-variation-settings: 'SOFT' 40, 'WONK' 1; }
 .rank__hours { margin-left: auto; font-family: var(--font-mono); font-size: .86rem; color: var(--muted); white-space: nowrap; }
 
-/* --- Steps --- */
-.step { display: flex; gap: 1.15rem; }
+/* --- Steps ---
+   Applying really is a sequence — apply, review, callsign, fly — so numbering
+   it carries information rather than decorating it, and the numerals stay.
+   The filled disc behind each one does not. */
+.step { display: flex; gap: 1.1rem; }
 .step__n {
-    width: 2.4rem; height: 2.4rem; border-radius: 999px; flex: none;
-    display: grid; place-items: center;
-    font-family: var(--font-mono); font-size: .84rem; font-weight: 700;
-    background: var(--accent); color: var(--accent-ink);
+    flex: none; min-width: 1.6rem;
+    font-family: var(--font-mono); font-size: 1rem; font-weight: 700;
+    color: var(--accent); font-variant-numeric: tabular-nums;
 }
 
 /* --- Live roster (fed by live.js) --- */
@@ -679,6 +713,11 @@ tbody tr:hover { background: var(--surface-2); }
 }
 .footer ul { list-style: none; padding: 0; display: grid; gap: .6rem; font-size: .92rem; }
 .footer__brand .mark { width: 4rem; margin-bottom: 1.05rem; color: #fff; }
+.footer__wordmark {
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 50, 'WONK' 1;
+    font-size: 1.5rem; letter-spacing: -.02em; color: #fff; margin-bottom: 1.05rem;
+}
 .footer__brand p { font-size: .92rem; max-width: 34ch; }
 /* Hecho en México — the flag, said plainly, at the bottom of every page. */
 .footer__origin {
@@ -700,10 +739,7 @@ tbody tr:hover { background: var(--surface-2); }
 @media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; } }
 
 /* ============================ EMBED FRAMES =============================== */
-.frame-host {
-    border: 1px solid var(--line); border-radius: var(--radius);
-    overflow: hidden; background: var(--surface); box-shadow: var(--shadow);
-}
+.frame-host { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .frame-host iframe { width: 100%; border: 0; display: block; }
 
 .skip {

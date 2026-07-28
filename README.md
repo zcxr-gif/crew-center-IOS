@@ -125,9 +125,18 @@ roster, which is Inflight's embed widget (`assets/js/live.js`) reading Infinite
 Flight traffic for callsigns starting `Aeromexico`. It runs in `roster` mode, so
 it renders no map, needs no Mapbox token, and costs nobody a map load.
 
-Everything else — pilot count, hours flown, fleet sizes, block times — is
-airline data the staff maintain by hand in `assets/js/data.js`. The site does
-not invent numbers.
+**The site states no figure it cannot back.** `data.js` used to carry
+`pilots: 640`, `hoursFlown: 48200`, `flightsFiled: 21400` and a `count` on
+every fleet type, and the home page printed three of them under the hero as
+big animated numerals. All of it was invented — plausible placeholders
+rendered as fact, next to things that were true, which is the worst way to be
+wrong because it reads as authoritative. They are gone.
+
+What the site now states is either **counted off the arrays in this repo**
+(`routes.length` destinations, `fleet.length` types, `hubs.length` hubs — so it
+cannot drift from what the site actually lists) or comes live from the Inflight
+embed. If the VA wants a real pilot count or hours total on the site, wire it to
+the crew center's actual figure. Do not type a number into `data.js`.
 
 `data.js` aircraft `type` strings are the **canonical Infinite Flight API
 names** ("Boeing 787-9 Dreamliner", not "789"). The crew center matches live
@@ -165,23 +174,30 @@ frame never loading and swaps in a direct link — deliberately, rather than
 showing an empty box. If that fallback starts firing for everyone, make
 `crew.html` a branded launcher instead of a frame.
 
-**The mark is a placeholder and is waiting on a trace.** `assets/img/mark.svg`
-is currently a hand-reconstruction of the Caballero Águila drawn by eye — close
-in structure, not accurate in line. Do not try to fix it by nudging path data;
-two passes of that produced a blob. Replace it properly:
+**There is no logo in the repo, deliberately.** Until the airline's own
+Caballero Águila artwork is committed, the brand lockup is the wordmark plus the
+tricolour — both real. An earlier pass shipped a hand-drawn eagle standing in
+for it; a drawn-from-memory approximation of a real mark is worse than no mark,
+because it looks like the airline chose it. It was removed rather than refined.
 
-```bash
-# drop the logo bitmap in first — clean, 2-colour, 1000px+ on the long edge
-convert assets/img/mark-source.png -threshold 60% -negate pbm:- \
-  | potrace --svg --turdsize 8 --alphamax 1 -o assets/img/mark.svg
-```
+**Adding the real logo is one file.** `brand.css` paints `assets/img/mark.svg`
+through a CSS mask (`.mark`), the same way it handles `greca.svg` and
+`serpent.svg`, so one file recolours every placement — nav, footer, hero
+watermark, favicon — and there is no second copy of the geometry to keep in
+step. To add it:
 
-Then set the paths to `fill="currentColor"`, drop the `width`/`height` so the
-`viewBox` alone drives scaling, and **paste the same geometry into the `MARK`
-constant in `assets/js/site.js`** — that copy is what the injected nav and
-footer render, and if the two drift the chrome and the favicon disagree. The
-mark is not square (currently 1300 × 730), so size it by width everywhere and
-leave height to the aspect ratio.
+1. Put the artwork at `assets/img/mark.svg`. From a bitmap:
+   ```bash
+   convert logo.png -threshold 60% -negate pbm:- \
+     | potrace --svg --turdsize 8 --alphamax 1 -o assets/img/mark.svg
+   ```
+2. Flip `HAS_MARK` to `true` in `assets/js/site.js`.
+3. Set `--mark-ratio` in `brand.css` to the artwork's real width/height.
+4. Re-add the favicon and `og:image` links in the page heads.
+
+The mask needs the logo's white cut-lines to be **actual holes**
+(`fill-rule="evenodd"`), not white-filled shapes — otherwise they will paint
+solid. `potrace` produces holes correctly from a clean two-colour bitmap.
 
 `assets/img/serpent.svg` *is* original — drawn from scratch, not traced from
 and not reproducing the XA-ADL nose art. Keep it that way.

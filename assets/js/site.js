@@ -11,24 +11,28 @@
 (function () {
     'use strict';
 
-    // ---- The mark (kept in step with assets/img/mark.svg) -------------------
-    // See that file for what each shape is doing, why none of them is optional,
-    // and — importantly — that it is an interim hand-reconstruction waiting to
-    // be replaced by a proper trace of the airline's own artwork. When that
-    // lands, this constant has to be updated with it or the injected chrome and
-    // the favicon will disagree.
+    // ---- The mark -----------------------------------------------------------
+    // THE REAL LOGO IS NOT IN THIS REPO YET, and nothing here invents one.
     //
-    // The viewBox is 1300 x 730, NOT square. Size it by width and leave height
-    // to the aspect ratio; forcing a square height squashes the profile.
-    const MARK = `<svg class="mark" viewBox="0 0 1300 730" aria-hidden="true">
-        <g fill="currentColor">
-            <path fill-rule="evenodd" d="M296 96C340 52 430 20 548 20c112 0 210 34 268 92 34 34 58 74 68 108-46-30-104-40-160-28 56-4 110 10 148 40 22 44 18 96-12 128-26-64-84-104-160-112-30-3-56-2-78 2-52 10-96 34-132 68-30 28-56 62-78 100-30-50-64-88-104-114-40-26-84-40-132-42 12-72 44-134 92-176ZM690 112c46-14 96-12 138 6-40 24-92 30-138 14Z"/>
-            <path d="M700 292c40-10 84-12 122-6 22 4 38 12 48 24 14 18 26 44 36 68 8 20 14 34 20 42 6 8 8 16 4 22-4 6-14 10-24 12 4 10 4 20-2 26-4 4-10 6-14 8 6 12 4 24-6 32-8 6-18 8-26 8 2 14-2 26-14 34-20 14-56 20-96 18-34-2-62-12-80-28-16-14-26-34-30-58-6-40 2-84 20-124 10-22 24-42 42-58Z"/>
-            <path d="M636 300c-70 22-136 66-190 128-44 50-76 110-92 172 42-6 84-24 122-52 52-38 94-92 122-154 20-44 32-84 38-114Z"/>
-            <path d="M618 306c-84 34-158 90-212 162-40 54-66 116-76 178 40-10 78-32 112-64 50-46 88-106 114-172 16-40 26-76 30-104Z"/>
-            <path d="M654 316c-6 74-4 148 6 218 6 42 16 78 30 108-26-16-48-42-64-76-22-46-32-102-30-160 2-38 8-70 18-96 10-26 24-44 40-56Z"/>
-        </g>
-    </svg>`;
+    // Until the airline's own Caballero Águila artwork is committed, the brand
+    // lockup is the wordmark plus the tricolour — both of which are real. An
+    // earlier pass shipped a hand-drawn eagle standing in for the logo; a
+    // drawn-from-memory approximation of a real mark is worse than no mark,
+    // because it looks like the airline chose it.
+    //
+    // TO DROP THE REAL LOGO IN, there is exactly one file to touch:
+    //     assets/img/mark.svg
+    // brand.css paints it through a CSS mask (.mark), the same way it handles
+    // greca.svg and serpent.svg, so one file recolours everywhere — nav,
+    // footer, watermark, favicon — and there is no second copy in this file to
+    // keep in step. Set --mark-ratio in brand.css to the artwork's real
+    // width/height. The mask needs the white cut-lines to be actual holes
+    // (fill-rule="evenodd"), not white-filled shapes; potrace produces holes
+    // correctly from a two-colour bitmap.
+    const HAS_MARK = false;
+    const MARK = HAS_MARK
+        ? '<span class="mark" role="img" aria-label="Aeromexico Virtual"></span>'
+        : '';
 
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------
     const P = {
@@ -93,7 +97,7 @@
         <nav class="nav" id="siteNav">
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" aria-label="Aeromexico Virtual — home">
-                    ${MARK}
+                    ${MARK || '<span class="flag" aria-hidden="true"></span>'}
                     <span class="wordmark"><b>Aeromexico</b><span>Virtual</span></span>
                 </a>
                 <div class="nav__links">${links}</div>
@@ -148,7 +152,7 @@
             <div class="wrap">
                 <div class="footer__grid">
                     <div class="footer__brand">
-                        ${MARK}
+                        ${MARK || '<p class="footer__wordmark">Aeromexico Virtual</p>'}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network — from
                            Mexico City across the Americas, Europe and the Pacific.</p>
                         <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>
