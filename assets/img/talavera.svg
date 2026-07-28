@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  talavera.svg — the Puebla azulejo tile.
+
+  Talavera poblana lays an eight-point star (estrella de ocho puntas — two
+  squares at 45° to each other) on a field, with a small rotated square at each
+  corner so that four neighbouring tiles close a diamond between them. That
+  corner trick is why the pattern reads as continuous tilework rather than as a
+  grid of separate stamps, so the corner diamonds are not decoration you can
+  drop — they are the join.
+
+  MONOCHROME ON PURPOSE — brand.css loads this as a CSS mask (`.talavera`) and
+  paints through it with a brand token. Real Talavera is cobalt on cream; the
+  colour decision lives in CSS, not here.
+
+  The star is 16 points stepped every 22.5°, alternating between an outer
+  radius of 16 and an inner radius of 6.6 about the tile centre (32, 32).
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <g fill="#000">
+    <!-- Eight-point star. -->
+    <path d="M48 32 38.1 34.5 43.3 43.3 34.5 38.1 32 48 29.5 38.1 20.7 43.3
+             25.9 34.5 16 32 25.9 29.5 20.7 20.7 29.5 25.9 32 16 34.5 25.9
+             43.3 20.7 38.1 29.5Z"/>
+    <!-- Corner quarters — four tiles meet to close one diamond. -->
+    <path d="M0 -7 7 0 0 7 -7 0Z"/>
+    <path d="M64 -7 71 0 64 7 57 0Z"/>
+    <path d="M0 57 7 64 0 71 -7 64Z"/>
+    <path d="M64 57 71 64 64 71 57 64Z"/>
+    <!-- Dots in the four quadrant gaps. Talavera fills its field; without
+         these the tile reads as a sparse grid of stamps rather than texture. -->
+    <circle cx="14" cy="14" r="2.4"/><circle cx="50" cy="14" r="2.4"/>
+    <circle cx="14" cy="50" r="2.4"/><circle cx="50" cy="50" r="2.4"/>
+  </g>
+  <!-- Hairline field lines, the drawn grout of a tiled wall. -->
+  <g fill="none" stroke="#000" stroke-width="1" opacity=".55">
+    <path d="M0 0H64V64H0Z"/>
+  </g>
+</svg>

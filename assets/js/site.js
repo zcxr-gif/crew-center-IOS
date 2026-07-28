@@ -83,6 +83,7 @@
         ).join('');
 
         host.innerHTML = `
+        <div class="flagline" aria-hidden="true"></div>
         <nav class="nav" id="siteNav">
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" aria-label="Aeromexico Virtual — home">
@@ -137,12 +138,14 @@
     function renderFooter(host) {
         host.innerHTML = `
         <footer class="footer">
+            <div class="footer__frieze" aria-hidden="true"></div>
             <div class="wrap">
                 <div class="footer__grid">
                     <div class="footer__brand">
                         ${MARK}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network — from
                            Mexico City across the Americas, Europe and the Pacific.</p>
+                        <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>
                     </div>
                     <div>
                         <h4>Airline</h4>

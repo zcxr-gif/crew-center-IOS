@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aeromexico Virtual — Fly the Eagle Warrior</title>
 <meta name="description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
-<meta name="theme-color" content="#0C2C64">
+<meta name="theme-color" content="#0A1D3B">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
@@ -13,12 +13,13 @@
 <meta property="og:image" content="/assets/img/mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Fonts load asynchronously. A render-blocking third-party stylesheet also
-     blocks the body scripts that inject the nav and footer, so a slow or
-     unreachable fonts.googleapis.com would leave the page chrome missing, not
-     merely unstyled. display=swap shows text in the fallback and swaps in. -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/brand.css">
 <script>
 /* Paint the stored theme before first paint so there's no light flash. */
@@ -55,6 +56,9 @@
                 <a class="btn btn--onink" href="/network">Explore the network</a>
             </div>
         </div>
+        <!-- The frieze sits on the seam where the navy meets the stat strip —
+             which is where a building would carry one too. -->
+        <div class="hero__frieze" aria-hidden="true"></div>
         <div class="strip">
             <div class="wrap" style="padding:0">
                 <div class="strip__inner" id="heroStats"></div>
@@ -156,6 +160,7 @@
 
     <!-- ==================== NETWORK ==================== -->
     <section class="section section--ink">
+        <div class="talavera" aria-hidden="true"></div>
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">The network</span>
@@ -165,7 +170,7 @@
                 </p>
             </div>
             <div class="grid grid-3" style="margin-bottom:2.5rem" id="hubList"></div>
-            <div class="table-scroll" data-reveal style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.14)">
+            <div class="table-scroll" data-reveal>
                 <table id="routePreview">
                     <thead><tr><th>Route</th><th>Destination</th><th>Region</th><th>Aircraft</th><th>Block</th></tr></thead>
                     <tbody></tbody>
@@ -215,9 +220,16 @@
         </div>
     </section>
 
-    <!-- ==================== CTA ==================== -->
+    <!-- ==================== CTA ====================
+         The bunting hangs directly above the band, so the cut edge of the
+         paper reads against the navy. This is the only papel picado on the
+         site — strung across every section it stops being a fiesta and starts
+         being wallpaper. -->
+    <div class="papel" aria-hidden="true"></div>
     <section class="band">
         <div class="band__wash"></div>
+        <div class="band__tile"></div>
+        <div class="band__serpent"></div>
         <div class="wrap band__inner">
             <h2>The eagle flies at 0600. Be on it.</h2>
             <p>Applications take about three minutes and get a human answer inside 48 hours.</p>
@@ -259,7 +271,7 @@
     const top = D.fleet.slice().sort((a, b) => b.count - a.count).slice(0, 3);
     document.getElementById('fleetPreview').innerHTML = top.map((a, i) => `
         <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${i * 80}">
-            <div class="fleet-card__media">${window.AMV.MARK.replace('class="mark"', 'class="mark" style="color:#fff"')}</div>
+            <div class="fleet-card__media">${window.AMV.MARK}</div>
             <div class="fleet-card__body">
                 <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
                 <h3>${esc(a.type)}</h3>
@@ -273,14 +285,15 @@
         </article>`).join('');
 
     // ---- Hubs ----
+    // No inline colours here — brand.css styles cards, icons and tags inside a
+    // .section--ink, so this markup is the same as it is on a light section.
     document.getElementById('hubList').innerHTML = D.hubs.map((h, i) => `
-        <article class="card" data-reveal data-reveal-delay="${i * 80}"
-                 style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)">
-            <div class="card__icon" style="background:rgba(255,255,255,.1);color:#fff">${icon('pin')}</div>
+        <article class="card" data-reveal data-reveal-delay="${i * 80}">
+            <div class="card__icon">${icon('pin')}</div>
             <span class="tag tag--hub">${esc(h.role)}</span>
             <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
-            <p style="color:#93A4C2">${esc(h.name)}</p>
-            <p class="mono" style="margin-top:.7rem;color:#fff;font-size:.85rem">${esc(h.icao)} · ${esc(h.iata)}</p>
+            <p>${esc(h.name)}</p>
+            <p class="mono" style="margin-top:.7rem;font-size:.86rem">${esc(h.icao)} · ${esc(h.iata)}</p>
         </article>`).join('');
 
     // ---- Route preview: the six longest sectors ----

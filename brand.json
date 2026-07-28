@@ -16,42 +16,44 @@
     "network": "Infinite Flight"
   },
 
+  "$comment_motifs": "Only design TOKENS cross this boundary — the crew center maps each key onto a CSS custom property, and nothing here is ever interpreted as CSS. The site's ornament (greca, talavera, papel picado, the Quetzalcóatl watermark) is drawn in assets/img/ and does not travel. What travels is the palette, the type and the shape, which is enough for the two products to read as one airline.",
+
   "theme": {
     "mode": "auto",
 
-    "font": "Inter",
-    "displayFont": "Sora",
+    "font": "Karla",
+    "displayFont": "Fraunces",
     "monoFont": "JetBrains Mono",
 
-    "radius": 14,
+    "radius": 18,
 
-    "$comment_gradient": "Stored as the ARGUMENTS to linear-gradient(), not the whole function. The crew center wraps it, so nothing but colours, angles and stops can cross the boundary.",
-    "gradient": "115deg, #0C2C64 0%, #6B2A72 52%, #E5417E 100%",
+    "$comment_gradient": "Stored as the ARGUMENTS to linear-gradient(), not the whole function. The crew center wraps it, so nothing but colours, angles and stops can cross the boundary. Deliberately ONE hue now: this is a depth wash for dark panels, not decoration. The old blue → plum → pink sweep is gone on purpose — see the header of assets/brand.css.",
+    "gradient": "168deg, #0A1D3B 0%, #0C2C64 58%, #103A7A 100%",
 
     "light": {
-      "bg":        "#F5F2ED",
-      "surface":   "#FFFFFF",
-      "surface2":  "#FBF9F6",
-      "line":      "#E3DED4",
-      "lineSoft":  "#EEEAE2",
-      "ink":       "#101828",
-      "muted":     "#5C6577",
-      "faint":     "#98A0B0",
+      "bg":        "#FAF5EC",
+      "surface":   "#FFFDF9",
+      "surface2":  "#F6F0E4",
+      "line":      "#E6DCC8",
+      "lineSoft":  "#F0E9DA",
+      "ink":       "#16233A",
+      "muted":     "#5E6577",
+      "faint":     "#9AA0AC",
       "accent":    "#0C2C64",
       "accentInk": "#FFFFFF"
     },
 
     "dark": {
-      "bg":        "#08111F",
-      "surface":   "#0E2039",
-      "surface2":  "#10253F",
-      "line":      "#1E3557",
-      "lineSoft":  "#172B48",
-      "ink":       "#EAF0FA",
-      "muted":     "#97A6BF",
-      "faint":     "#61728E",
-      "accent":    "#5B86D6",
-      "accentInk": "#08111F"
+      "bg":        "#071426",
+      "surface":   "#0D2138",
+      "surface2":  "#10273F",
+      "line":      "#1E3556",
+      "lineSoft":  "#17293F",
+      "ink":       "#EEF2F8",
+      "muted":     "#9CACC4",
+      "faint":     "#64768F",
+      "accent":    "#7FA6E8",
+      "accentInk": "#071426"
     }
   }
 }

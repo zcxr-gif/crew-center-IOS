@@ -7,85 +7,137 @@
    pages render in this exact design system. Change a value here, change it in
    brand.json, and the crew center follows. Nothing else should hard-code a
    colour.
+
+   ---------------------------------------------------------------------------
+   THE ONE RULE: COLOUR COMES FROM PATTERN, NOT FROM GRADIENTS.
+
+   This site used to lean on a single blue → plum → pink sweep, blurred behind
+   the hero, painted across the CTA band, clipped into the headline text, and
+   used as the fill of every fleet card. Plus a dot-grid. That combination is
+   the house style of software that has never been art-directed, and it said
+   nothing whatsoever about a Mexican airline.
+
+   So the sweep is gone. What carries decoration now is real ornament, drawn as
+   geometry in assets/img/ and documented there:
+
+     greca.svg     the step-fret band off the stone friezes at Mitla
+     talavera.svg  the eight-point star of a Puebla azulejo
+     papel.svg     papel picado, cut-paper fiesta bunting
+     serpent.svg   Quetzalcóatl, after the nose art on Aeroméxico's XA-ADL
+
+   The palette is the livery (navy, blue, that red) plus the colours the
+   Quetzalcóatl 787 actually wears. The paper is a warm lime-washed off-white,
+   not a clinical grey. And the national tricolour runs across the top of every
+   page and under every eyebrow — hard stops, never a blend.
+
+   If you are adding something and you reach for a multi-hue gradient, reach
+   for a motif instead. That is the whole design.
    ========================================================================== */
 
 :root {
-    /* ---- Core palette (Aeroméxico livery) ---------------------------------- */
-    --am-navy:      #0B1E3D;   /* darkest — footer, deep sections            */
-    --am-blue:      #0C2C64;   /* primary brand blue                        */
-    --am-blue-600:  #12419A;   /* lifted blue — hovers, links               */
-    --am-blue-300:  #5B86D6;   /* on-dark blue text                         */
-    --am-red:       #E4002B;   /* Aeroméxico red                            */
-    --am-pink:      #E5417E;   /* gradient terminus                         */
-    --am-plum:      #6B2A72;   /* gradient midpoint                         */
-    --am-sand:      #F5F2ED;   /* warm paper                                */
-    --am-ink:       #101828;
+    /* ---- Livery ------------------------------------------------------------ */
+    --am-navy:      #0A1D3B;   /* tail navy — deep sections, footer           */
+    --am-blue:      #0C2C64;   /* primary brand blue                          */
+    --am-blue-600:  #123F8C;   /* lifted blue — hovers, links                 */
+    --am-blue-300:  #7FA6E8;   /* on-dark blue text                           */
+    --am-red:       #D8102F;   /* the fuselage swoosh                         */
 
-    /* The livery sweep: blue → plum → pink. Used for hero washes and rules.  */
-    --am-gradient: linear-gradient(115deg, var(--am-blue) 0%, var(--am-plum) 52%, var(--am-pink) 100%);
+    /* ---- Quetzalcóatl ------------------------------------------------------
+       The glyphs down the side of XA-ADL. These are accent colours for tags,
+       fleet panels and papel picado — never body text, never large fields. */
+    --am-jade:      #0E8C5A;
+    --am-turquoise: #0E9BAA;
+    --am-rosa:      #D6337E;   /* rosa mexicano                               */
+    --am-marigold:  #F2A03D;   /* cempasúchil                                 */
+    --am-clay:      #C05A2E;   /* barro                                       */
+    --am-cobalt:    #1B5FC1;   /* talavera poblana                            */
 
-    /* ---- Semantic surface tokens (light) ---------------------------------- */
-    --bg:         var(--am-sand);
-    --bg-alt:     #FFFFFF;
-    --surface:    #FFFFFF;
-    --surface-2:  #FBF9F6;
-    --line:       #E3DED4;
-    --line-soft:  #EEEAE2;
+    /* ---- Bandera ----------------------------------------------------------
+       The official flag greens and reds, kept separate from the livery reds
+       so nobody "tidies up" the palette by merging them. They are not ours. */
+    --mx-green:     #006847;
+    --mx-red:       #CE1126;
+
+    /* ---- Paper ------------------------------------------------------------- */
+    --am-cal:       #FAF5EC;   /* a lime-washed wall                          */
+    --am-ink:       #16233A;
+
+    /* The hero/band depth wash. Deliberately ONE hue, dark to slightly less
+       dark — it adds depth without becoming decoration. Ornament is the job
+       of the motifs, not of this. */
+    --am-wash: linear-gradient(168deg, #0A1D3B 0%, #0C2C64 58%, #103A7A 100%);
+
+    /* ---- Semantic surfaces (light) ----------------------------------------- */
+    --bg:         var(--am-cal);
+    --bg-alt:     #FFFCF6;
+    --surface:    #FFFDF9;
+    --surface-2:  #F6F0E4;
+    --line:       #E6DCC8;
+    --line-soft:  #F0E9DA;
     --ink:        var(--am-ink);
-    --muted:      #5C6577;
-    --faint:      #98A0B0;
+    --muted:      #5E6577;
+    --faint:      #9AA0AC;
     --accent:     var(--am-blue);
-    --accent-ink: #FFFFFF;     /* text that sits on --accent               */
+    --accent-ink: #FFFFFF;     /* text that sits on --accent                  */
 
-    /* ---- Type ------------------------------------------------------------- */
-    --font-display: 'Sora', 'Inter', system-ui, sans-serif;
-    --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+    /* ---- Type --------------------------------------------------------------
+       Fraunces is a soft, slightly wonky old-style — it carries the warmth the
+       brief asked for and it is nobody's default. Karla sets text underneath
+       it. JetBrains Mono stays: flight levels, block times, ICAO codes and
+       registrations all want tabular figures. */
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-body:    'Karla', system-ui, -apple-system, sans-serif;
     --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
-    /* ---- Shape & motion --------------------------------------------------- */
-    --radius:    14px;
-    --radius-sm: 9px;
-    --radius-lg: 22px;
+    /* ---- Shape & motion ----------------------------------------------------
+       Bigger radii and warm-tinted shadows. The old shadows were mixed from
+       navy, which on warm paper reads as grey damp; these are mixed from the
+       paper's own brown so edges soften instead of dirtying. */
+    --radius:    18px;
+    --radius-sm: 11px;
+    --radius-lg: 28px;
     --ease:      cubic-bezier(.2, .8, .2, 1);
-    --shadow:    0 1px 2px rgba(11, 30, 61, .04), 0 8px 28px -12px rgba(11, 30, 61, .16);
-    --shadow-lg: 0 24px 60px -20px rgba(11, 30, 61, .34);
+    --shadow:    0 1px 2px rgba(58, 42, 20, .05), 0 10px 30px -14px rgba(58, 42, 20, .18);
+    --shadow-lg: 0 28px 70px -24px rgba(58, 42, 20, .30);
 
     --maxw: 1180px;
     color-scheme: light dark;
 }
 
-/* ---- Dark ---------------------------------------------------------------- */
+/* ---- Dark ----------------------------------------------------------------
+   Night over the valley, not a grey dashboard: the paper goes to the same
+   navy the tail is painted in, so the livery still reads. */
 :root[data-theme="dark"] {
-    --bg:        #08111F;
-    --bg-alt:    #0B1930;
-    --surface:   #0E2039;
-    --surface-2: #10253F;
-    --line:      #1E3557;
-    --line-soft: #172B48;
-    --ink:       #EAF0FA;
-    --muted:     #97A6BF;
-    --faint:     #61728E;
-    --accent:    #5B86D6;
-    --accent-ink:#08111F;
-    --shadow:    0 1px 2px rgba(0, 0, 0, .3), 0 8px 28px -12px rgba(0, 0, 0, .6);
-    --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, .7);
+    --bg:        #071426;
+    --bg-alt:    #0A1B31;
+    --surface:   #0D2138;
+    --surface-2: #10273F;
+    --line:      #1E3556;
+    --line-soft: #17293F;
+    --ink:       #EEF2F8;
+    --muted:     #9CACC4;
+    --faint:     #64768F;
+    --accent:    var(--am-blue-300);
+    --accent-ink:#071426;
+    --shadow:    0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px -14px rgba(0, 0, 0, .6);
+    --shadow-lg: 0 28px 70px -24px rgba(0, 0, 0, .7);
 }
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --bg:        #08111F;
-        --bg-alt:    #0B1930;
-        --surface:   #0E2039;
-        --surface-2: #10253F;
-        --line:      #1E3557;
-        --line-soft: #172B48;
-        --ink:       #EAF0FA;
-        --muted:     #97A6BF;
-        --faint:     #61728E;
-        --accent:    #5B86D6;
-        --accent-ink:#08111F;
-        --shadow:    0 1px 2px rgba(0, 0, 0, .3), 0 8px 28px -12px rgba(0, 0, 0, .6);
-        --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, .7);
+        --bg:        #071426;
+        --bg-alt:    #0A1B31;
+        --surface:   #0D2138;
+        --surface-2: #10273F;
+        --line:      #1E3556;
+        --line-soft: #17293F;
+        --ink:       #EEF2F8;
+        --muted:     #9CACC4;
+        --faint:     #64768F;
+        --accent:    var(--am-blue-300);
+        --accent-ink:#071426;
+        --shadow:    0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px -14px rgba(0, 0, 0, .6);
+        --shadow-lg: 0 28px 70px -24px rgba(0, 0, 0, .7);
     }
 }
 
@@ -99,7 +151,8 @@ body {
     font-family: var(--font-body);
     background: var(--bg);
     color: var(--ink);
-    line-height: 1.6;
+    font-size: 1.02rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
 }
@@ -118,39 +171,161 @@ button, input, select, textarea { font: inherit; color: inherit; }
     }
 }
 
-/* ============================ TYPE ======================================= */
-h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; line-height: 1.1; letter-spacing: -.025em; }
-h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
-h2 { font-size: clamp(1.75rem, 3.6vw, 2.6rem); }
-h3 { font-size: clamp(1.15rem, 1.8vw, 1.4rem); letter-spacing: -.015em; }
+/* ============================ MOTIFS =====================================
+   The four ornaments, and the tricolour.
 
-.eyebrow {
-    font-size: .69rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .2em; color: var(--muted);
+   greca, talavera and serpent are loaded as CSS MASKS over a plain background
+   colour, so one monochrome file serves every colour and both themes — set
+   `color` (or override `background`) on the element and the motif follows.
+   Give them a `background-image` instead and they will be stuck black.
+
+   papel picado is the exception and is a real background-image: fiesta colour
+   is not brand colour, it does not re-tint, and it is the same in the dark.
+   ========================================================================= */
+
+/* The step-fret band. Used as a rule, and as the edge of dark sections. */
+.greca {
+    height: 18px;
+    background: currentColor;
+    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
 }
-.lede  { font-size: clamp(1rem, 1.5vw, 1.16rem); color: var(--muted); max-width: 62ch; }
+.greca--sm { height: 13px; }
+.greca--lg { height: 26px; }
+
+/* Azulejo texture. Absolute, so it needs a positioned parent; it is a wash,
+   never a foreground. Opacity is the only thing that should vary.
+
+   The tile is large and the opacity low on purpose. Small and bright, an
+   eight-point star stops reading as tilework and starts reading as a sparkle
+   field — which is the exact generic-decoration problem this redesign exists
+   to remove. If it catches your eye before the text does, it is too strong. */
+.talavera {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: currentColor;
+    -webkit-mask: url('/assets/img/talavera.svg') repeat left top / 104px 104px;
+            mask: url('/assets/img/talavera.svg') repeat left top / 104px 104px;
+    opacity: .05;
+}
+
+/* Cut-paper bunting. Hangs from the top edge of whatever it is dropped into.
+   Use it ONCE per page — strung across every section it stops being a fiesta
+   and starts being wallpaper. */
+.papel {
+    height: 62px;
+    background: url('/assets/img/papel.svg') repeat-x left top / auto 100%;
+}
+
+/* Quetzalcóatl, as a watermark. */
+.serpent {
+    background: currentColor;
+    -webkit-mask: url('/assets/img/serpent.svg') no-repeat center / contain;
+            mask: url('/assets/img/serpent.svg') no-repeat center / contain;
+}
+
+/* La bandera. Hard stops at the thirds — this is a flag, and a flag does not
+   have a gradient in it. Runs full-bleed across the top of every page. */
+.flagline {
+    height: 5px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 -1px 0 rgba(22, 35, 58, .12);
+}
+.flag {
+    width: 1.6rem; height: 1.1rem; border-radius: 3px; flex: none;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .14);
+}
+
+/* ============================ TYPE ======================================= */
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variation-settings: 'SOFT' 40, 'WONK' 1;
+    line-height: 1.12;
+    letter-spacing: -.018em;
+}
+h1 { font-size: clamp(2.4rem, 6vw, 4.1rem); font-variation-settings: 'SOFT' 60, 'WONK' 1; }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.7rem); }
+h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
+
+/* The eyebrow carries the tricolour tick. It appears above almost every
+   section on the site, so this one detail ties the whole thing to Mexico
+   without any single page having to shout about it. */
+.eyebrow {
+    display: inline-flex; align-items: center; gap: .6rem;
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .16em; color: var(--muted);
+}
+/* The hairline is load-bearing, not a nicety: the middle band of the flag is
+   white, and on warm paper a bare white band disappears into the page and
+   leaves a green dash and a red dash with a hole between them. The outline
+   gives the white something to be white against. Same reason .flag has one. */
+.eyebrow::before {
+    content: ""; width: 1.6rem; height: 5px; border-radius: 2px; flex: none;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 0 0 1px rgba(22, 35, 58, .18);
+}
+:root[data-theme="dark"] .eyebrow::before { box-shadow: none; }
+
+.lede  { font-size: clamp(1.04rem, 1.5vw, 1.19rem); color: var(--muted); max-width: 62ch; }
 .muted { color: var(--muted); }
 .faint { color: var(--faint); }
 .mono  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .num   { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 
-.grad-text {
-    background: var(--am-gradient);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent; color: transparent;
-}
+/* Was a gradient clipped into the text. Now it is simply the livery red —
+   the class name is kept because the pages already use it. On the navy hero
+   red goes muddy, so there it takes the marigold instead. */
+.grad-text { color: var(--am-red); }
+.hero .grad-text, .band .grad-text, .section--ink .grad-text { color: var(--am-marigold); }
 
 /* ============================ LAYOUT ===================================== */
 .wrap    { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: clamp(1.15rem, 4vw, 2rem); }
 .section { padding-block: clamp(3.5rem, 8vw, 7rem); }
 .section--tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
 .section--alt   { background: var(--bg-alt); }
-.section--ink   { background: var(--am-navy); color: #EAF0FA; }
-.section--ink .muted { color: #93A4C2; }
-.section--ink .eyebrow { color: #93A4C2; }
+.section--ink   { position: relative; isolation: isolate; background: var(--am-navy); color: #EEF2F8; }
+.section--ink .muted   { color: #9DB0CE; }
+.section--ink .eyebrow { color: #9DB0CE; }
+
+/* Surfaces inside a navy section. Cards and tables default to warm paper, and
+   dropped onto navy they came out as bright cream slabs; the pages used to
+   patch that with inline rgba() on every element. It belongs here instead, so
+   a new dark section is right without anyone remembering the incantation.
+   These are also opaque enough to sit ON the azulejo rather than let it show
+   through the middle of a route table. */
+.section--ink .card {
+    background: color-mix(in srgb, #FFF 6%, var(--am-navy));
+    border-color: rgba(255, 255, 255, .13);
+}
+.section--ink .card p       { color: #9DB0CE; }
+.section--ink .card__icon   { background: rgba(255, 255, 255, .1); color: #fff; }
+.section--ink .card--hover:hover { border-color: rgba(255, 255, 255, .34); }
+
+.section--ink .table-scroll {
+    background: color-mix(in srgb, #FFF 5%, var(--am-navy));
+    border-color: rgba(255, 255, 255, .14);
+}
+.section--ink thead th {
+    background: color-mix(in srgb, #FFF 9%, var(--am-navy)); color: #B7C6DE;
+    border-bottom-color: rgba(255, 255, 255, .14);
+}
+.section--ink tbody td       { border-bottom-color: rgba(255, 255, 255, .09); }
+.section--ink tbody tr:hover { background: rgba(255, 255, 255, .05); }
+
+.section--ink .tag {
+    background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .16); color: #C3D0E4;
+}
+.section--ink .tag--hub {
+    background: color-mix(in srgb, var(--am-red) 30%, transparent);
+    border-color: transparent; color: #FFC2CB;
+}
 
 .head { max-width: 60ch; margin-bottom: clamp(2rem, 4vw, 3rem); }
-.head .eyebrow { display: block; margin-bottom: .85rem; }
+.head .eyebrow { display: inline-flex; margin-bottom: .85rem; }
 .head p { margin-top: .9rem; }
 
 .grid { display: grid; gap: clamp(1rem, 2vw, 1.4rem); }
@@ -160,21 +335,24 @@ h3 { font-size: clamp(1.15rem, 1.8vw, 1.4rem); letter-spacing: -.015em; }
 
 /* ============================ COMPONENTS ================================= */
 
-/* --- Buttons --- */
+/* --- Buttons ---
+   Sentence case. The old buttons were UPPERCASE at .13em tracking, which is
+   the single most generic control on the internet; at this size the words are
+   also easier to read. */
 .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
-    padding: .82rem 1.6rem; border-radius: 999px; border: 1px solid transparent;
-    font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .13em;
+    padding: .86rem 1.7rem; border-radius: 999px; border: 1px solid transparent;
+    font-size: .95rem; font-weight: 700; letter-spacing: -.005em;
     cursor: pointer; white-space: nowrap;
     transition: transform .25s var(--ease), background .25s var(--ease),
                 border-color .25s var(--ease), color .25s var(--ease), box-shadow .25s var(--ease);
 }
 .btn:hover  { transform: translateY(-2px); }
 .btn:active { transform: translateY(0); }
-.btn svg    { width: 1em; height: 1em; flex: none; }
+.btn svg    { width: 1.05em; height: 1.05em; flex: none; }
 
 .btn--primary { background: var(--am-blue); color: #fff; box-shadow: var(--shadow); }
-.btn--primary:hover { background: var(--am-red); box-shadow: 0 14px 34px -12px rgba(228, 0, 43, .6); }
+.btn--primary:hover { background: var(--am-red); box-shadow: 0 14px 34px -14px rgba(216, 16, 47, .6); }
 
 .btn--ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn--ghost:hover { border-color: var(--ink); background: var(--surface); }
@@ -182,38 +360,52 @@ h3 { font-size: clamp(1.15rem, 1.8vw, 1.4rem); letter-spacing: -.015em; }
 .btn--light { background: #fff; color: var(--am-navy); }
 .btn--light:hover { background: var(--am-red); color: #fff; }
 
-.btn--onink { background: rgba(255, 255, 255, .1); color: #fff; border-color: rgba(255, 255, 255, .22); }
+.btn--onink { background: rgba(255, 255, 255, .1); color: #fff; border-color: rgba(255, 255, 255, .26); }
 .btn--onink:hover { background: #fff; color: var(--am-navy); border-color: #fff; }
 
-.btn--sm { padding: .6rem 1.15rem; font-size: .7rem; }
+.btn--sm { padding: .6rem 1.2rem; font-size: .86rem; }
 
 /* --- Cards --- */
 .card {
     background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: clamp(1.3rem, 2.4vw, 1.75rem);
+    border-radius: var(--radius); padding: clamp(1.4rem, 2.4vw, 1.85rem);
     transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.card--hover:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--shadow); }
-.card__icon {
-    width: 2.6rem; height: 2.6rem; border-radius: var(--radius-sm);
-    display: grid; place-items: center; margin-bottom: 1.1rem;
-    background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);
+.card--hover:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+    box-shadow: var(--shadow);
 }
-.card__icon svg { width: 1.3rem; height: 1.3rem; }
+.card__icon {
+    width: 2.8rem; height: 2.8rem; border-radius: var(--radius-sm);
+    display: grid; place-items: center; margin-bottom: 1.15rem;
+    background: color-mix(in srgb, var(--accent) 11%, transparent); color: var(--accent);
+}
+.card__icon svg { width: 1.35rem; height: 1.35rem; }
 .card h3 { margin-bottom: .5rem; }
-.card p  { color: var(--muted); font-size: .94rem; }
+.card p  { color: var(--muted); font-size: .96rem; }
+
+/* Icon tiles cycle through the Quetzalcóatl glyph colours. A grid of six
+   identical pale-blue squares is the flattest thing on a page; six flat
+   colours off the aircraft makes the same grid read as a set. Cards inside a
+   navy section opt out above — polychrome on navy just muddies. */
+.section:not(.section--ink) .grid > .card:nth-child(6n+2) .card__icon { background: color-mix(in srgb, var(--am-jade) 14%, transparent);      color: var(--am-jade); }
+.section:not(.section--ink) .grid > .card:nth-child(6n+3) .card__icon { background: color-mix(in srgb, var(--am-clay) 14%, transparent);      color: var(--am-clay); }
+.section:not(.section--ink) .grid > .card:nth-child(6n+4) .card__icon { background: color-mix(in srgb, var(--am-turquoise) 15%, transparent); color: #0A7C89; }
+.section:not(.section--ink) .grid > .card:nth-child(6n+5) .card__icon { background: color-mix(in srgb, var(--am-rosa) 13%, transparent);      color: var(--am-rosa); }
+.section:not(.section--ink) .grid > .card:nth-child(6n+6) .card__icon { background: color-mix(in srgb, var(--am-red) 12%, transparent);       color: var(--am-red); }
 
 /* --- Chips / pills --- */
 .chip {
     display: inline-flex; align-items: center; gap: .45rem;
-    padding: .32rem .78rem; border-radius: 999px;
+    padding: .34rem .82rem; border-radius: 999px;
     background: color-mix(in srgb, var(--accent) 10%, transparent);
     color: var(--accent);
-    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .13em;
+    font-size: .74rem; font-weight: 700; letter-spacing: .01em;
 }
-.chip--live { background: color-mix(in srgb, #16A34A 14%, transparent); color: #15803D; }
-:root[data-theme="dark"] .chip--live { color: #4ADE80; }
-.chip--onink { background: rgba(255, 255, 255, .12); color: #fff; }
+.chip--live { background: color-mix(in srgb, var(--am-jade) 15%, transparent); color: #0B7049; }
+:root[data-theme="dark"] .chip--live { color: #45C48C; }
+.chip--onink { background: rgba(255, 255, 255, .13); color: #fff; }
 
 .dot-live {
     width: .45rem; height: .45rem; border-radius: 50%; background: currentColor;
@@ -224,27 +416,51 @@ h3 { font-size: clamp(1.15rem, 1.8vw, 1.4rem); letter-spacing: -.015em; }
 /* --- Stat --- */
 .stat__num {
     font-family: var(--font-display); font-weight: 800;
-    font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1;
-    letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+    font-variation-settings: 'SOFT' 60, 'WONK' 0;
+    font-size: clamp(2.1rem, 4.5vw, 3rem); line-height: 1;
+    letter-spacing: -.03em; font-variant-numeric: tabular-nums;
 }
 .stat__label {
     display: block; margin-top: .6rem;
-    font-size: .68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .18em; color: var(--muted);
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .15em; color: var(--muted);
 }
 
-/* --- Rule --- */
-.rule { height: 3px; width: 60px; border-radius: 999px; background: var(--am-gradient); }
+/* --- Rule ---
+   A short length of greca, in the accent. This is the workhorse divider and
+   it appears under nearly every page heading.
+
+   The numbers are not arbitrary. greca.svg is a 40 × 26 tile, so at height h
+   a tile renders 40/26 × h wide; at h = 13 that is exactly 20px, and a 120px
+   rule is exactly six whole spirals. Pick a height that does not divide
+   cleanly and the rule ends on half a spiral, which reads as a rendering bug
+   rather than as a border. Keep width a multiple of (40/26 × height).
+
+   Full-bleed friezes (.hero__frieze, .footer__frieze) are exempt — they run
+   to the viewport edge, where a clipped tile is just how a border behaves. */
+.rule {
+    height: 13px; width: 120px;
+    background: var(--accent);
+    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+}
+.section--ink .rule, .hero .rule, .band .rule { background: #fff; opacity: .75; }
+/* The tricolour cut of the same divider. */
+.rule--flag {
+    height: 5px; border-radius: 3px; -webkit-mask: none; mask: none;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+}
 
 /* --- Table --- */
 .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 table { width: 100%; border-collapse: collapse; min-width: 40rem; }
 thead th {
     text-align: left; padding: .95rem 1.15rem; white-space: nowrap;
-    font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .16em;
+    font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em;
     color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line);
 }
-tbody td { padding: .95rem 1.15rem; border-bottom: 1px solid var(--line-soft); font-size: .92rem; }
+tbody td { padding: .95rem 1.15rem; border-bottom: 1px solid var(--line-soft); font-size: .94rem; }
 tbody tr:last-child td { border-bottom: 0; }
 tbody tr { transition: background .2s var(--ease); }
 tbody tr:hover { background: var(--surface-2); }
@@ -252,38 +468,45 @@ tbody tr:hover { background: var(--surface-2); }
 /* ============================ NAV ======================================== */
 .nav {
     position: sticky; top: 0; z-index: 60;
-    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
     backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     border-bottom: 1px solid transparent;
     transition: border-color .3s var(--ease), background .3s var(--ease);
 }
 .nav.is-stuck { border-bottom-color: var(--line); }
 .nav__inner { display: flex; align-items: center; gap: 1.5rem; height: 4.5rem; }
-.nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
-.nav__brand .mark { width: 2.1rem; height: 2.1rem; flex: none; }
-.nav__brand .wordmark { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
+.nav__brand { display: flex; align-items: center; gap: .75rem; margin-right: auto; min-width: 0; }
+.nav__brand .mark { width: 2.2rem; height: 2.2rem; flex: none; color: var(--am-blue); }
+:root[data-theme="dark"] .nav__brand .mark { color: var(--am-blue-300); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .nav__brand .mark { color: var(--am-blue-300); }
+}
+.nav__brand .wordmark { display: flex; flex-direction: column; line-height: 1.08; min-width: 0; }
 .nav__brand .wordmark b {
-    font-family: var(--font-display); font-weight: 800; font-size: .96rem;
-    letter-spacing: -.02em; white-space: nowrap;
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 50, 'WONK' 1;
+    font-size: 1.06rem; letter-spacing: -.02em; white-space: nowrap;
 }
 .nav__brand .wordmark span {
-    font-size: .58rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .24em; color: var(--muted);
+    font-size: .6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .22em; color: var(--muted);
 }
 .nav__links { display: none; align-items: center; gap: 1.9rem; }
 .nav__links a {
-    font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .13em;
-    color: var(--muted); transition: color .2s var(--ease); position: relative; padding-block: .3rem;
+    font-size: .95rem; font-weight: 600; color: var(--muted);
+    transition: color .2s var(--ease); position: relative; padding-block: .35rem;
 }
 .nav__links a:hover, .nav__links a[aria-current="page"] { color: var(--ink); }
+/* The active tab is marked with the flag, not with a gradient bar. */
 .nav__links a[aria-current="page"]::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -.15rem;
-    height: 2px; border-radius: 2px; background: var(--am-gradient);
+    content: ""; position: absolute; left: 0; right: 0; bottom: -.2rem; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
 }
 .nav__actions { display: flex; align-items: center; gap: .55rem; }
 
 .icon-btn {
-    width: 2.35rem; height: 2.35rem; border-radius: 999px; border: 1px solid var(--line);
+    width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 1px solid var(--line);
     background: transparent; display: grid; place-items: center; cursor: pointer;
     color: var(--muted); transition: color .2s var(--ease), border-color .2s var(--ease);
 }
@@ -297,8 +520,8 @@ tbody tr:hover { background: var(--surface-2); }
 }
 .nav__menu.is-open { display: block; }
 .nav__menu a {
-    display: block; padding: .8rem 0; border-bottom: 1px solid var(--line-soft);
-    font-size: .82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .13em;
+    display: block; padding: .85rem 0; border-bottom: 1px solid var(--line-soft);
+    font-size: 1rem; font-weight: 600;
 }
 .nav__menu .btn { width: 100%; margin-top: 1.15rem; }
 
@@ -310,31 +533,42 @@ tbody tr:hover { background: var(--surface-2); }
 
 /* ============================ HERO ======================================= */
 .hero { position: relative; overflow: hidden; background: var(--am-navy); color: #fff; isolation: isolate; }
-.hero__wash {
-    position: absolute; inset: -30% -10% auto -10%; height: 150%;
-    background: var(--am-gradient); opacity: .5;
-    filter: blur(90px); z-index: -2;
-}
+/* A single-hue depth wash. Not decoration — the decoration is the tilework
+   and the eagle sitting on top of it. */
+.hero__wash { position: absolute; inset: 0; background: var(--am-wash); z-index: -3; }
+/* Kept the class name the pages already use; it is azulejo now, not a grid. */
 .hero__grid {
-    position: absolute; inset: 0; z-index: -1; opacity: .5;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
-    background-size: 76px 76px;
-    -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 40%, #000 40%, transparent 100%);
-            mask-image: radial-gradient(ellipse 80% 65% at 50% 40%, #000 40%, transparent 100%);
+    position: absolute; inset: 0; z-index: -2; pointer-events: none;
+    background: #fff;
+    -webkit-mask:
+        url('/assets/img/talavera.svg') repeat left top / 104px 104px,
+        radial-gradient(ellipse 74% 66% at 50% 42%, #000 30%, transparent 100%);
+    -webkit-mask-composite: source-in;
+            mask:
+        url('/assets/img/talavera.svg') repeat left top / 104px 104px,
+        radial-gradient(ellipse 74% 66% at 50% 42%, #000 30%, transparent 100%);
+            mask-composite: intersect;
+    opacity: .075;
 }
 .hero__inner { padding-block: clamp(4.5rem, 13vw, 9rem); position: relative; }
 .hero h1 { margin-block: 1.3rem; max-width: 16ch; }
-.hero .lede { color: #B9C7DE; max-width: 50ch; }
+.hero .lede { color: #C3D0E4; max-width: 50ch; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.3rem; }
 /* Keep the whole head in frame — the hooked beak is the shape that makes the
    mark read as a raptor, and clipping it is what makes it read as an insect. */
 .hero__mark {
     position: absolute; right: 2%; top: 50%; translate: 0 -50%;
-    width: min(40vw, 26rem); opacity: .12; z-index: -1; pointer-events: none;
+    width: min(40vw, 26rem); opacity: .13; z-index: -1; pointer-events: none;
 }
-@media (max-width: 48rem) { .hero__mark { right: -14%; opacity: .08; } }
+@media (max-width: 48rem) { .hero__mark { right: -14%; opacity: .09; } }
+
+/* The greca runs along the bottom edge of the hero, where the navy meets the
+   stat strip — the seam a frieze would actually sit on. */
+.hero__frieze {
+    position: relative; z-index: 1; height: 20px; background: #fff; opacity: .3;
+    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+}
 
 /* Stat strip under the hero */
 .strip { border-top: 1px solid rgba(255, 255, 255, .12); background: rgba(0, 0, 0, .22); }
@@ -342,24 +576,41 @@ tbody tr:hover { background: var(--surface-2); }
     display: grid; grid-template-columns: repeat(2, 1fr);
     gap: 1px; background: rgba(255, 255, 255, .1);
 }
-.strip__cell { background: var(--am-navy); padding: 1.5rem clamp(1.15rem, 4vw, 2rem); }
+.strip__cell { background: var(--am-navy); padding: 1.6rem clamp(1.15rem, 4vw, 2rem); }
 .strip .stat__num   { color: #fff; }
-.strip .stat__label { color: #8FA2C0; }
+.strip .stat__label { color: #93A8C8; }
 @media (min-width: 48rem) { .strip__inner { grid-template-columns: repeat(4, 1fr); } }
 
 /* ============================ FLEET / ROUTE BITS ========================= */
 .fleet-card { display: flex; flex-direction: column; overflow: hidden; padding: 0; }
+/* Every fleet panel used to be the same pink gradient. They are now flat
+   livery-and-glyph colours, cycled per card, with azulejo laid over them —
+   so a grid of aircraft reads as a set rather than as one repeated tile. */
 .fleet-card__media {
-    aspect-ratio: 16 / 9; background: var(--am-gradient);
-    display: grid; place-items: center; position: relative; overflow: hidden;
+    aspect-ratio: 16 / 9; position: relative; isolation: isolate; overflow: hidden;
+    display: grid; place-items: center;
+    background: var(--am-blue);
 }
-.fleet-card__media img { width: 100%; height: 100%; object-fit: cover; }
-.fleet-card__media .mark { width: 42%; opacity: .3; }
-.fleet-card__body { padding: 1.3rem 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
-.fleet-card__body .type { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; color: var(--accent); font-weight: 700; }
+/* Azulejo over the flat colour, so a fleet panel is tiled rather than plain. */
+.fleet-card__media::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: #fff; opacity: .13;
+    -webkit-mask: url('/assets/img/talavera.svg') repeat left top / 88px 88px;
+            mask: url('/assets/img/talavera.svg') repeat left top / 88px 88px;
+}
+.fleet-card__media img { width: 100%; height: 100%; object-fit: cover; position: relative; }
+.fleet-card__media .mark { width: 40%; opacity: .42; color: #fff; }
+.fleet-card:nth-child(6n+2) .fleet-card__media { background: var(--am-jade); }
+.fleet-card:nth-child(6n+3) .fleet-card__media { background: var(--am-clay); }
+.fleet-card:nth-child(6n+4) .fleet-card__media { background: var(--am-turquoise); }
+.fleet-card:nth-child(6n+5) .fleet-card__media { background: var(--am-rosa); }
+.fleet-card:nth-child(6n+6) .fleet-card__media { background: var(--am-cobalt); }
+
+.fleet-card__body { padding: 1.35rem 1.45rem 1.55rem; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+.fleet-card__body .type { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em; color: var(--accent); font-weight: 700; }
 .fleet-card__specs {
     display: flex; flex-wrap: wrap; gap: .35rem 1.15rem; margin-top: auto; padding-top: 1rem;
-    font-size: .76rem; color: var(--muted);
+    font-size: .8rem; color: var(--muted);
 }
 .fleet-card__specs b { font-family: var(--font-mono); color: var(--ink); font-weight: 600; }
 
@@ -367,12 +618,12 @@ tbody tr:hover { background: var(--surface-2); }
 .route-pair .arrow { color: var(--faint); }
 
 .tag {
-    display: inline-block; padding: .2rem .55rem; border-radius: 5px;
-    font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    display: inline-block; padding: .22rem .6rem; border-radius: 6px;
+    font-size: .7rem; font-weight: 700; letter-spacing: .04em;
     background: var(--surface-2); border: 1px solid var(--line); color: var(--muted);
 }
-.tag--hub { background: color-mix(in srgb, var(--am-red) 12%, transparent); border-color: transparent; color: var(--am-red); }
-:root[data-theme="dark"] .tag--hub { color: #FF6B85; }
+.tag--hub { background: color-mix(in srgb, var(--am-red) 13%, transparent); border-color: transparent; color: var(--am-red); }
+:root[data-theme="dark"] .tag--hub { color: #FF7C90; }
 
 /* --- Rank ladder --- */
 .rank {
@@ -382,15 +633,15 @@ tbody tr:hover { background: var(--surface-2); }
 .rank:last-child { border-bottom: 0; }
 .rank__bars { display: flex; flex-direction: column; gap: 2px; width: 1.6rem; flex: none; }
 .rank__bars i { height: 3px; border-radius: 2px; background: var(--accent); display: block; }
-.rank__name { font-family: var(--font-display); font-weight: 700; letter-spacing: -.01em; }
-.rank__hours { margin-left: auto; font-family: var(--font-mono); font-size: .84rem; color: var(--muted); white-space: nowrap; }
+.rank__name { font-family: var(--font-display); font-weight: 700; font-variation-settings: 'SOFT' 40, 'WONK' 1; }
+.rank__hours { margin-left: auto; font-family: var(--font-mono); font-size: .86rem; color: var(--muted); white-space: nowrap; }
 
 /* --- Steps --- */
 .step { display: flex; gap: 1.15rem; }
 .step__n {
-    width: 2.3rem; height: 2.3rem; border-radius: 999px; flex: none;
+    width: 2.4rem; height: 2.4rem; border-radius: 999px; flex: none;
     display: grid; place-items: center;
-    font-family: var(--font-mono); font-size: .82rem; font-weight: 700;
+    font-family: var(--font-mono); font-size: .84rem; font-weight: 700;
     background: var(--accent); color: var(--accent-ink);
 }
 
@@ -401,39 +652,70 @@ tbody tr:hover { background: var(--surface-2); }
     padding: .85rem 0; border-bottom: 1px solid var(--line-soft);
 }
 .live-row:last-child { border-bottom: 0; }
-.live-row__cs { font-family: var(--font-mono); font-weight: 700; font-size: .88rem; }
-.live-row__ac { font-size: .78rem; color: var(--muted); grid-column: 1; }
-.live-row__leg { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); text-align: right; grid-row: 1 / span 2; }
+.live-row__cs { font-family: var(--font-mono); font-weight: 700; font-size: .9rem; }
+.live-row__ac { font-size: .8rem; color: var(--muted); grid-column: 1; }
+.live-row__leg { font-family: var(--font-mono); font-size: .82rem; color: var(--muted); text-align: right; grid-row: 1 / span 2; }
 
-/* ============================ CTA BAND =================================== */
+/* ============================ CTA BAND ===================================
+   The band used to be the gradient at 55% over navy. It is now navy with
+   azulejo laid across it and Quetzalcóatl surfacing out of the left edge. */
 .band { position: relative; overflow: hidden; background: var(--am-navy); color: #fff; isolation: isolate; }
-.band__wash { position: absolute; inset: 0; background: var(--am-gradient); opacity: .55; z-index: -1; }
-.band__inner { padding-block: clamp(3.5rem, 8vw, 6rem); text-align: center; }
+.band__wash { position: absolute; inset: 0; background: var(--am-wash); z-index: -3; }
+.band__tile {
+    position: absolute; inset: 0; z-index: -2; pointer-events: none;
+    background: #fff; opacity: .06;
+    -webkit-mask: url('/assets/img/talavera.svg') repeat left top / 104px 104px;
+            mask: url('/assets/img/talavera.svg') repeat left top / 104px 104px;
+}
+.band__serpent {
+    position: absolute; left: -4%; top: 50%; translate: 0 -50%;
+    width: min(46vw, 30rem); aspect-ratio: 3 / 2;
+    background: #fff; opacity: .1; z-index: -1; pointer-events: none;
+    -webkit-mask: url('/assets/img/serpent.svg') no-repeat center / contain;
+            mask: url('/assets/img/serpent.svg') no-repeat center / contain;
+}
+@media (max-width: 52rem) { .band__serpent { opacity: .06; left: -18%; } }
+.band__inner { padding-block: clamp(3.5rem, 8vw, 6rem); text-align: center; position: relative; }
 .band h2 { max-width: 20ch; margin-inline: auto; }
-.band p { color: rgba(255, 255, 255, .82); max-width: 52ch; margin: 1.1rem auto 0; }
+.band p { color: rgba(255, 255, 255, .84); max-width: 52ch; margin: 1.1rem auto 0; }
 .band .hero__cta { justify-content: center; }
 
 /* ============================ FOOTER ===================================== */
-.footer { background: var(--am-navy); color: #B9C7DE; padding-block: clamp(3rem, 6vw, 4.5rem) 2rem; }
-.footer a { color: #B9C7DE; transition: color .2s var(--ease); }
+.footer { position: relative; background: var(--am-navy); color: #C3D0E4; padding-block: clamp(3rem, 6vw, 4.5rem) 2rem; }
+/* A frieze along the top edge, the way a building carries one along a cornice.
+   Absolute so it sits on the actual edge — in flow it would be pushed down by
+   the footer's own top padding and float in the middle of nothing. */
+.footer__frieze {
+    position: absolute; left: 0; right: 0; top: 0;
+    height: 18px; background: #fff; opacity: .22;
+    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+}
+.footer a { color: #C3D0E4; transition: color .2s var(--ease); }
 .footer a:hover { color: #fff; }
 .footer__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
 @media (min-width: 48rem) { .footer__grid { grid-template-columns: 1.4fr repeat(3, 1fr); } }
 .footer h4 {
-    font-size: .68rem; text-transform: uppercase; letter-spacing: .18em;
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .16em;
+    font-family: var(--font-body); font-weight: 700;
     color: #fff; margin-bottom: 1.05rem;
 }
-.footer ul { list-style: none; padding: 0; display: grid; gap: .6rem; font-size: .88rem; }
-.footer__brand .mark { width: 2.6rem; margin-bottom: 1.05rem; }
-.footer__brand p { font-size: .88rem; max-width: 34ch; }
+.footer ul { list-style: none; padding: 0; display: grid; gap: .6rem; font-size: .92rem; }
+.footer__brand .mark { width: 2.8rem; margin-bottom: 1.05rem; color: #fff; }
+.footer__brand p { font-size: .92rem; max-width: 34ch; }
+/* Hecho en México — the flag, said plainly, at the bottom of every page. */
+.footer__origin {
+    display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.3rem;
+    font-size: .78rem; font-weight: 700; letter-spacing: .04em; color: #fff;
+}
 .footer__base {
     margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid rgba(255, 255, 255, .12);
     display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
-    font-size: .76rem; color: #7E90AE;
+    font-size: .8rem; color: #8698B6;
 }
 
 /* The disclaimer is not decoration — keep it legible. */
-.disclaimer { font-size: .74rem; line-height: 1.55; color: #7E90AE; max-width: 68ch; }
+.disclaimer { font-size: .78rem; line-height: 1.6; color: #8698B6; max-width: 68ch; }
 
 /* ============================ REVEAL ===================================== */
 [data-reveal] { opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
