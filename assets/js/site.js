@@ -12,13 +12,16 @@
     'use strict';
 
     // ---- The mark (kept in step with assets/img/mark.svg) -------------------
+    // See that file for what each shape is doing and why none of them is
+    // optional — the brow, the hooked beak and the gape are what make it read
+    // as a raptor rather than a generic snouted animal.
     const MARK = `<svg class="mark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
         <g fill="currentColor">
-            <path d="M54 50C38 46 22 36 10 22c6 18 20 32 40 38z" opacity=".55"/>
-            <path d="M60 44C48 36 38 22 34 6c-4 18 4 34 18 44z" opacity=".75"/>
-            <path d="M70 42C64 32 62 18 66 2c-10 12-12 28-6 42z" opacity=".9"/>
+            <path d="M54 52C42 52 28 50 15 47C28 55 41 60 53 62Z" opacity=".5"/>
+            <path d="M52 44C40 41 27 35 16 28C27 39 39 47 51 54Z" opacity=".72"/>
+            <path d="M54 37C46 30 38 21 32 12C36 24 43 33 52 42Z" opacity=".95"/>
         </g>
-        <path fill="currentColor" fill-rule="evenodd" d="M30 74c0-18 14-30 32-28 8 1 13 5 15 11l33 12c2 4 0 9-5 11-7-2-15-5-25-7-2 9-10 16-22 19l-14 12-10-6c-4-8-5-16-4-24zM58 62a5 5 0 1 0 .1 0z"/>
+        <path fill="currentColor" fill-rule="evenodd" d="M32 54C36 38 50 32 63 36C73 39 79 43 81 50L110 60C113 67 110 78 102 80C100 72 95 68 86 65C84 75 77 82 66 86L56 95L40 89C32 79 30 65 32 54ZM67 56a5.5 5.5 0 1 0 .1 0zM83 62L99 66L97 70L82 67Z"/>
     </svg>`;
 
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------

@@ -328,11 +328,13 @@ tbody tr:hover { background: var(--surface-2); }
 .hero h1 { margin-block: 1.3rem; max-width: 16ch; }
 .hero .lede { color: #B9C7DE; max-width: 50ch; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.3rem; }
+/* Keep the whole head in frame — the hooked beak is the shape that makes the
+   mark read as a raptor, and clipping it is what makes it read as an insect. */
 .hero__mark {
-    position: absolute; right: -6%; top: 50%; translate: 0 -50%;
-    width: min(46vw, 30rem); opacity: .11; z-index: -1; pointer-events: none;
+    position: absolute; right: 2%; top: 50%; translate: 0 -50%;
+    width: min(40vw, 26rem); opacity: .12; z-index: -1; pointer-events: none;
 }
-@media (max-width: 48rem) { .hero__mark { right: -22%; opacity: .08; } }
+@media (max-width: 48rem) { .hero__mark { right: -14%; opacity: .08; } }
 
 /* Stat strip under the hero */
 .strip { border-top: 1px solid rgba(255, 255, 255, .12); background: rgba(0, 0, 0, .22); }
