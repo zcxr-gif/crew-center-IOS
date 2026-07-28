@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  papel.svg — papel picado, the perforated tissue banner.
+
+  Cut-paper bunting strung across a street or a courtyard for a fiesta. Four
+  panels hang from one straight string; the bottom edge is a cut fringe and the
+  design is punched clean through, which is what "picado" means — pricked.
+
+  POLYCHROME ON PURPOSE, unlike greca.svg and talavera.svg. Those two are
+  masks that take a brand colour from CSS; papel picado is not a brand colour,
+  it is fiesta colour, and it stays the same in light and dark. brand.css uses
+  it as a plain background-image (`.papel`) and only varies its opacity.
+
+  Each panel is one path with fill-rule="evenodd": the outline runs first and
+  every punch after it is its own closed subpath, so the punches drop out and
+  the page shows through them. The tile is 480 wide (4 × 120) so the
+  colour sequence has to travel 4 panels before it repeats — a one-panel
+  tile would strobe.
+
+  GENERATED, and the geometry is fiddly enough that it should stay generated:
+  every panel is the same punch layout offset by 120px, and hand-editing one
+  panel silently desynchronises it from the other three. The generator is in
+  the commit that added this file (scratch script gen_papel.py) — to change
+  the design, change the constants there and re-emit, don't patch path data.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 92" width="480" height="92">
+
+  <!-- The string. Overhangs both ends so tiled copies join with no seam. -->
+  <path d="M-2 4H482" stroke="#B08968" stroke-width="2.5" fill="none"/>
+
+  <!-- Panel 1 — rosa mexicano -->
+  <path fill="#D6337E" fill-rule="evenodd" d="M6 4H114V64l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9Z M51 26a9 9 0 1 0 18 0 9 9 0 1 0-18 0Z M55 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M55 42a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M39 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M71 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M26 21 35 30 26 39 17 30Z M94 21 103 30 94 39 85 30Z M32 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M56 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M80 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z"/>
+  <!-- Panel 2 — cempasúchil -->
+  <path fill="#F2A03D" fill-rule="evenodd" d="M126 4H234V64l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9Z M171 26a9 9 0 1 0 18 0 9 9 0 1 0-18 0Z M175 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M175 42a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M159 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M191 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M146 21 155 30 146 39 137 30Z M214 21 223 30 214 39 205 30Z M152 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M176 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M200 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z"/>
+  <!-- Panel 3 — jade -->
+  <path fill="#0E8C5A" fill-rule="evenodd" d="M246 4H354V64l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9Z M291 26a9 9 0 1 0 18 0 9 9 0 1 0-18 0Z M295 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M295 42a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M279 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M311 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M266 21 275 30 266 39 257 30Z M334 21 343 30 334 39 325 30Z M272 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M296 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M320 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z"/>
+  <!-- Panel 4 — turquesa -->
+  <path fill="#0E9BAA" fill-rule="evenodd" d="M366 4H474V64l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9l-6 9-6-9Z M411 26a9 9 0 1 0 18 0 9 9 0 1 0-18 0Z M415 10a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M415 42a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M399 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M431 26a5 5 0 1 0 10 0 5 5 0 1 0-10 0Z M386 21 395 30 386 39 377 30Z M454 21 463 30 454 39 445 30Z M392 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M416 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z M440 48a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z"/>
+</svg>
