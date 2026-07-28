@@ -1,55 +1,51 @@
 /* ============================================================================
    Aeromexico Virtual — live.js
-   Mounts the Inflight "Active VA Pilots" widget wherever a page puts
-   <div data-live-roster></div>.
+   Mounts the two Inflight embeds this site carries, both driven by the one
+   embed token issued to Aeromexico Virtual:
 
-   Roster mode is deliberate: it renders no map, so it costs nobody a Mapbox
-   load and needs no token (see EMBED.md in the tracker repo). The widget is the
-   only genuinely live thing on this site — every other number is airline data
-   the staff maintain in data.js.
+     <div data-live-roster></div>   pilots airborne right now
+     <div data-live-events></div>   events + calendar
+
+   The token is what configures each widget — which VA, which callsign
+   prefixes, which servers, the theme, the accent, the radius, the events
+   template. All of that lives on the token in the VA portal, not here, so a
+   look-and-feel change is made once over there and lands on every page. That
+   is also why nothing below appends appearance parameters: once ?token= is
+   present, both widgets resolve their config from the backend and ignore
+   query-string overrides.
+
+   The token is a public, origin-restricted embed credential — it is meant to
+   ship in the page source, exactly like the iframes the VA portal hands out.
    ========================================================================== */
 
 (function () {
     'use strict';
 
-    const EMBED_ORIGIN = 'https://inflight.info';
+    const TOKEN = 'tok_d9689dd5ee39acb3fd09c3bbffad6dcd';
 
-    const CONFIG = {
-        va: 'AEROMEXICO',                 // leading callsign word we fly under
-        name: 'Aeromexico Virtual',
-        prefixes: 'Aeromexico,AMX',       // full callsign prefixes to match
-        servers: 'Expert',                // Expert Server only
-        color: '#0C2C64',                 // header brand colour (matches --am-blue)
-        radius: 14,                       // matches --radius
+    // The live-traffic widget is fronted by the tracker site; the events widget
+    // is served straight off the InGdo backend so its own /api and /assets
+    // calls resolve without a forwarding rule. Two origins, one token — both
+    // are in frame-src in _headers.
+    const WIDGETS = {
+        roster: {
+            src:    'https://inflight.info/embed.html',
+            height: 520,
+            title:  'Aeromexico Virtual pilots airborne now',
+        },
+        events: {
+            src:    'https://site--indgo-backend--6dmjph8ltlhv.code.run/embed-events.html',
+            height: 720,
+            title:  'Aeromexico Virtual events and calendar',
+        },
     };
 
-    function themeNow() {
-        const set = document.documentElement.getAttribute('data-theme');
-        if (set === 'dark' || set === 'light') return set;
-        return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    function buildSrc() {
-        const q = new URLSearchParams({
-            va: CONFIG.va,
-            name: CONFIG.name,
-            prefixes: CONFIG.prefixes,
-            servers: CONFIG.servers,
-            mode: 'roster',
-            header: 'off',
-            theme: themeNow(),
-            color: CONFIG.color,
-            radius: String(CONFIG.radius),
-        });
-        return `${EMBED_ORIGIN}/embed.html?${q}`;
-    }
-
-    function mount(host) {
-        const height = host.dataset.height || '460';
+    function mount(host, widget) {
+        const height = host.dataset.height || widget.height;
 
         const frame = document.createElement('iframe');
-        frame.src = buildSrc();
-        frame.title = 'Aeromexico Virtual pilots airborne now';
+        frame.src = `${widget.src}?token=${encodeURIComponent(TOKEN)}`;
+        frame.title = widget.title;
         frame.loading = 'lazy';
         frame.style.height = height + 'px';
         frame.setAttribute('scrolling', 'no');
@@ -60,24 +56,13 @@
 
         host.innerHTML = '';
         host.appendChild(shell);
-
-        // Re-point the widget when the visitor flips the site theme, so the
-        // roster never sits light-on-dark against the page around it.
-        let last = themeNow();
-        const sync = () => {
-            const now = themeNow();
-            if (now === last) return;
-            last = now;
-            frame.src = buildSrc();
-        };
-        new MutationObserver(sync).observe(document.documentElement, {
-            attributes: true, attributeFilter: ['data-theme'],
-        });
-        matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
     }
 
     function boot() {
-        document.querySelectorAll('[data-live-roster]').forEach(mount);
+        document.querySelectorAll('[data-live-roster]')
+            .forEach(el => mount(el, WIDGETS.roster));
+        document.querySelectorAll('[data-live-events]')
+            .forEach(el => mount(el, WIDGETS.events));
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

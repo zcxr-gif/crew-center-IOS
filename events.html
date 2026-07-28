@@ -17,18 +17,6 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/brand.css">
-<style>
-    .event { display:grid; gap:1.5rem; grid-template-columns:1fr; align-items:start; }
-    @media (min-width:52rem){ .event { grid-template-columns:12rem 1fr; } }
-    .event__when {
-        border-left:3px solid var(--accent); padding-left:1.1rem;
-    }
-    .event__day  { font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; letter-spacing:-.04em; }
-    .event__mon  { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:var(--muted); display:block; margin-top:.4rem; }
-    .event__time { font-family:var(--font-mono); font-size:.82rem; color:var(--muted); display:block; margin-top:.7rem; }
-    .event--past { opacity:.55; }
-    .event--past .event__when { border-left-color:var(--line); }
-</style>
 <script>
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
@@ -48,24 +36,27 @@
                 <div class="rule"></div>
                 <p class="lede" style="margin-top:1.4rem">
                     Group departures and fly-ins on the Expert Server, run with staffed ATC,
-                    published slots and a briefing that goes out 48 hours ahead. Times below are
-                    shown in your own timezone.
+                    published slots and a briefing that goes out 48 hours ahead. The calendar
+                    below is the live one out of the crew center.
                 </p>
             </div>
         </div>
     </section>
 
+    <!-- The calendar is the crew center's own events feed, not a copy of it
+         kept by hand on this site. Whatever staff publish in the portal shows
+         up here the moment it is saved. -->
     <section class="section" style="padding-top:0">
         <div class="wrap">
-            <h2 style="margin-bottom:1.6rem">Upcoming</h2>
-            <div class="grid" id="upcoming" style="gap:1.2rem"></div>
-        </div>
-    </section>
-
-    <section class="section section--alt" id="pastSection" hidden>
-        <div class="wrap">
-            <h2 style="margin-bottom:1.6rem">Flown</h2>
-            <div class="grid" id="past" style="gap:1.2rem"></div>
+            <div data-live-events data-reveal>
+                <div class="frame-host muted" style="padding:3rem;text-align:center">
+                    Loading the calendar…
+                </div>
+            </div>
+            <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
+                Times are shown in your own timezone. Slot bookings and the briefing pack open
+                in the crew center 48 hours before each departure.
+            </p>
         </div>
     </section>
 
@@ -85,60 +76,7 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js"></script>
 <script src="/assets/js/site.js"></script>
-<script>
-(function () {
-    const D = window.AMV_DATA;
-    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-    const now = Date.now();
-    const sorted = D.events.slice().sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
-    const upcoming = sorted.filter(e => Date.parse(e.date) > now);
-    const past = sorted.filter(e => Date.parse(e.date) <= now).reverse();
-
-    const dayFmt  = new Intl.DateTimeFormat(undefined, { day: 'numeric' });
-    const monFmt  = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
-    const timeFmt = new Intl.DateTimeFormat(undefined, {
-        weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-
-    function card(e, isPast) {
-        const d = new Date(e.date);
-        return `
-        <article class="card event${isPast ? ' event--past' : ''}" data-reveal>
-            <div class="event__when">
-                <span class="event__day">${esc(dayFmt.format(d))}</span>
-                <span class="event__mon">${esc(monFmt.format(d))}</span>
-                <span class="event__time">${esc(timeFmt.format(d))}</span>
-            </div>
-            <div>
-                <span class="chip">${esc(e.server)} Server</span>
-                <h3 style="margin:.8rem 0 .5rem;font-size:clamp(1.25rem,2.4vw,1.6rem)">${esc(e.title)}</h3>
-                <p style="max-width:60ch">${esc(e.blurb)}</p>
-                <div class="fleet-card__specs" style="padding-top:1.2rem">
-                    <span>Route <b>${esc(e.from)} → ${esc(e.to)}</b></span>
-                    <span>Aircraft <b>${esc(e.ac)}</b></span>
-                    ${e.slots ? `<span>Slots <b>${e.slots}</b></span>` : '<span>Slots <b>Open</b></span>'}
-                </div>
-            </div>
-        </article>`;
-    }
-
-    const up = document.getElementById('upcoming');
-    up.innerHTML = upcoming.length
-        ? upcoming.map(e => card(e, false)).join('')
-        : `<div class="card"><p>Nothing on the calendar right now. New events go up in the crew
-             center first — <a href="/crew"
-             style="color:var(--accent);font-weight:600">sign in</a> to catch them early.</p></div>`;
-
-    if (past.length) {
-        document.getElementById('pastSection').hidden = false;
-        document.getElementById('past').innerHTML = past.map(e => card(e, true)).join('');
-    }
-
-    window.AMV.refresh();
-})();
-</script>
+<script src="/assets/js/live.js"></script>
 </body>
 </html>
