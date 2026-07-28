@@ -103,6 +103,7 @@
 
 <script src="/assets/js/data.js?v=2"></script>
 <script src="/assets/js/site.js?v=2"></script>
+<script src="/assets/js/crew.js?v=2"></script>
 <script src="/assets/js/live.js?v=2"></script>
 <script>
 (function () {
@@ -111,8 +112,11 @@
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     // ---- Hubs ----
+    // The sector count per hub is counted off whichever list is current, so it
+    // cannot end up saying 23 while the list below it shows 3.
+    function renderHubs() {
     document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
-        const legs = D.routes.filter(r => r.from === h.icao || r.to === h.icao).length;
+        const legs = ROUTES.filter(r => r.from === h.icao || r.to === h.icao).length;
         return `
         <article class="card card--hover" data-reveal data-reveal-delay="${i * 80}">
             <div class="card__icon">${icon('pin')}</div>
@@ -126,17 +130,26 @@
             </div>
         </article>`;
     }).join('');
+    }
 
     // ---- Region filter ----
-    const regions = ['All', ...Array.from(new Set(D.routes.map(r => r.region)))];
     let active = 'All';
 
-    document.getElementById('filters').innerHTML = regions.map(r =>
-        `<button class="filter" type="button" data-region="${esc(r)}"
-                 aria-pressed="${r === 'All'}">${esc(r)}</button>`).join('');
+    function renderFilters() {
+        const regions = ['All', ...Array.from(new Set(ROUTES.map(r => r.region)))];
+        if (!regions.includes(active)) active = 'All';
+        document.getElementById('filters').innerHTML = regions.map(r =>
+            `<button class="filter" type="button" data-region="${esc(r)}"
+                     aria-pressed="${r === active}">${esc(r)}</button>`).join('');
+    }
 
     const list = document.getElementById('routes');
     const count = document.getElementById('routeCount');
+
+    // The sectors this page shows. Starts as the copy in data.js so the page is
+    // complete on first paint, and is replaced by the crew center's own list if
+    // that answers — see the live-routes block at the bottom.
+    let ROUTES = D.routes;
 
     // Lookups off the same arrays, so nothing here is a second copy of a fact.
     // The origin is always one of our own hubs, which is where its airport name
@@ -145,19 +158,22 @@
     const hubBy  = Object.fromEntries(D.hubs.map(h => [h.icao, h]));
     const typeBy = Object.fromEntries(D.fleet.map(a => [a.short, a.type]));
 
+    // Every line below the code is optional. A sector that came from the crew
+    // center and has no twin in data.js has no city and no region to show, and
+    // an empty line reserved for one is worse than not drawing it.
     function end(icao, city, name, home, side) {
         return `
             <div class="route-end route-end--${side}">
                 <span class="route-end__code">${esc(icao)}</span>
-                <span class="route-end__place">
+                ${city ? `<span class="route-end__place">
                     ${home ? '<span class="flag" aria-hidden="true"></span>' : ''}${esc(city)}
-                </span>
+                </span>` : ''}
                 ${name ? `<span class="route-end__name">${esc(name)}</span>` : ''}
             </div>`;
     }
 
     function render() {
-        const rows = active === 'All' ? D.routes : D.routes.filter(r => r.region === active);
+        const rows = active === 'All' ? ROUTES : ROUTES.filter(r => r.region === active);
         count.textContent = rows.length;
         list.innerHTML = rows.map((r, i) => {
             const h = hubBy[r.from] || {};
@@ -170,9 +186,10 @@
                     ${end(r.to, r.city, r.region, r.region === 'Domestic', 'to')}
                 </div>
                 <div class="route-card__meta">
-                    <span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>
-                    <span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>
-                    <span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>
+                    ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
+                    ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
+                    ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
+                    ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
                 </div>
             </article>`;
         }).join('');
@@ -190,8 +207,48 @@
         render();
     });
 
+    renderHubs();
+    renderFilters();
     render();
     window.AMV.refresh();
+
+    // ---- Live routes from the crew center -----------------------------------
+    // The crew center is where sectors are actually added, so it — not this
+    // repo — is the airline's route network. data.js has already painted the
+    // page above; this replaces it if and only if the crew center answers.
+    //
+    // The two records are not the same shape. The crew center knows the sector
+    // and the aircraft; data.js knows the things a reader wants and an ops tool
+    // has no reason to store — the destination's city, which region it belongs
+    // to, the scheduled block time. So a live sector is matched to its data.js
+    // twin on the airport pair and takes those labels from it. Anything with no
+    // twin is still shown, with the fields we genuinely have: no city invented
+    // for it, no block time guessed at.
+    (function liveRoutes() {
+        if (!window.AMV_CREW) return;
+        const key = r => `${r.from}-${r.to}`;
+        const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
+
+        window.AMV_CREW.routes().then(live => {
+            if (!live) return;                       // backend quiet — keep data.js
+            ROUTES = live.map(r => {
+                const m = local[key(r)] || {};
+                return {
+                    from: r.from, to: r.to,
+                    city:   m.city   || '',
+                    region: m.region || 'Network',   // honest bucket, not a guess
+                    ac:     r.ac     || m.ac || '',
+                    dist:   r.dist   || m.dist || 0,
+                    block:  m.block  || '',
+                    flight: r.flight,
+                };
+            });
+            renderHubs();
+            renderFilters();
+            render();
+            window.AMV.refresh();
+        });
+    })();
 })();
 </script>
 </body>

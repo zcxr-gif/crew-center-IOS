@@ -19,6 +19,7 @@ assets/brand.css  The design system. Every token lives here.
 assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
 assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
 assets/js/live.js Mounts both Inflight embeds — live traffic and events
+assets/js/crew.js Read-only client for the crew center's public feeds
 tools/            Regenerate mark.svg and plane-hero.webp from the source art
 assets/img/       Supplied artwork, and what is generated from it. See below.
 ```
@@ -189,6 +190,56 @@ Only design tokens. `crewTheme` on the backend is validated on write
 colours must be hex, font names are a plain family with no quotes or commas, and
 `gradient` holds only the *arguments* to `linear-gradient()` — colours, angles
 and stops. No CSS ever travels as CSS.
+
+---
+
+## Fed by the crew center
+
+The crew center is where the airline is actually run — sectors are added there,
+pilots join there, hours accrue there. Anything this site states that the crew
+center also knows should come **from** the crew center, or the two will
+disagree and the website will be the one that is wrong.
+
+`assets/js/crew.js` is the read-only client. Everything it reads is public and
+CORS-open (`Access-Control-Allow-Origin: *`), so there is no key in it and
+nothing to keep out of git — writes are gated, reads are not.
+
+| helper | endpoint | used for |
+|---|---|---|
+| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` |
+| `AMV_CREW.stats()` | `GET /api/crew/<slug>/roster` | aggregate pilots + hours |
+| `AMV_CREW.get(path)` | anything else public | adding a feed |
+
+**The rule for every feed: the page must already be correct before the fetch
+runs.** Each helper resolves to `null` on any failure — offline, slow, backend
+down, endpoint changed — and every caller treats `null` as "leave what is
+already on the page". `data.js` stays the fallback rather than becoming dead
+weight. Never build a section that only exists once a fetch resolves; a visitor
+on hotel wifi gets an empty page instead of a slow one.
+
+An **empty** answer is treated the same as no answer, deliberately. A crew
+center whose route list has not been filled in yet would otherwise blank a
+network page that this repo already knows 23 sectors for.
+
+The two record shapes do not match, and that is the interesting part. The crew
+center knows the sector and the aircraft; `data.js` knows the things a reader
+wants and an ops tool has no reason to store — the destination's city, which
+region it belongs to, the scheduled block time. A live sector is matched to its
+`data.js` twin on the airport pair and takes those labels from it. **A sector
+with no twin is still shown, with only the fields we genuinely have** — no city
+invented for it, no block time guessed at, and its region falls into a plain
+`Network` bucket rather than being assigned one. Everything counted off the
+list — the sector count, the per-hub sector counts — is counted off whichever
+list is current, so the page cannot say 23 above a list of 3.
+
+Adding a feed is `AMV_CREW.get('/api/…')`, a `null` check, and a re-render.
+The backend is in `connect-src` in `_headers`; a feed from a *new* origin needs
+that origin added there or the fetch is blocked.
+
+Roster data is read as an **aggregate only**. The endpoint is public and returns
+members individually, but a public marketing page has no reason to list who
+flies for the airline — the count and the hours are the airline's figures, the
+names are its people.
 
 ---
 

@@ -12,8 +12,11 @@
   # events + calendar embed off its own origin (both driven by the one embed
   # token in assets/js/live.js). Only inflight.info is a connect target; the
   # embeds call their own backends from inside their own frames, which this
-  # page's CSP does not govern.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://inflight.info https://site--indgo-backend--6dmjph8ltlhv.code.run; connect-src 'self' https://inflight.info; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'
+  # page's CSP does not govern. The backend IS a connect target now as well:
+  # assets/js/crew.js reads the crew center's public routes and roster from it
+  # (see "Fed by the crew center" in the README), and that fetch is made by
+  # this page, so it is this page's CSP that has to permit it.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://inflight.info https://site--indgo-backend--6dmjph8ltlhv.code.run; connect-src 'self' https://inflight.info https://site--indgo-backend--6dmjph8ltlhv.code.run; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'
 
 # These filenames are NOT content-hashed — this site has no build step, so
 # /assets/js/site.js keeps that name while its contents change under it. It was
