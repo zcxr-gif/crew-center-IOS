@@ -976,6 +976,93 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .frame-host { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .frame-host iframe { width: 100%; border: 0; display: block; }
 
+/* ---- Route cards ---------------------------------------------------------
+   The sector list used to be a six-column table, which put the pair of airport
+   codes — the one thing a pilot is actually scanning for — at the smallest
+   type size on the page. Each sector is now a card built around that pair:
+   two panels with an arrow between them, the way a timetable states a sector.
+
+   The origin panel carries its airport name because the origin is always one
+   of our own hubs and `hubs` has it. The destination panel carries the region
+   in that slot instead — `routes` only knows the city, and a plausible-looking
+   airport name typed in for twenty airports is exactly the kind of invented
+   data this project has thrown out once already. It also balances the two
+   panels, which otherwise sit at visibly different weights.
+
+   The panels take `--surface` and a hairline rather than `--surface-2`: these
+   cards sit on `.section--alt`, which now carries the greca field behind it,
+   and a panel a half-step off the background disappears into the pattern. */
+.route-card {
+    display: grid; gap: .8rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+}
+.route-card:first-child { border-top: 1px solid var(--line); }
+
+.route-card__ends {
+    display: grid; gap: .55rem;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+}
+.route-end {
+    display: grid; align-content: center; gap: .18rem;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: .8rem 1rem;
+    min-width: 0;
+}
+.route-end--to { text-align: right; }
+.route-end__code {
+    font-family: var(--font-mono); font-weight: 700;
+    font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+    letter-spacing: -.02em; line-height: 1.05;
+}
+.route-end__place {
+    display: flex; align-items: center; gap: .45rem;
+    font-weight: 600; font-size: .95rem; min-width: 0;
+}
+.route-end--to .route-end__place { justify-content: flex-end; }
+.route-end__name { font-size: .82rem; color: var(--muted); }
+
+/* The arrow sits in the gap between the panels, not inside either one. */
+.route-card__arrow {
+    align-self: center; flex: none;
+    display: grid; place-items: center;
+    width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: var(--am-blue); color: #fff;
+}
+.route-card__arrow svg { width: 1.1rem; height: 1.1rem; }
+:root[data-theme="dark"] .route-card__arrow { background: var(--am-blue-600); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .route-card__arrow { background: var(--am-blue-600); }
+}
+
+.route-card__meta { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; align-items: center; }
+.route-meta { display: flex; align-items: baseline; gap: .45rem; font-size: .86rem; }
+.route-meta i {
+    font-style: normal; color: var(--muted);
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700;
+}
+.route-meta b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
+
+/* Stacked, the arrow points down — an arrow still pointing right between two
+   panels that are now one above the other reads as the wrong diagram. */
+@media (max-width: 44rem) {
+    .route-card__ends { grid-template-columns: 1fr; }
+    .route-end--to { text-align: left; }
+    .route-end--to .route-end__place { justify-content: flex-start; }
+    .route-card__arrow { transform: rotate(90deg); justify-self: center; }
+}
+
+/* Visible to a screen reader, gone from the page: the arrow between the two
+   panels is decorative, so the sector needs a real word joining the codes. */
+.sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
 .skip {
     position: absolute; left: -9999px; top: 0;
     background: var(--accent); color: var(--accent-ink);
