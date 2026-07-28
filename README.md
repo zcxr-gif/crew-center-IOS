@@ -45,7 +45,7 @@ airline's design reads as exactly what it is. The azulejo in particular was
 tiled edge to edge behind whole sections, which is the wallpaper a generated
 layout reaches for.
 
-**The greca has since come back, and only the greca.** The VA asked for Mexican
+**The greca and the serpent have since come back, generated.** The VA asked for Mexican
 patterns knowing what the paragraph above says; that is their call about their
 own airline. What makes the fret defensible where the azulejo and the papel
 picado were not is that it is the one motif here that is *architectural rather
@@ -53,7 +53,18 @@ than pictorial* — stepped right angles on a grid — so `tools/make-greca.py`
 generates it from parameters instead of anyone illustrating it, and it is used
 as texture and as a rule, never as a subject. The standing rule in `brand.css`
 is now **no pictorial invention**: if the next idea cannot be expressed as a
-script that emits it, it is the wrong idea.
+script that emits it, it is the wrong idea. The Quetzalcóatl frieze
+(`make-serpent.py`) came in on the same terms — chevrons and rhombs on a grid,
+and the feathered serpent is already what the accent palette is taken from.
+
+**The eagle-and-serpent of the national coat of arms is still not here, and
+should not be.** The *escudo nacional* is a state emblem whose reproduction is
+regulated under the Ley sobre el Escudo, la Bandera y el Himno Nacionales, and
+a virtual airline has no claim on it — which is the same reason the tricolour
+on this site has only ever been plain bands. What the site pairs instead is
+Aeroméxico's **own** eagle (the Caballero Águila, `mark.svg`, watermarked
+behind `.band`) with the serpent frieze along that section's top edge: two
+motifs sharing a section, not that device.
 
 **Now** it is the airline's own material, plus one generated ornament:
 
@@ -65,6 +76,7 @@ script that emits it, it is the wrong idea.
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
 | `assets/img/greca-tile.svg` | the same fret over its mirror | a faint field across `.section--alt` |
+| `assets/img/serpent.svg` | a Quetzalcóatl frieze, generated from a grid | a band along the top of every `.band` |
 | the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
@@ -92,6 +104,7 @@ python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
 python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
 python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg + stripes-mirror.svg
 python3 tools/make-greca.py   # (parameters only)      -> greca.svg + greca-tile.svg
+python3 tools/make-serpent.py # (parameters only)      -> serpent.svg
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
