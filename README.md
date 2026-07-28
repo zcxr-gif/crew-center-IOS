@@ -252,6 +252,31 @@ target, `inflight.info`. Adding an embed served from a new origin means adding
 that origin to `frame-src`, or the frame is blocked with nothing in the page to
 show for it.
 
+**Assets revalidate, and must keep revalidating.** `/assets/*` was served
+`max-age=31536000, immutable`. Nothing under it is content-hashed — there is no
+build step, so `site.js` keeps that name while its contents change — which made
+that header a false promise, and `immutable` means the browser does not even
+ask. HTML is not under `/assets/*` and so caches by different rules, and the
+two drift apart: a returning visitor gets today's `fleet.html` calling a
+function that only exists in a `site.js` they will not re-fetch for a year.
+That is not hypothetical, it is what shipped — `window.AMV.fleetMedia is not a
+function`, thrown only at people who had visited before.
+
+Assets now carry `max-age=0, must-revalidate`. That is a conditional request
+per asset, answered with a 304 and a few hundred bytes when nothing changed —
+the right trade for a hand-maintained site whose alternative is silently
+serving mismatched code. **If long-lived caching is ever wanted back, the
+filenames have to carry a content hash first, and something has to generate
+them.** Do not restore `immutable` over stable names.
+
+The `?v=2` on the CSS and JS tags is a **one-time escape, not a convention to
+maintain.** Fixing the header does nothing for caches already poisoned under
+the old one — those copies are pinned for a year and will not be re-requested
+to discover the new policy. A changed query string is a different cache key, so
+it forces the one fetch that gets those browsers onto the revalidating policy.
+Once a visitor has been through it, revalidation carries every change after,
+and the number never needs bumping again.
+
 ---
 
 ## Notes for whoever picks this up next

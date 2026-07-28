@@ -15,8 +15,25 @@
   # page's CSP does not govern.
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://inflight.info https://site--indgo-backend--6dmjph8ltlhv.code.run; connect-src 'self' https://inflight.info; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'self'
 
+# These filenames are NOT content-hashed — this site has no build step, so
+# /assets/js/site.js keeps that name while its contents change under it. It was
+# served `max-age=31536000, immutable`, which is a promise to the browser that
+# the bytes at this URL will never change, and that promise was false.
+#
+# What that cost: `immutable` means the browser will not even revalidate, so a
+# returning visitor kept a year-old site.js while getting fresh HTML — the two
+# are cached under different rules because HTML is not under /assets/*. Ship a
+# page that calls a function added to site.js in the same commit and it throws
+# on exactly the people who had been to the site before. Which is what happened:
+# "window.AMV.fleetMedia is not a function".
+#
+# So assets revalidate now. That costs a conditional request per asset, which
+# is a 304 and a few hundred bytes when nothing changed — the right trade for a
+# hand-maintained site where the alternative is silently shipping mismatched
+# code. If this ever needs long-lived caching back, the filenames have to carry
+# a content hash FIRST, and something has to generate them.
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate
 
 /brand.json
   Access-Control-Allow-Origin: *
