@@ -529,82 +529,111 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================ HERO =======================================
-   White, and the aeroplane is the hero. The 787-9 special-livery artwork is
-   drawn on white already, so it bleeds into the page with no cutout and no
-   panel around it — the folk-art illustration bursting off the fuselage is the
-   decoration, and it belongs to the airline.
+   Two columns of content over a full-bleed aircraft.
 
-   This replaces, in order: a blurred tri-hue gradient, a dot-grid, a tiled
-   azulejo, and a hand-drawn eagle watermark. None of them were as Mexican as
-   the actual aircraft. */
+   The previous version was a left-aligned block of copy with the entire right
+   half of the viewport left white, and the artwork as a separate slab beneath
+   it. That is the stock landing-page hero, and no amount of adjusting the
+   padding fixes it — the composition was the problem. So:
+
+     · the copy keeps the left, but the right carries the airline in four
+       counted figures, which is real information rather than filler;
+     · the artwork is genuinely full-bleed and slightly overscanned, so it runs
+       off both edges and reads as a crop of something larger rather than an
+       object floating in a box with margins.
+   ========================================================================= */
 .hero { position: relative; background: var(--bg); color: var(--ink); overflow: hidden; }
-.hero__inner { padding-block: clamp(2.25rem, 5vw, 3.75rem) clamp(1.25rem, 2.5vw, 2rem); position: relative; }
-.hero h1 { margin-block: 1.2rem; max-width: 15ch; text-wrap: balance; }
+.hero__inner {
+    display: grid; gap: clamp(1.75rem, 4vw, 3.5rem);
+    padding-block: clamp(2.25rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+}
+/* Two columns only once there is genuinely room; below that the figures stack
+   under the copy rather than squeezing it. `end` alignment sits the last rule
+   of the figures on the same baseline as the buttons. */
+@media (min-width: 62rem) {
+    .hero__inner {
+        grid-template-columns: minmax(0, 1.3fr) minmax(16rem, .7fr);
+        align-items: end;
+    }
+}
+.hero h1 { margin-block: 1rem; max-width: 15ch; text-wrap: balance; }
 .hero .lede { max-width: 46ch; }
 .hero .eyebrow { margin-bottom: .3rem; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
+
+/* --- The four figures --- */
+.hero__facts { margin: 0; display: grid; }
+.hero__facts > div {
+    display: flex; align-items: baseline; gap: clamp(.9rem, 2vw, 1.4rem);
+    padding: .8rem 0; border-top: 1px solid var(--line);
+}
+.hero__facts > div:last-child { border-bottom: 1px solid var(--line); }
+.hero__facts dt {
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 60, 'WONK' 0;
+    font-size: 1.9rem; line-height: 1; letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.4ch; text-align: right; color: var(--accent);
+}
+.hero__facts dd { margin: 0; display: grid; }
+.hero__facts dd b { font-size: .95rem; font-weight: 700; letter-spacing: -.005em; }
+.hero__facts dd span { font-size: .84rem; color: var(--muted); }
+
+/* --- The aircraft --- */
+/* Full-bleed and overscanned. `width: 108%` on a centred flex child inside an
+   overflow-hidden figure bleeds it off both edges at every viewport width. */
+.hero__art {
+    margin: 0; width: 100%; padding: 0;
+    display: flex; justify-content: center; overflow: hidden;
+}
+.hero__art img {
+    flex: none; width: 108%; max-width: none; height: auto;
+    aspect-ratio: 1394 / 372;
+}
+
+/* The artwork is drawn on white, so in the dark theme it needs its own band
+   rather than a glaring slab with nothing holding it. Full width, no radius —
+   an overscanned image cannot have rounded corners, they are off-screen. */
+:root[data-theme="dark"] .hero__art img { background: #fff; padding-block: 1rem; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .hero__art img { background: #fff; padding-block: 1rem; }
+}
+
+/* Below this the aircraft stops fitting and is sized by height instead: fitted
+   whole to a phone it is ~100px tall and illegible, which was the single worst
+   thing on the page. ~1.35x the viewport keeps the airframe complete while the
+   illustration bleeds off. */
 @media (max-width: 48rem) {
+    .hero__art img {
+        width: auto; height: clamp(9rem, 36vw, 13rem);
+    }
     .hero__inner { padding-block: 1.75rem 1.5rem; }
     .hero h1 { margin-block: .8rem; }
     .hero__cta { margin-top: 1.6rem; gap: .6rem; }
     .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
-}
-.hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.2rem; }
 
-/* Wider than the text measure on purpose: the artwork runs out toward the
-   viewport edges while the copy stays in the column. The aspect-ratio reserves
-   its height so the page does not jump while the image decodes. */
-.hero__art {
-    margin: 0 auto; width: 100%; max-width: 1500px;
-    padding-inline: clamp(.5rem, 2vw, 1.5rem);
-}
-.hero__art img { width: 100%; height: auto; aspect-ratio: 1394 / 372; }
-
-/* The artwork is 3.7:1. Fitted to a phone that is ~100px tall and the aircraft
-   is illegible, which is the single worst thing about the page on a handset.
-   So below this width it stops fitting: it is sized by HEIGHT, overflows the
-   viewport, and is centred and clipped — the aircraft reads at a usable size
-   and the illustration bleeds off both edges, which is a deliberate crop
-   rather than a shrunken whole. */
-@media (max-width: 48rem) {
-    .hero__art {
-        display: flex; justify-content: center;
-        overflow: hidden; padding-inline: 0;
-    }
-    .hero__art img {
-        flex: none; width: auto; max-width: none;
-        /* ~1.35x the viewport: enough that the aircraft reads, little enough
-           that the whole airframe still fits and only the illustration
-           bleeds off. Larger and the nose and tail get cut, which looks like
-           a mistake rather than a crop. */
-        height: clamp(9rem, 36vw, 13rem); aspect-ratio: 1394 / 372;
-    }
+    /* Two up. Stacked one per row these four figures run to ~600px and push
+       the aircraft off the bottom of the screen entirely, which is the thing
+       the hero is here to show. */
+    .hero__facts { grid-template-columns: 1fr 1fr; column-gap: clamp(1rem, 4vw, 1.6rem); }
+    .hero__facts > div:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+    .hero__facts dt { font-size: 1.6rem; }
+    .hero__facts dd b { font-size: .9rem; }
+    .hero__facts dd span { font-size: .78rem; }
 }
 
-/* The livery art is drawn on white, so in the dark theme it needs its own
-   plate rather than a glaring full-bleed slab — a light insert in a dark page,
-   the way a printed plate reads. */
-:root[data-theme="dark"] .hero__art img {
-    background: #fff; border-radius: var(--radius); padding: 1.25rem 1rem;
-}
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero__art img {
-        background: #fff; border-radius: var(--radius); padding: 1.25rem 1rem;
-    }
-}
-/* Once the artwork bleeds past the viewport the rounded plate would be a card
-   with its corners off-screen. It becomes a full-width band instead. */
-@media (max-width: 48rem) {
-    :root[data-theme="dark"] .hero__art img { border-radius: 0; padding: .9rem 0; }
-    @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) .hero__art img { border-radius: 0; padding: .9rem 0; }
-    }
+/* On a phone the sub-notes wrap to three lines each and cost ~160px, which is
+   the difference between the aircraft being on the first screen and not. The
+   figure and its label carry the meaning on their own at this size. */
+@media (max-width: 34rem) {
+    .hero__facts dd span { display: none; }
+    .hero__facts > div { padding: .7rem 0; }
 }
 
-/* A line of facts under the artwork, every one counted off data.js. */
-.strip { border-top: 1px solid var(--line); }
+/* A single line of counted facts. The hero used to use this; it now runs its
+   own four-figure block, but fleet.html still sets its type counts this way. */
 .strip__facts {
     display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1.2rem;
-    padding-block: 1.15rem;
     font-size: .88rem; color: var(--muted);
 }
 .strip__facts span { display: inline-flex; align-items: center; gap: 1.2rem; }

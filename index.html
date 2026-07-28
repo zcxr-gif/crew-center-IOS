@@ -46,30 +46,31 @@
          azulejo and a hand-drawn eagle watermark. -->
     <section class="hero">
         <div class="wrap hero__inner">
-            <span class="eyebrow">Infinite Flight · Expert Server</span>
-            <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
-            <p class="lede">
-                Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight — from
-                Mexico City out to New York, Madrid, Tokyo and Buenos Aires. Real routes, a real
-                rank ladder, and every hour logged automatically.
-            </p>
-            <div class="hero__cta">
-                <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                <a class="btn btn--ghost" href="/network">Explore the network</a>
+            <div class="hero__copy">
+                <span class="eyebrow">Infinite Flight · Expert Server</span>
+                <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
+                <p class="lede">
+                    Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight — from
+                    Mexico City out to New York, Madrid, Tokyo and Buenos Aires. Real routes, a real
+                    rank ladder, and every hour logged automatically.
+                </p>
+                <div class="hero__cta">
+                    <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                    <a class="btn btn--ghost" href="/network">Explore the network</a>
+                </div>
             </div>
+            <!-- The airline in four counted figures. This used to be a strip
+                 under the artwork; it sits here because the right half of the
+                 hero was otherwise empty white, which is what made the page
+                 read as a template. -->
+            <dl class="hero__facts" id="heroFacts"></dl>
         </div>
         <figure class="hero__art">
-            <!-- Dimensions are on the tag so the box is reserved before decode
-                 and the facts line below it does not jump. -->
+            <!-- Dimensions are on the tag so the box is reserved before decode. -->
             <img src="/assets/img/plane-hero.webp" width="1394" height="372" fetchpriority="high"
                  alt="Aeroméxico Boeing 787-9 in its special livery, surrounded by Mexican folk-art
                       illustration — eagles, skulls, marigolds and a feathered serpent.">
         </figure>
-        <div class="strip">
-            <div class="wrap">
-                <p class="strip__facts" id="heroFacts"></p>
-            </div>
-        </div>
     </section>
 
     <!-- ==================== LIVE NOW ==================== -->
@@ -251,16 +252,20 @@
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     // ---- Hero facts ----
-    // Counted off the arrays in data.js, so they cannot drift from what the
-    // site actually lists. This strip used to animate a fabricated pilot count
-    // and hours total; nothing here is typed in by hand any more.
+    // Every figure counted off the arrays in data.js, so none of them can drift
+    // from what the site actually lists. This block used to animate a fabricated
+    // pilot count and hours total; nothing here is typed in by hand any more.
     const dests = new Set(D.routes.map(r => r.to)).size;
     document.getElementById('heroFacts').innerHTML = [
-        `${D.hubs.length} hubs`,
-        `${dests} destinations`,
-        `${D.fleet.length} aircraft types`,
-        'Expert Server only',
-    ].map(t => `<span>${esc(t)}</span>`).join('');
+        [D.hubs.length,  'Hubs',           'Mexico City, Guadalajara, Monterrey'],
+        [dests,          'Destinations',   'Across five regions'],
+        [D.fleet.length, 'Aircraft types', 'Every one flyable in the sim'],
+        [D.ranks.length, 'Ranks',          'Cadet to Line Check Captain'],
+    ].map(([n, label, note]) => `
+        <div>
+            <dt>${n}</dt>
+            <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
+        </div>`).join('');
 
     // ---- Fleet preview ----
     // The types a new pilot actually starts on. It used to sort by a
