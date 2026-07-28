@@ -31,6 +31,17 @@
 
    So: no hand-drawn motif, no repeating geometric fill, no multi-hue gradient.
    If a page needs decoration it needs a photograph, or the airline's own art.
+
+   Where the dark sections went after that, and why it is not a walk-back: the
+   ruled device now runs down BOTH edges and the eagle sits faded behind them.
+   Both are the same two generated files the rule above allows — stripes
+   measured off full-logo.webp, the mark traced off Aeromexico-Symbol.webp —
+   used more, not joined by anything new. The one addition is a two-stop red →
+   rosa ramp painted under the stripe mask. That is not the gradient this file
+   threw out: that one was three invented hues washed behind entire pages; this
+   is two colours already in the palette, confined to a device generated from
+   the logo. The line to hold is the source of the artwork, not the count of
+   the colours — if the next idea needs something DRAWN, it is the wrong idea.
    ========================================================================== */
 
 :root {
@@ -180,10 +191,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
     }
 }
 
-/* The ruled-feather device, run down the right edge of dark sections.
-   Bars flush right, ragged left — the block of rules beside the eagle in the
-   logo, extended. Generated from the logo itself by tools/make-stripes.py, so
-   the ragged profile is measured rather than invented.
+/* ---- The ruled-feather device -------------------------------------------
+   Run down BOTH edges of dark sections: bars flush to the outside with the
+   ragged edge facing in, mirrored left and right. It is the block of rules
+   beside the eagle in the logo, extended — generated from the logo itself by
+   tools/make-stripes.py, so the ragged profile is measured rather than
+   invented, and the mirror is that same profile flipped, not a second guess.
+
+   One pseudo-element spans the whole section and carries TWO mask layers,
+   one pinned to each edge. Two elements would be the obvious build, but the
+   colour below is a single gradient across the full width, and splitting it
+   into two elements would restart the ramp at each rail so the two sides no
+   longer agree.
+
+   The gradient is where the extra detail lives. A flat red rail states the
+   livery once; ramping red → rosa mexicano → red down the section makes the
+   two sides read as one composition, and picks up the rosa that already runs
+   through the fleet rules. Two hues off the existing palette, on a device
+   generated from the logo — not a third colour invented for the occasion.
 
    Attached as a pseudo-element rather than a div so it needs no markup and no
    page can forget it. z-index -1 keeps it behind the copy; every host below
@@ -191,23 +216,76 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .band::after,
 .footer::after,
 .section--ink::after {
-    content: ""; position: absolute; right: 0; top: 0; bottom: 0;
-    width: clamp(1.75rem, 5vw, 4rem);
-    background: var(--am-red);
-    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
-            mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+        var(--am-red) 0%, var(--am-rosa) 42%, var(--am-rosa) 58%, var(--am-red) 100%);
+    --stripe-w: clamp(1.75rem, 5vw, 4rem);
+    -webkit-mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--stripe-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--stripe-w) var(--stripe-tile);
+            mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--stripe-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--stripe-w) var(--stripe-tile);
     z-index: -1; pointer-events: none;
 }
 /* The band already isolates; these two need to so the -1 stays contained. */
 .footer, .section--ink { isolation: isolate; }
 
-/* Reserve the gutter the device occupies. Below --maxw the wrap fills the
+/* ---- The eagle, faded in behind ------------------------------------------
+   The Caballero Águila the nav and footer already carry, blown up and dropped
+   to a whisper behind dark sections. Same mask, same file — so it is the
+   airline's own symbol at low contrast, not a background texture drawn to
+   look like one.
+
+   It sits at -2, under the rails at -1, and is deliberately weak: at 6% white
+   on navy it reads as a shape in the paper rather than a picture, and it is
+   never what carries meaning on the page. Anything stronger and the copy on
+   top starts fighting it — the band's headline is centred right over the
+   eagle's head.
+
+   Sized to sit INSIDE the section (82% of its height) rather than overrun it.
+   Scaled past the edges the bird crops to an unreadable blob — a big soft
+   shape behind the copy, which is the texture this file already threw out
+   once. Whole and quiet reads as the mark; cropped and loud reads as noise.
+
+   Hence the cap. 82% alone is a percentage of the SECTION, and a section can
+   be any height: on the home page's route block it worked out to a bird well
+   over a thousand pixels tall, cropped on all four sides and sitting behind a
+   data table. The cap is what keeps it a watermark on a tall section instead
+   of scaling with the content; short sections like the band never reach it.
+
+   Not on the footer: that is four columns of links and a disclaimer over a
+   shallow band, the one place where a watermark lands squarely behind text
+   that has to stay legible, and the brand column already carries the mark at
+   full strength a few pixels away. */
+.band::before,
+.section--ink::before {
+    content: ""; position: absolute; inset: 0;
+    background: #fff; opacity: .06;
+    -webkit-mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
+            mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
+    z-index: -2; pointer-events: none;
+}
+/* The mark is half again as wide as it is tall, so on a narrow screen the
+   height that fits is the width that doesn't, and the bird clips at both
+   sides. Below this width, size it off the width instead. There is no
+   cross-axis min() in CSS — sizing by height and by width are separate
+   keywords — so this is a breakpoint rather than one expression. */
+@media (max-width: 34rem) {
+    .band::before,
+    .section--ink::before {
+        -webkit-mask-size: 88% auto;
+                mask-size: 88% auto;
+    }
+}
+
+/* Reserve the gutters the device occupies. Below --maxw the wrap fills the
    viewport and its own padding is the only thing between the copy and the
-   stripes, so without this the last column collides with them on tablets and
-   phones. The band centres its text, so it takes the reservation on both
-   sides and stays centred; the others only need it on the right. */
+   stripes, so without this the outer column collides with them on tablets and
+   phones. Now that the rails run down both edges, every host reserves on both
+   sides — the band already did, being centred. */
 .footer > .wrap,
-.section--ink > .wrap { padding-right: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
+.section--ink > .wrap,
 .band > .wrap { padding-inline: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
 
 /* ============================ BRAND MARKS ================================
