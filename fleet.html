@@ -16,7 +16,7 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/brand.css?v=2">
 <script>
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
@@ -86,8 +86,8 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js"></script>
-<script src="/assets/js/site.js"></script>
+<script src="/assets/js/data.js?v=2"></script>
+<script src="/assets/js/site.js?v=2"></script>
 <script>
 (function () {
     const D = window.AMV_DATA;
@@ -107,7 +107,7 @@
 
     document.getElementById('fleetGrid').innerHTML = D.fleet.map((a, i) => `
         <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${(i % 3) * 80}">
-            <div class="fleet-card__media">${window.AMV.MARK}</div>
+            <div class="fleet-card__media">${window.AMV.fleetMedia(a)}</div>
             <div class="fleet-card__body">
                 <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
                 <h3>${esc(a.type)}</h3>

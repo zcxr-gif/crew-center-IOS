@@ -10,7 +10,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 index.html        Home — hero, live roster, fleet, network, ranks, next event
 fleet.html        The six operated types
 network.html      Hubs + all 23 sectors, filterable by region
-events.html       Upcoming and flown events
+events.html       The live events + calendar embed
 join.html         Requirements + the real application form (framed)
 crew.html         The Crew Center, framed in our own chrome
 
@@ -18,7 +18,8 @@ brand.json        ← the brand contract. See "One brand, two products" below.
 assets/brand.css  The design system. Every token lives here.
 assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
 assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
-assets/js/live.js Mounts the Inflight live-traffic widget
+assets/js/live.js Mounts both Inflight embeds — live traffic and events
+assets/js/crew.js Read-only client for the crew center's public feeds
 tools/            Regenerate mark.svg and plane-hero.webp from the source art
 assets/img/       Supplied artwork, and what is generated from it. See below.
 ```
@@ -27,9 +28,10 @@ assets/img/       Supplied artwork, and what is generated from it. See below.
 
 ## The artwork
 
-The decoration on this site is material the airline actually owns. Nothing is
-drawn by hand, and that is the third answer to this question rather than the
-first — the two before it are worth knowing about so they don't come back.
+Most of the decoration on this site is material the airline actually owns, and
+the rest is geometry generated from parameters. Nothing is drawn by eye. That
+is the third answer to this question rather than the first — the two before it
+are worth knowing about so they don't come back in their original form.
 
 **First** the site leaned on a blue → plum → pink gradient: blurred behind the
 hero, painted across the CTA band, clipped into the headline, and used as the
@@ -43,14 +45,56 @@ airline's design reads as exactly what it is. The azulejo in particular was
 tiled edge to edge behind whole sections, which is the wallpaper a generated
 layout reaches for.
 
-**Now** it is the real thing:
+**The greca and the serpent have since come back, generated.** The VA asked for Mexican
+patterns knowing what the paragraph above says; that is their call about their
+own airline. What makes the fret defensible where the azulejo and the papel
+picado were not is that it is the one motif here that is *architectural rather
+than pictorial* — stepped right angles on a grid — so `tools/make-greca.py`
+generates it from parameters instead of anyone illustrating it, and it is used
+as texture and as a rule, never as a subject. The standing rule in `brand.css`
+is now **no pictorial invention**: if the next idea cannot be expressed as a
+script that emits it, it is the wrong idea. The Quetzalcóatl frieze
+(`make-serpent.py`) came in on the same terms — chevrons and rhombs on a grid,
+and the feathered serpent is already what the accent palette is taken from.
+
+**The eagle-and-serpent of the national coat of arms is still not here, and
+should not be.** The *escudo nacional* is a state emblem whose reproduction is
+regulated under the Ley sobre el Escudo, la Bandera y el Himno Nacionales, and
+a virtual airline has no claim on it — which is the same reason the tricolour
+on this site has only ever been plain bands. What the site pairs instead is
+Aeroméxico's **own** eagle (the Caballero Águila, `mark.svg`, watermarked
+behind `.band`) with the serpent frieze along that section's top edge: two
+motifs sharing a section, not that device.
+
+**Now** it is the airline's own material, plus one generated ornament:
 
 | file | what it is | where it runs |
 |---|---|---|
-| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries |
+| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries, and faded behind dark sections |
 | `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
+| `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
+| `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
+| `assets/img/greca-tile.svg` | the same fret over its mirror | a faint field across `.section--alt` |
+| `assets/img/serpent.svg` | a Quetzalcóatl frieze, generated from a grid | a band along the top of every `.band` |
+| the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
+
+**The fleet photographs are hotlinked, deliberately.** They live in the
+tracker's `community-aircraft` bucket — the same objects the live map serves —
+so re-uploading a shot there updates this site with no deploy, and there is one
+copy of each rather than one here that quietly goes stale. The trade is a
+runtime dependency on that bucket: if it moves, the fleet cards fall back to
+nothing rather than to the mark, because the `<img>` is already in the DOM by
+then. `img-src` in `_headers` is `'self' data: https:`, so no CSP change was
+needed and none is needed for a future bucket either.
+
+Each entry carries the airframe's registration and the file's real pixel
+dimensions. The dimensions go on the tag: these are off-site images, so without
+them a card has no height until the image lands, and the grid jumps when it
+does. A type with no `photo` falls back to the mark — `AMV.fleetMedia` in
+`site.js` owns that choice, because both the home-page preview and the fleet
+page render entries and the fallback has to behave the same in each.
 
 Two build steps, both reproducible and both leaving the supplied originals
 untouched:
@@ -58,7 +102,9 @@ untouched:
 ```bash
 python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
 python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
-python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg
+python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg + stripes-mirror.svg
+python3 tools/make-greca.py   # (parameters only)      -> greca.svg + greca-tile.svg
+python3 tools/make-serpent.py # (parameters only)      -> serpent.svg
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
@@ -74,20 +120,47 @@ mark) and the surrounding white, which was pushing the aircraft below the fold.
 It detects the band rather than hard-coding it, so a re-exported source still
 works.
 
-`make-stripes.py` produces the ruled column that runs down the right-hand edge
-of the dark sections — bars flush right with a ragged left edge, the way the
-rules sit beside the eagle in the mark. **The bar lengths are measured, not
-invented:** the script finds the ruled block in `full-logo.webp` (the right edge
-that *recurs* across rows — the furthest-right ink is the eagle's head, which
-would give forty identical bars) and records how far left each rule reaches.
-That ragged profile is the pattern.
+`make-stripes.py` produces the ruled columns that run down **both** edges of the
+dark sections — bars flush to the outside with the ragged edge facing in, the
+way the rules sit beside the eagle in the mark. **The bar lengths are measured,
+not invented:** the script finds the ruled block in `full-logo.webp` (the right
+edge that *recurs* across rows — the furthest-right ink is the eagle's head,
+which would give forty identical bars) and records how far left each rule
+reaches. That ragged profile is the pattern, and the mirror is the same profile
+flipped rather than a second guess at it.
 
-Two things about wiring it up. It is attached as a `::after` on `.band`,
-`.footer` and `.section--ink`, so no page has to remember it, and each of those
-isolates so the `z-index: -1` cannot escape its section. And the mask is sized
-`100% var(--stripe-tile)` rather than `100% auto` — `auto` ties the vertical
-rhythm to the column width, which collapses the bars to hairlines on a phone.
-Keep `--stripe-tile` in step with what the generator prints.
+Three things about wiring it up.
+
+It is attached as an `::after` on `.band`, `.footer` and `.section--ink`, so no
+page has to remember it, and each of those isolates so the `z-index: -1` cannot
+escape its section. **One** pseudo-element spans the section and carries two
+mask layers, one pinned to each edge — two elements would be the obvious build,
+but the paint under the mask is a single gradient across the full width, and
+splitting it would restart the ramp at each rail so the two sides stopped
+agreeing. That gradient (red → rosa mexicano → red, down the section) is why
+there are two mirrored files instead of one flipped with a CSS transform: a
+transform on that element would turn both rails.
+
+The mask is sized `var(--stripe-w) var(--stripe-tile)` rather than `… auto` —
+`auto` ties the vertical rhythm to the column width, which collapses the bars to
+hairlines on a phone. Keep `--stripe-tile` in step with what the generator
+prints.
+
+Both rails need a gutter reserved, so `.band`, `.footer` and `.section--ink`
+each pad their `.wrap` on both sides. Below `--maxw` the wrap fills the viewport
+and its own padding is all that keeps the outer column off the stripes.
+
+**The mark also runs faded behind `.band` and `.section--ink`** — a `::before`
+at `z-index: -2`, white at 6%, the same `mark.svg` through the same mask. Two
+things keep it a watermark rather than the texture this project already threw
+out once. It is sized to sit *inside* the section, because scaled past the edges
+the bird crops to an unreadable blob. And that size is capped (`min(82%, 26rem)`)
+rather than a bare percentage: a percentage is of the *section*, and on a tall
+one — the home page's route block — 82% worked out to a bird over a thousand
+pixels tall sitting behind a data table. Not on `.footer`: four columns of links
+and a disclaimer over a shallow band is the one place a watermark lands squarely
+behind text that has to stay legible, and the brand column already carries the
+mark at full strength a few pixels away.
 
 **If a page needs decoration it needs a photograph or the airline's own art.**
 Not a hand-drawn motif, not a repeating geometric fill, not a gradient.
@@ -133,12 +206,86 @@ and stops. No CSS ever travels as CSS.
 
 ---
 
+## Fed by the crew center
+
+The crew center is where the airline is actually run — sectors are added there,
+pilots join there, hours accrue there. Anything this site states that the crew
+center also knows should come **from** the crew center, or the two will
+disagree and the website will be the one that is wrong.
+
+`assets/js/crew.js` is the read-only client. Everything it reads is public and
+CORS-open (`Access-Control-Allow-Origin: *`), so there is no key in it and
+nothing to keep out of git — writes are gated, reads are not.
+
+| helper | endpoint | used for |
+|---|---|---|
+| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` |
+| `AMV_CREW.stats()` | `GET /api/crew/<slug>/roster` | aggregate pilots + hours |
+| `AMV_CREW.get(path)` | anything else public | adding a feed |
+
+**The rule for every feed: the page must already be correct before the fetch
+runs.** Each helper resolves to `null` on any failure — offline, slow, backend
+down, endpoint changed — and every caller treats `null` as "leave what is
+already on the page". `data.js` stays the fallback rather than becoming dead
+weight. Never build a section that only exists once a fetch resolves; a visitor
+on hotel wifi gets an empty page instead of a slow one.
+
+An **empty** answer is treated the same as no answer, deliberately. A crew
+center whose route list has not been filled in yet would otherwise blank a
+network page that this repo already knows 23 sectors for.
+
+The two record shapes do not match, and that is the interesting part. The crew
+center knows the sector and the aircraft; `data.js` knows the things a reader
+wants and an ops tool has no reason to store — the destination's city, which
+region it belongs to, the scheduled block time. A live sector is matched to its
+`data.js` twin on the airport pair and takes those labels from it. **A sector
+with no twin is still shown, with only the fields we genuinely have** — no city
+invented for it, no block time guessed at, and its region falls into a plain
+`Network` bucket rather than being assigned one. Everything counted off the
+list — the sector count, the per-hub sector counts — is counted off whichever
+list is current, so the page cannot say 23 above a list of 3.
+
+Adding a feed is `AMV_CREW.get('/api/…')`, a `null` check, and a re-render.
+The backend is in `connect-src` in `_headers`; a feed from a *new* origin needs
+that origin added there or the fetch is blocked.
+
+Roster data is read as an **aggregate only**. The endpoint is public and returns
+members individually, but a public marketing page has no reason to list who
+flies for the airline — the count and the hours are the airline's figures, the
+names are its people.
+
+---
+
 ## The live data
 
-Exactly one thing on this site is live: the **"who's airborne right now"**
-roster, which is Inflight's embed widget (`assets/js/live.js`) reading Infinite
-Flight traffic for callsigns starting `Aeromexico`. It runs in `roster` mode, so
-it renders no map, needs no Mapbox token, and costs nobody a map load.
+Two things on this site are live, and both are Inflight embeds mounted by
+`assets/js/live.js`:
+
+| Placeholder            | Widget                     | Served from |
+|------------------------|----------------------------|-------------|
+| `<div data-live-roster>` | Who's airborne right now | `inflight.info/embed.html` |
+| `<div data-live-events>` | Events + calendar        | the InGdo backend's `/embed-events.html` |
+
+The roster runs on the home page and the network page; the calendar is the
+whole of `events.html`.
+
+**One embed token drives both.** `live.js` holds the token Aeromexico Virtual
+was issued and appends nothing else, because nothing else would be read: once
+`?token=` is present, each widget resolves its own configuration from the
+backend and ignores query-string overrides. Which callsign prefixes count, which
+servers are scanned, roster vs map, the theme, the accent, the corner radius,
+the events template — all of it is set **on the token, in the VA portal**
+(Embed tab → Customize), not in this repo. Change the look there and both pages
+follow without a deploy.
+
+That is also why the site's own light/dark toggle no longer re-themes the
+roster: the widget's theme is whatever the token says. If it clashes with the
+page, set the token's theme in the portal.
+
+The token is a public, origin-restricted embed credential — the portal hands it
+out as a copy-paste `<iframe>`, so it belongs in the page source. It is not a
+secret and there is nothing to keep out of git. If it is ever rotated or
+revoked, change the one constant at the top of `live.js`.
 
 **The site states no figure it cannot back.** `data.js` used to carry
 `pilots: 640`, `hoursFlown: 48200`, `flightsFiled: 21400` and a `count` on
@@ -176,8 +323,37 @@ both forms when it highlights the active nav item, so nav looks right either way
 ## Deploying
 
 Netlify, publish directory `.`, no build command. `_redirects` and `_headers`
-are picked up automatically. `_headers` sets a CSP whose only permitted frame
-and connect target is `inflight.info`.
+are picked up automatically. `_headers` sets a CSP with exactly two permitted
+frame targets — `inflight.info` (crew center, application form, live traffic)
+and the InGdo backend origin that serves the events embed — and one connect
+target, `inflight.info`. Adding an embed served from a new origin means adding
+that origin to `frame-src`, or the frame is blocked with nothing in the page to
+show for it.
+
+**Assets revalidate, and must keep revalidating.** `/assets/*` was served
+`max-age=31536000, immutable`. Nothing under it is content-hashed — there is no
+build step, so `site.js` keeps that name while its contents change — which made
+that header a false promise, and `immutable` means the browser does not even
+ask. HTML is not under `/assets/*` and so caches by different rules, and the
+two drift apart: a returning visitor gets today's `fleet.html` calling a
+function that only exists in a `site.js` they will not re-fetch for a year.
+That is not hypothetical, it is what shipped — `window.AMV.fleetMedia is not a
+function`, thrown only at people who had visited before.
+
+Assets now carry `max-age=0, must-revalidate`. That is a conditional request
+per asset, answered with a 304 and a few hundred bytes when nothing changed —
+the right trade for a hand-maintained site whose alternative is silently
+serving mismatched code. **If long-lived caching is ever wanted back, the
+filenames have to carry a content hash first, and something has to generate
+them.** Do not restore `immutable` over stable names.
+
+The `?v=2` on the CSS and JS tags is a **one-time escape, not a convention to
+maintain.** Fixing the header does nothing for caches already poisoned under
+the old one — those copies are pinned for a year and will not be re-requested
+to discover the new policy. A changed query string is a different cache key, so
+it forces the one fetch that gets those browsers onto the revalidating policy.
+Once a visitor has been through it, revalidation carries every change after,
+and the number never needs bumping again.
 
 ---
 
@@ -204,6 +380,12 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**Events go stale.** `data.js` events carry ISO-8601 dates with an explicit UTC
-offset; `events.html` sorts them into upcoming and flown on its own. Past events
-do not need deleting — they move themselves.
+**One hand-typed copy of the events is left, on the home page.** `events.html`
+is now the live calendar out of the crew center, but the "next event" card on
+`index.html` still reads `data.js`, so the two can disagree — the home page can
+advertise a departure the calendar has never heard of. Whoever picks this up
+should close that: either drop the home-page card in favour of a second
+`data-live-events` mount on a compact events template, or wire it to the same
+feed. Until then, if you edit `data.js` events, check the home page against the
+real calendar. Those entries carry ISO-8601 dates with an explicit UTC offset
+and past ones age out on their own — nothing needs deleting.

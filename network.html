@@ -16,7 +16,7 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css">
+<link rel="stylesheet" href="/assets/brand.css?v=2">
 <style>
     .filters { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.6rem; }
     .filter {
@@ -62,14 +62,10 @@
                 <h2 style="margin-top:.9rem"><span id="routeCount">23</span> sectors</h2>
             </div>
             <div class="filters" id="filters" role="group" aria-label="Filter routes by region"></div>
-            <div class="table-scroll">
-                <table id="routes">
-                    <thead>
-                        <tr><th>Route</th><th>Destination</th><th>Region</th><th>Aircraft</th><th>Distance</th><th>Block</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+            <!-- Each sector is a card rather than a table row: the pair of
+                 airport codes is the thing a pilot is scanning for, and at
+                 table-cell size it was the smallest text on the page. -->
+            <div id="routes"></div>
             <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
                 Distances are great-circle nautical miles. Block times are scheduled and will vary
                 with routing, winds and the day's traffic.
@@ -84,7 +80,7 @@
                 <h2 style="margin-top:.9rem">Who's flying the network</h2>
                 <p class="lede">Aeromexico Virtual pilots airborne on the Expert Server this minute.</p>
             </div>
-            <div data-live-roster data-height="420" data-reveal>
+            <div data-live-roster data-reveal>
                 <div class="frame-host muted" style="padding:3rem;text-align:center">Loading live traffic…</div>
             </div>
         </div>
@@ -105,9 +101,10 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js"></script>
-<script src="/assets/js/site.js"></script>
-<script src="/assets/js/live.js"></script>
+<script src="/assets/js/data.js?v=2"></script>
+<script src="/assets/js/site.js?v=2"></script>
+<script src="/assets/js/crew.js?v=2"></script>
+<script src="/assets/js/live.js?v=2"></script>
 <script>
 (function () {
     const D = window.AMV_DATA, icon = window.AMV.icon;
@@ -115,8 +112,11 @@
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     // ---- Hubs ----
+    // The sector count per hub is counted off whichever list is current, so it
+    // cannot end up saying 23 while the list below it shows 3.
+    function renderHubs() {
     document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
-        const legs = D.routes.filter(r => r.from === h.icao || r.to === h.icao).length;
+        const legs = ROUTES.filter(r => r.from === h.icao || r.to === h.icao).length;
         return `
         <article class="card card--hover" data-reveal data-reveal-delay="${i * 80}">
             <div class="card__icon">${icon('pin')}</div>
@@ -130,30 +130,72 @@
             </div>
         </article>`;
     }).join('');
+    }
 
     // ---- Region filter ----
-    const regions = ['All', ...Array.from(new Set(D.routes.map(r => r.region)))];
     let active = 'All';
 
-    document.getElementById('filters').innerHTML = regions.map(r =>
-        `<button class="filter" type="button" data-region="${esc(r)}"
-                 aria-pressed="${r === 'All'}">${esc(r)}</button>`).join('');
+    function renderFilters() {
+        const regions = ['All', ...Array.from(new Set(ROUTES.map(r => r.region)))];
+        if (!regions.includes(active)) active = 'All';
+        document.getElementById('filters').innerHTML = regions.map(r =>
+            `<button class="filter" type="button" data-region="${esc(r)}"
+                     aria-pressed="${r === active}">${esc(r)}</button>`).join('');
+    }
 
-    const tbody = document.querySelector('#routes tbody');
+    const list = document.getElementById('routes');
     const count = document.getElementById('routeCount');
 
+    // The sectors this page shows. Starts as the copy in data.js so the page is
+    // complete on first paint, and is replaced by the crew center's own list if
+    // that answers — see the live-routes block at the bottom.
+    let ROUTES = D.routes;
+
+    // Lookups off the same arrays, so nothing here is a second copy of a fact.
+    // The origin is always one of our own hubs, which is where its airport name
+    // and city come from; a destination only has the city data.js gives it, so
+    // the card shows that and does not invent an airport name for it.
+    const hubBy  = Object.fromEntries(D.hubs.map(h => [h.icao, h]));
+    const typeBy = Object.fromEntries(D.fleet.map(a => [a.short, a.type]));
+
+    // Every line below the code is optional. A sector that came from the crew
+    // center and has no twin in data.js has no city and no region to show, and
+    // an empty line reserved for one is worse than not drawing it.
+    function end(icao, city, name, home, side) {
+        return `
+            <div class="route-end route-end--${side}">
+                <span class="route-end__code">${esc(icao)}</span>
+                ${city ? `<span class="route-end__place">
+                    ${home ? '<span class="flag" aria-hidden="true"></span>' : ''}${esc(city)}
+                </span>` : ''}
+                ${name ? `<span class="route-end__name">${esc(name)}</span>` : ''}
+            </div>`;
+    }
+
     function render() {
-        const rows = active === 'All' ? D.routes : D.routes.filter(r => r.region === active);
+        const rows = active === 'All' ? ROUTES : ROUTES.filter(r => r.region === active);
         count.textContent = rows.length;
-        tbody.innerHTML = rows.map(r => `
-            <tr>
-                <td><span class="route-pair">${esc(r.from)} <span class="arrow">→</span> ${esc(r.to)}</span></td>
-                <td>${esc(r.city)}</td>
-                <td><span class="tag">${esc(r.region)}</span></td>
-                <td class="mono">${esc(r.ac)}</td>
-                <td class="mono">${r.dist.toLocaleString()} nm</td>
-                <td class="mono">${esc(r.block)}</td>
-            </tr>`).join('');
+        list.innerHTML = rows.map((r, i) => {
+            const h = hubBy[r.from] || {};
+            return `
+            <article class="route-card" data-reveal data-reveal-delay="${Math.min(i, 6) * 40}">
+                <div class="route-card__ends">
+                    ${end(r.from, h.city || '', h.name || '', true, 'from')}
+                    <span class="route-card__arrow" aria-hidden="true">${icon('arrow')}</span>
+                    <span class="sr-only">to</span>
+                    ${end(r.to, r.city, r.region, r.region === 'Domestic', 'to')}
+                </div>
+                <div class="route-card__meta">
+                    ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
+                    ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
+                    ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
+                    ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
+                </div>
+            </article>`;
+        }).join('');
+        // The cards are injected, so their [data-reveal] has to be wired each
+        // time — without this a filtered-in card sits at opacity 0 forever.
+        window.AMV.refresh(list);
     }
 
     document.getElementById('filters').addEventListener('click', (e) => {
@@ -165,8 +207,48 @@
         render();
     });
 
+    renderHubs();
+    renderFilters();
     render();
     window.AMV.refresh();
+
+    // ---- Live routes from the crew center -----------------------------------
+    // The crew center is where sectors are actually added, so it — not this
+    // repo — is the airline's route network. data.js has already painted the
+    // page above; this replaces it if and only if the crew center answers.
+    //
+    // The two records are not the same shape. The crew center knows the sector
+    // and the aircraft; data.js knows the things a reader wants and an ops tool
+    // has no reason to store — the destination's city, which region it belongs
+    // to, the scheduled block time. So a live sector is matched to its data.js
+    // twin on the airport pair and takes those labels from it. Anything with no
+    // twin is still shown, with the fields we genuinely have: no city invented
+    // for it, no block time guessed at.
+    (function liveRoutes() {
+        if (!window.AMV_CREW) return;
+        const key = r => `${r.from}-${r.to}`;
+        const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
+
+        window.AMV_CREW.routes().then(live => {
+            if (!live) return;                       // backend quiet — keep data.js
+            ROUTES = live.map(r => {
+                const m = local[key(r)] || {};
+                return {
+                    from: r.from, to: r.to,
+                    city:   m.city   || '',
+                    region: m.region || 'Network',   // honest bucket, not a guess
+                    ac:     r.ac     || m.ac || '',
+                    dist:   r.dist   || m.dist || 0,
+                    block:  m.block  || '',
+                    flight: r.flight,
+                };
+            });
+            renderHubs();
+            renderFilters();
+            render();
+            window.AMV.refresh();
+        });
+    })();
 })();
 </script>
 </body>

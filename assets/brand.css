@@ -29,8 +29,41 @@
    The hero is that aircraft on white. It is the most Mexican thing available
    and it required no drawing.
 
-   So: no hand-drawn motif, no repeating geometric fill, no multi-hue gradient.
-   If a page needs decoration it needs a photograph, or the airline's own art.
+   Where the dark sections went next, still inside that rule: the ruled device
+   now runs down BOTH edges and the eagle sits faded behind them. Both are the
+   same two generated files — stripes measured off full-logo.webp, the mark
+   traced off Aeromexico-Symbol.webp — used more, not joined by anything new.
+   The one addition there is a two-stop red → rosa ramp under the stripe mask:
+   two colours already in the palette, confined to a device generated from the
+   logo, not three invented hues washed behind whole pages.
+
+   ---------------------------------------------------------------------------
+   AND THEN THE RULE WAS RELAXED, ON PURPOSE. READ THIS BEFORE RESTORING IT.
+
+   The VA asked for Mexican patterns twice, having been told what this file
+   says. That is their call to make about their own airline, so the greca is
+   here: the stepped fret off Mixtec and Zapotec stonework, generated from a
+   grid by tools/make-greca.py, tiled faintly across the pale sections and run
+   as a band along the top of the footer.
+
+   Be honest about what changed. The greca is NOT airline artwork the way the
+   mark and the aircraft are — nobody at Aeroméxico drew it, and the paragraphs
+   above would have refused it. What makes it defensible where the old azulejo
+   and papel picado were not:
+
+     - it is generated from parameters, not drawn by eye, so it is a real
+       geometry that can be retuned rather than a picture someone illustrated;
+     - it is built from right angles on a grid, which is what the ornament
+       actually is — this is the one Mexican motif that is architectural rather
+       than pictorial, so a faithful version needs no illustration;
+     - it is used as texture and as a rule, never as a subject, and never
+       standing in for the airline's own identity.
+
+   So the standing rule is now: no PICTORIAL invention — no drawn eagles, no
+   illustrated tiles, no papel picado bunting, nothing that imitates artwork a
+   designer would have been paid to make. Geometry generated from parameters is
+   allowed. If the next idea cannot be expressed as a script that emits it, it
+   is the wrong idea.
    ========================================================================== */
 
 :root {
@@ -109,6 +142,19 @@
        which prints the value it generated. */
     --stripe-tile: 520px;
 
+    /* The greca, in px. Both keep the generator's 60:24 (band) and 60:42 (tile)
+       proportions — stretch either axis on its own and the fret stops being
+       square-cornered, which is the whole character of the ornament. Sized in
+       px rather than `auto` for the same reason --stripe-tile is: `auto` ties
+       the pattern to the element's width and it collapses on a phone. */
+    --greca-band:   150px 60px;
+    --greca-band-h: 22px;     /* how much of that band shows as the footer rule */
+    --greca-tile:   90px 63px;
+
+    /* The Quetzalcóatl frieze. Same 128:29 the generator emits. */
+    --serpent-band: 128px 29px;
+    --serpent-h:    29px;
+
     --maxw: 1180px;
     color-scheme: light dark;
 }
@@ -180,10 +226,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
     }
 }
 
-/* The ruled-feather device, run down the right edge of dark sections.
-   Bars flush right, ragged left — the block of rules beside the eagle in the
-   logo, extended. Generated from the logo itself by tools/make-stripes.py, so
-   the ragged profile is measured rather than invented.
+/* ---- The ruled-feather device -------------------------------------------
+   Run down BOTH edges of dark sections: bars flush to the outside with the
+   ragged edge facing in, mirrored left and right. It is the block of rules
+   beside the eagle in the logo, extended — generated from the logo itself by
+   tools/make-stripes.py, so the ragged profile is measured rather than
+   invented, and the mirror is that same profile flipped, not a second guess.
+
+   One pseudo-element spans the whole section and carries TWO mask layers,
+   one pinned to each edge. Two elements would be the obvious build, but the
+   colour below is a single gradient across the full width, and splitting it
+   into two elements would restart the ramp at each rail so the two sides no
+   longer agree.
+
+   The gradient is where the extra detail lives. A flat red rail states the
+   livery once; ramping red → rosa mexicano → red down the section makes the
+   two sides read as one composition, and picks up the rosa that already runs
+   through the fleet rules. Two hues off the existing palette, on a device
+   generated from the logo — not a third colour invented for the occasion.
 
    Attached as a pseudo-element rather than a div so it needs no markup and no
    page can forget it. z-index -1 keeps it behind the copy; every host below
@@ -191,23 +251,144 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .band::after,
 .footer::after,
 .section--ink::after {
-    content: ""; position: absolute; right: 0; top: 0; bottom: 0;
-    width: clamp(1.75rem, 5vw, 4rem);
-    background: var(--am-red);
-    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
-            mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+        var(--am-red) 0%, var(--am-rosa) 42%, var(--am-rosa) 58%, var(--am-red) 100%);
+    --stripe-w: clamp(1.75rem, 5vw, 4rem);
+    -webkit-mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--stripe-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--stripe-w) var(--stripe-tile);
+            mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--stripe-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--stripe-w) var(--stripe-tile);
     z-index: -1; pointer-events: none;
 }
 /* The band already isolates; these two need to so the -1 stays contained. */
 .footer, .section--ink { isolation: isolate; }
 
-/* Reserve the gutter the device occupies. Below --maxw the wrap fills the
+/* ---- The eagle, faded in behind ------------------------------------------
+   The Caballero Águila the nav and footer already carry, blown up and dropped
+   to a whisper behind dark sections. Same mask, same file — so it is the
+   airline's own symbol at low contrast, not a background texture drawn to
+   look like one.
+
+   It sits at -2, under the rails at -1, and is deliberately weak: at 6% white
+   on navy it reads as a shape in the paper rather than a picture, and it is
+   never what carries meaning on the page. Anything stronger and the copy on
+   top starts fighting it — the band's headline is centred right over the
+   eagle's head.
+
+   Sized to sit INSIDE the section (82% of its height) rather than overrun it.
+   Scaled past the edges the bird crops to an unreadable blob — a big soft
+   shape behind the copy, which is the texture this file already threw out
+   once. Whole and quiet reads as the mark; cropped and loud reads as noise.
+
+   Hence the cap. 82% alone is a percentage of the SECTION, and a section can
+   be any height: on the home page's route block it worked out to a bird well
+   over a thousand pixels tall, cropped on all four sides and sitting behind a
+   data table. The cap is what keeps it a watermark on a tall section instead
+   of scaling with the content; short sections like the band never reach it.
+
+   Not on the footer: that is four columns of links and a disclaimer over a
+   shallow band, the one place where a watermark lands squarely behind text
+   that has to stay legible, and the brand column already carries the mark at
+   full strength a few pixels away. */
+.band::before,
+.section--ink::before {
+    content: ""; position: absolute; inset: 0;
+    background: #fff; opacity: .06;
+    -webkit-mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
+            mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
+    z-index: -2; pointer-events: none;
+}
+/* The mark is half again as wide as it is tall, so on a narrow screen the
+   height that fits is the width that doesn't, and the bird clips at both
+   sides. Below this width, size it off the width instead. There is no
+   cross-axis min() in CSS — sizing by height and by width are separate
+   keywords — so this is a breakpoint rather than one expression. */
+@media (max-width: 34rem) {
+    .band::before,
+    .section--ink::before {
+        -webkit-mask-size: 88% auto;
+                mask-size: 88% auto;
+    }
+}
+
+/* ---- The greca ------------------------------------------------------------
+   The stepped fret off Mixtec and Zapotec stonework — the mosaics at Mitla are
+   the ones everybody has seen. Generated by tools/make-greca.py from a grid,
+   not drawn: it is built entirely out of right angles, which is the reason it
+   can be generated at all and the reason it sits beside the ruled-feather
+   device without either looking out of place.
+
+   Two placements, both automatic so no page has to remember them:
+
+     .section--alt   a faint tiled field, the pale sections given a texture
+     .footer         a band across the top edge, closing the page
+
+   Painted through a mask like everything else here, so the colour is set by
+   `background` and follows the theme. */
+.section--alt::before {
+    content: ""; position: absolute; inset: 0;
+    background: var(--am-blue); opacity: .05;
+    -webkit-mask: url('/assets/img/greca-tile.svg') repeat left top / var(--greca-tile);
+            mask: url('/assets/img/greca-tile.svg') repeat left top / var(--greca-tile);
+    z-index: -1; pointer-events: none;
+}
+:root[data-theme="dark"] .section--alt::before { background: var(--am-blue-300); opacity: .05; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .section--alt::before { background: var(--am-blue-300); opacity: .05; }
+}
+
+/* The band closing the page. It sits ON the footer's top edge, half above and
+   half below, so it reads as a course of masonry rather than a border stuck to
+   a box. ::before is free here — the eagle watermark deliberately skips the
+   footer — and ::after is already the ruled rails. */
+.footer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: var(--greca-band-h);
+    transform: translateY(-50%);
+    background: var(--am-red);
+    -webkit-mask: url('/assets/img/greca.svg') repeat-x center / var(--greca-band);
+            mask: url('/assets/img/greca.svg') repeat-x center / var(--greca-band);
+    z-index: 1; pointer-events: none;
+}
+
+/* ---- The serpent ---------------------------------------------------------
+   Quetzalcóatl, as a frieze along the top edge of every .band: the chevron
+   body of a serpent course with a rhomb riding in each fold. Generated by
+   tools/make-serpent.py, same as the greca.
+
+   It runs on .band precisely because the eagle already does — the Caballero
+   Águila watermark sits behind that section. Eagle and serpent on one section
+   is the pairing the VA asked for, built from the airline's own mark and the
+   feathered serpent its accent palette is already taken from.
+
+   NOT the escudo nacional. The eagle-and-serpent of the coat of arms is a
+   state emblem whose reproduction is regulated, and a virtual airline has no
+   claim on it; the tricolour on this site has always been plain bands for the
+   same reason. These are two motifs sharing a section, not that device.
+
+   Hung on .band__wash rather than a pseudo-element of .band: .band::before is
+   the eagle and .band::after is the rails, and the wash is a real div every
+   band already has. It sits flush at the top rather than straddling the edge —
+   .band clips its overflow, so a straddling band would lose its top half. */
+.band__wash::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: var(--serpent-h);
+    background: var(--am-marigold);
+    -webkit-mask: url('/assets/img/serpent.svg') repeat-x center / var(--serpent-band);
+            mask: url('/assets/img/serpent.svg') repeat-x center / var(--serpent-band);
+    pointer-events: none;
+}
+
+/* Reserve the gutters the device occupies. Below --maxw the wrap fills the
    viewport and its own padding is the only thing between the copy and the
-   stripes, so without this the last column collides with them on tablets and
-   phones. The band centres its text, so it takes the reservation on both
-   sides and stays centred; the others only need it on the right. */
+   stripes, so without this the outer column collides with them on tablets and
+   phones. Now that the rails run down both edges, every host reserves on both
+   sides — the band already did, being centred. */
 .footer > .wrap,
-.section--ink > .wrap { padding-right: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
+.section--ink > .wrap,
 .band > .wrap { padding-inline: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
 
 /* ============================ BRAND MARKS ================================
@@ -282,7 +463,7 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .wrap    { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: clamp(1.15rem, 4vw, 2rem); }
 .section { padding-block: clamp(3.5rem, 8vw, 7rem); }
 .section--tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
-.section--alt   { background: var(--bg-alt); }
+.section--alt   { position: relative; isolation: isolate; background: var(--bg-alt); }
 .section--ink   { position: relative; isolation: isolate; background: var(--am-navy); color: #EEF2F8; }
 .section--ink .muted   { color: #9DB0CE; }
 .section--ink .eyebrow { color: #9DB0CE; }
@@ -676,6 +857,49 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .fleet-card:nth-child(6n+6) .fleet-card__media .mark { color: var(--am-cobalt); }
 .fleet-card__media img { width: 100%; height: auto; }
 
+/* The airframe itself, where there is a photograph of it. These are the VA's
+   own sim shots off the community-aircraft gallery — real material, which is
+   the only kind this site decorates with.
+
+   Fixed aspect box with object-fit, not `height: auto`: the gallery's shots are
+   not all the same ratio (some 1920x886, some 1920x864), and left to their own
+   heights a row of three cards has three different photo heights and the type
+   names below them stop lining up. The ratio here is the gallery's own, so the
+   crop it applies is a hair off the top and bottom of the taller ones rather
+   than anything that cuts an aircraft.
+
+   The tinted surface behind is what shows while an off-site image is still in
+   flight, so the card holds its shape instead of flashing white. */
+.fleet-card__media { position: relative; }
+.fleet-card__media .fleet-photo {
+    aspect-ratio: 1920 / 886;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+
+/* The mark as a tail badge on the photo, in the type's own livery colour —
+   the same colour that opens the card as a rule above it. Small on purpose:
+   the photograph is the subject now, and the badge is there to keep the
+   per-type colour, not to compete with the aircraft.
+
+   It sits on a light chip rather than straight on the image because these
+   shots are mostly sky, and a coloured mark on pale blue at this size is
+   unreadable. The chip is near-white in both themes for the same reason —
+   it is a surface for the mark, not a themed surface.
+
+   The chip has to be a WRAPPER, not the mark itself: .mark paints by masking
+   `background: currentColor`, so a background on that element replaces the
+   eagle instead of sitting behind it. */
+.fleet-card__media .fleet-badge {
+    position: absolute; left: .55rem; bottom: .55rem;
+    display: block; padding: .32rem;
+    background: rgba(255, 255, 255, .92);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 1px 3px rgba(15, 27, 46, .22);
+}
+.fleet-card__media .fleet-badge .mark { width: 1.7rem; }
+
 .fleet-card__body { padding: 0; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
 .fleet-card__body .type {
     font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
@@ -783,6 +1007,93 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* ============================ EMBED FRAMES =============================== */
 .frame-host { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .frame-host iframe { width: 100%; border: 0; display: block; }
+
+/* ---- Route cards ---------------------------------------------------------
+   The sector list used to be a six-column table, which put the pair of airport
+   codes — the one thing a pilot is actually scanning for — at the smallest
+   type size on the page. Each sector is now a card built around that pair:
+   two panels with an arrow between them, the way a timetable states a sector.
+
+   The origin panel carries its airport name because the origin is always one
+   of our own hubs and `hubs` has it. The destination panel carries the region
+   in that slot instead — `routes` only knows the city, and a plausible-looking
+   airport name typed in for twenty airports is exactly the kind of invented
+   data this project has thrown out once already. It also balances the two
+   panels, which otherwise sit at visibly different weights.
+
+   The panels take `--surface` and a hairline rather than `--surface-2`: these
+   cards sit on `.section--alt`, which now carries the greca field behind it,
+   and a panel a half-step off the background disappears into the pattern. */
+.route-card {
+    display: grid; gap: .8rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+}
+.route-card:first-child { border-top: 1px solid var(--line); }
+
+.route-card__ends {
+    display: grid; gap: .55rem;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+}
+.route-end {
+    display: grid; align-content: center; gap: .18rem;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: .8rem 1rem;
+    min-width: 0;
+}
+.route-end--to { text-align: right; }
+.route-end__code {
+    font-family: var(--font-mono); font-weight: 700;
+    font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+    letter-spacing: -.02em; line-height: 1.05;
+}
+.route-end__place {
+    display: flex; align-items: center; gap: .45rem;
+    font-weight: 600; font-size: .95rem; min-width: 0;
+}
+.route-end--to .route-end__place { justify-content: flex-end; }
+.route-end__name { font-size: .82rem; color: var(--muted); }
+
+/* The arrow sits in the gap between the panels, not inside either one. */
+.route-card__arrow {
+    align-self: center; flex: none;
+    display: grid; place-items: center;
+    width: 2.2rem; height: 2.2rem; border-radius: 50%;
+    background: var(--am-blue); color: #fff;
+}
+.route-card__arrow svg { width: 1.1rem; height: 1.1rem; }
+:root[data-theme="dark"] .route-card__arrow { background: var(--am-blue-600); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .route-card__arrow { background: var(--am-blue-600); }
+}
+
+.route-card__meta { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; align-items: center; }
+.route-meta { display: flex; align-items: baseline; gap: .45rem; font-size: .86rem; }
+.route-meta i {
+    font-style: normal; color: var(--muted);
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700;
+}
+.route-meta b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
+
+/* Stacked, the arrow points down — an arrow still pointing right between two
+   panels that are now one above the other reads as the wrong diagram. */
+@media (max-width: 44rem) {
+    .route-card__ends { grid-template-columns: 1fr; }
+    .route-end--to { text-align: left; }
+    .route-end--to .route-end__place { justify-content: flex-start; }
+    .route-card__arrow { transform: rotate(90deg); justify-self: center; }
+}
+
+/* Visible to a screen reader, gone from the page: the arrow between the two
+   panels is decorative, so the sector needs a real word joining the codes. */
+.sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 
 .skip {
     position: absolute; left: -9999px; top: 0;
