@@ -597,6 +597,9 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
     font-size: .72rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .15em; color: var(--muted);
 }
+/* What the figure actually counts. A number this size invites a guess, and the
+   guess is usually wrong — "hours" could be this month's or all time. */
+.stat__note { display: block; margin-top: .5rem; font-size: .85rem; color: var(--muted); line-height: 1.45; }
 
 /* --- Rule ---
    Was a length of hand-drawn greca. It is the tricolour now: real colours,
@@ -822,6 +825,39 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     content: ""; width: 4px; height: 4px; border-radius: 50%;
     background: currentColor; opacity: .45;
 }
+
+/* ============================ OPERATING FIGURES ==========================
+   Pilots, hours logged, flight reports filed — the airline's real numbers,
+   read live from the crew center (see crew.js). Set on navy so they read as a
+   statement of record rather than another card grid, and because these are the
+   only numbers on the site that change on their own.
+
+   Built on .stat, which already is "a big figure with a label" — it was left
+   orphaned when the fabricated figures strip was removed, and this is the
+   honest version of the thing it was written for. Only the layout, the rule
+   above each figure and the marigold are new.
+
+   NOTE the band is [hidden] in the markup and only revealed once real figures
+   arrive. There is no zero state and no skeleton — an airline we could not get
+   figures for shows nothing, rather than a row of dashes. See the null
+   contract at the top of crew.js.
+   ========================================================================= */
+.ops__grid { display: grid; gap: clamp(1.6rem, 4vw, 2.4rem); }
+@media (min-width: 40rem) { .ops__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .ops__grid { grid-template-columns: repeat(4, 1fr); } }
+
+.ops__grid .stat { padding-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, .22); }
+/* Bigger than .stat elsewhere: on this band the figures are the content. */
+.ops__grid .stat__num { font-size: clamp(2.5rem, 5.5vw, 3.6rem); color: var(--am-marigold); }
+.section--ink .stat__label, .section--ink .stat__note { color: #9DB0CE; }
+
+/* Provenance. Deliberately quiet and deliberately present: a live figure with
+   no source named is just a number someone might have typed. */
+.ops__asof {
+    margin-top: clamp(2rem, 4vw, 3rem); font-size: .85rem; color: #9DB0CE;
+    display: flex; flex-wrap: wrap; align-items: center; gap: .55rem;
+}
+.ops__asof b { color: #EEF2F8; }
 
 /* ============================ FLEET / ROUTE BITS =========================
    An aircraft used to be a card: a saturated colour panel with the mark on it,
