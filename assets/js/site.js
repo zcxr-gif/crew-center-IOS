@@ -277,6 +277,11 @@
         return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
+    // The mark rides along with the photo as a small tail badge in the type's
+    // own livery colour — the per-type colour cycle predates the photographs
+    // and was carrying each card on its own; a photograph is no reason to lose
+    // it. aria-hidden because the photo's alt already names the aircraft, and
+    // a second "Aeromexico Virtual" on every card is noise in a screen reader.
     function fleetMedia(a) {
         const p = a && a.photo;
         if (!p || !p.src) return MARK;
@@ -284,7 +289,8 @@
         return `<img class="fleet-photo" src="${attr(p.src)}"
                      width="${Number(p.w) || 1920}" height="${Number(p.h) || 886}"
                      loading="lazy" decoding="async"
-                     alt="${attr((a.livery || 'Aeromexico') + ' ' + a.type + reg)}">`;
+                     alt="${attr((a.livery || 'Aeromexico') + ' ' + a.type + reg)}">` +
+               `<span class="fleet-badge" aria-hidden="true"><span class="mark"></span></span>`;
     }
 
     // ---- Boot ---------------------------------------------------------------

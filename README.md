@@ -27,9 +27,10 @@ assets/img/       Supplied artwork, and what is generated from it. See below.
 
 ## The artwork
 
-The decoration on this site is material the airline actually owns. Nothing is
-drawn by hand, and that is the third answer to this question rather than the
-first — the two before it are worth knowing about so they don't come back.
+Most of the decoration on this site is material the airline actually owns, and
+the rest is geometry generated from parameters. Nothing is drawn by eye. That
+is the third answer to this question rather than the first — the two before it
+are worth knowing about so they don't come back in their original form.
 
 **First** the site leaned on a blue → plum → pink gradient: blurred behind the
 hero, painted across the CTA band, clipped into the headline, and used as the
@@ -43,7 +44,17 @@ airline's design reads as exactly what it is. The azulejo in particular was
 tiled edge to edge behind whole sections, which is the wallpaper a generated
 layout reaches for.
 
-**Now** it is the real thing:
+**The greca has since come back, and only the greca.** The VA asked for Mexican
+patterns knowing what the paragraph above says; that is their call about their
+own airline. What makes the fret defensible where the azulejo and the papel
+picado were not is that it is the one motif here that is *architectural rather
+than pictorial* — stepped right angles on a grid — so `tools/make-greca.py`
+generates it from parameters instead of anyone illustrating it, and it is used
+as texture and as a rule, never as a subject. The standing rule in `brand.css`
+is now **no pictorial invention**: if the next idea cannot be expressed as a
+script that emits it, it is the wrong idea.
+
+**Now** it is the airline's own material, plus one generated ornament:
 
 | file | what it is | where it runs |
 |---|---|---|
@@ -51,6 +62,8 @@ layout reaches for.
 | `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
+| `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
+| `assets/img/greca-tile.svg` | the same fret over its mirror | a faint field across `.section--alt` |
 | the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
@@ -77,6 +90,7 @@ untouched:
 python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
 python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
 python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg + stripes-mirror.svg
+python3 tools/make-greca.py   # (parameters only)      -> greca.svg + greca-tile.svg
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
