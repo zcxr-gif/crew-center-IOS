@@ -2,30 +2,75 @@
 <!--
   Aeromexico Virtual — the Caballero Águila mark.
 
-  Original geometry: an eagle-warrior head in profile facing right, under a
-  backswept feather plume. Drawn from scratch (no traced or lifted artwork) so
-  the VA owns what it ships.
-
-  Three shapes carry the raptor read, and none of them is optional:
-    · the brow ridge overhanging the eye,
-    · the beak as a distinct wedge with a deep DOWNWARD hook,
-    · the cut gape line under the eye.
-  Lose any one and it turns into a generic snouted animal. The plume sweeps
-  back and stays short on purpose — tall vertical feathers read as ears, and a
-  long plume goes to noise at favicon size.
+  An eagle-warrior head in profile facing right: the eagle's head forms the
+  helm with its eye punched white on the crown, the warrior's own face sits
+  inside it below, and feathers sweep back and down to the left in layered
+  strands separated by white cuts.
 
   Uses `currentColor` throughout, so a single fill on the parent recolours it.
+
+  ---------------------------------------------------------------------------
+  INTERIM — HAND-RECONSTRUCTED, NOT THE REAL MARK.
+
+  This is drawn by eye against a reference of the real Caballero Águila, and it
+  is close in structure but not accurate in line. It should be REPLACED with a
+  proper vectorisation of the airline's own artwork rather than nudged further
+  by hand. To do that:
+
+      1. put the logo bitmap at assets/img/mark-source.png (clean, 2-colour,
+         as large as you have — 1000px+ on the long edge),
+      2. potrace it:
+             convert mark-source.png -threshold 60% -negate pbm:- \
+               | potrace --svg --turdsize 8 --alphamax 1 -o mark.svg
+      3. set the paths to fill="currentColor" and drop the width/height so the
+         viewBox alone drives scaling — every consumer here sizes it with CSS.
+
+  Hand-nudging does not converge on this shape; two passes of it produced a
+  blob. Trace the source instead.
+  ---------------------------------------------------------------------------
+
+  Four things carry the read, and none is optional:
+    · the eagle's eye, a white crescent high on the head,
+    · the beak as a wedge reaching right and hooking down,
+    · the warrior's profile inside the helm — brow, nose, lips, chin,
+    · the feather strands fanning down-left, each cut from the next in white.
+  Lose the warrior's profile and it is only a bird; lose the beak hook and the
+  helm stops reading as an eagle at all.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Aeromexico Virtual">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 730" role="img" aria-label="Aeromexico Virtual">
   <title>Aeromexico Virtual</title>
-
-  <!-- Feather plume, swept back behind the skull. -->
   <g fill="currentColor">
-    <path d="M54 52C42 52 28 50 15 47C28 55 41 60 53 62Z" opacity=".5"/>
-    <path d="M52 44C40 41 27 35 16 28C27 39 39 47 51 54Z" opacity=".72"/>
-    <path d="M54 37C46 30 38 21 32 12C36 24 43 33 52 42Z" opacity=".95"/>
-  </g>
 
-  <!-- Head, hooked beak, eye and gape. Counter-forms punched with evenodd. -->
-  <path fill="currentColor" fill-rule="evenodd" d="M32 54C36 38 50 32 63 36C73 39 79 43 81 50L110 60C113 67 110 78 102 80C100 72 95 68 86 65C84 75 77 82 66 86L56 95L40 89C32 79 30 65 32 54ZM67 56a5.5 5.5 0 1 0 .1 0zM83 62L99 66L97 70L82 67Z"/>
+    <!-- Helm: the eagle's head and crest, with the eye punched out. -->
+    <path fill-rule="evenodd" d="
+      M296 96C340 52 430 20 548 20c112 0 210 34 268 92 34 34 58 74 68 108
+      -46-30-104-40-160-28 56-4 110 10 148 40 22 44 18 96-12 128
+      -26-64-84-104-160-112-30-3-56-2-78 2-52 10-96 34-132 68
+      -30 28-56 62-78 100-30-50-64-88-104-114-40-26-84-40-132-42
+      12-72 44-134 92-176Z
+      M690 112c46-14 96-12 138 6-40 24-92 30-138 14Z"/>
+
+    <!-- The warrior's face, inside the helm: brow, nose, lips, chin. -->
+    <path d="
+      M700 292c40-10 84-12 122-6 22 4 38 12 48 24 14 18 26 44 36 68
+      8 20 14 34 20 42 6 8 8 16 4 22-4 6-14 10-24 12 4 10 4 20-2 26
+      -4 4-10 6-14 8 6 12 4 24-6 32-8 6-18 8-26 8 2 14-2 26-14 34
+      -20 14-56 20-96 18-34-2-62-12-80-28-16-14-26-34-30-58
+      -6-40 2-84 20-124 10-22 24-42 42-58Z"/>
+
+    <!-- Feather strand 1 — the outermost, sweeping widest to the left. -->
+    <path d="
+      M636 300c-70 22-136 66-190 128-44 50-76 110-92 172 42-6 84-24 122-52
+      52-38 94-92 122-154 20-44 32-84 38-114Z"/>
+
+    <!-- Feather strand 2. -->
+    <path d="
+      M618 306c-84 34-158 90-212 162-40 54-66 116-76 178 40-10 78-32 112-64
+      50-46 88-106 114-172 16-40 26-76 30-104Z"/>
+
+    <!-- Feather strand 3 — the innermost, falling closest to the face. -->
+    <path d="
+      M654 316c-6 74-4 148 6 218 6 42 16 78 30 108-26-16-48-42-64-76
+      -22-46-32-102-30-160 2-38 8-70 18-96 10-26 24-44 40-56Z"/>
+  </g>
 </svg>

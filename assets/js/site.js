@@ -12,16 +12,22 @@
     'use strict';
 
     // ---- The mark (kept in step with assets/img/mark.svg) -------------------
-    // See that file for what each shape is doing and why none of them is
-    // optional — the brow, the hooked beak and the gape are what make it read
-    // as a raptor rather than a generic snouted animal.
-    const MARK = `<svg class="mark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+    // See that file for what each shape is doing, why none of them is optional,
+    // and — importantly — that it is an interim hand-reconstruction waiting to
+    // be replaced by a proper trace of the airline's own artwork. When that
+    // lands, this constant has to be updated with it or the injected chrome and
+    // the favicon will disagree.
+    //
+    // The viewBox is 1300 x 730, NOT square. Size it by width and leave height
+    // to the aspect ratio; forcing a square height squashes the profile.
+    const MARK = `<svg class="mark" viewBox="0 0 1300 730" aria-hidden="true">
         <g fill="currentColor">
-            <path d="M54 52C42 52 28 50 15 47C28 55 41 60 53 62Z" opacity=".5"/>
-            <path d="M52 44C40 41 27 35 16 28C27 39 39 47 51 54Z" opacity=".72"/>
-            <path d="M54 37C46 30 38 21 32 12C36 24 43 33 52 42Z" opacity=".95"/>
+            <path fill-rule="evenodd" d="M296 96C340 52 430 20 548 20c112 0 210 34 268 92 34 34 58 74 68 108-46-30-104-40-160-28 56-4 110 10 148 40 22 44 18 96-12 128-26-64-84-104-160-112-30-3-56-2-78 2-52 10-96 34-132 68-30 28-56 62-78 100-30-50-64-88-104-114-40-26-84-40-132-42 12-72 44-134 92-176ZM690 112c46-14 96-12 138 6-40 24-92 30-138 14Z"/>
+            <path d="M700 292c40-10 84-12 122-6 22 4 38 12 48 24 14 18 26 44 36 68 8 20 14 34 20 42 6 8 8 16 4 22-4 6-14 10-24 12 4 10 4 20-2 26-4 4-10 6-14 8 6 12 4 24-6 32-8 6-18 8-26 8 2 14-2 26-14 34-20 14-56 20-96 18-34-2-62-12-80-28-16-14-26-34-30-58-6-40 2-84 20-124 10-22 24-42 42-58Z"/>
+            <path d="M636 300c-70 22-136 66-190 128-44 50-76 110-92 172 42-6 84-24 122-52 52-38 94-92 122-154 20-44 32-84 38-114Z"/>
+            <path d="M618 306c-84 34-158 90-212 162-40 54-66 116-76 178 40-10 78-32 112-64 50-46 88-106 114-172 16-40 26-76 30-104Z"/>
+            <path d="M654 316c-6 74-4 148 6 218 6 42 16 78 30 108-26-16-48-42-64-76-22-46-32-102-30-160 2-38 8-70 18-96 10-26 24-44 40-56Z"/>
         </g>
-        <path fill="currentColor" fill-rule="evenodd" d="M32 54C36 38 50 32 63 36C73 39 79 43 81 50L110 60C113 67 110 78 102 80C100 72 95 68 86 65C84 75 77 82 66 86L56 95L40 89C32 79 30 65 32 54ZM67 56a5.5 5.5 0 1 0 .1 0zM83 62L99 66L97 70L82 67Z"/>
     </svg>`;
 
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------

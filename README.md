@@ -19,7 +19,7 @@ assets/brand.css  The design system. Every token lives here.
 assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
 assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
 assets/js/live.js Mounts the Inflight live-traffic widget
-assets/img/       The mark, and the four motifs. See "The ornament" below.
+assets/img/       The mark, and the three motifs. See "The ornament" below.
 ```
 
 ---
@@ -31,20 +31,27 @@ behind the hero, painted across the CTA band, clipped into the headline, and
 used as the fill of every fleet card — plus a dot-grid. That is the house style
 of software nobody art-directed, and it said nothing about a Mexican airline.
 
-**The rule now is that colour comes from pattern, not from gradients.** Four
-motifs carry the decoration, each drawn from scratch as geometry and documented
-at the top of its own file:
+**Two rules now. Colour comes from ornament, not from gradients — and the
+ornament is linear, not tiled.** Three motifs carry it, each drawn from scratch
+as geometry and documented at the top of its own file:
 
 | file | motif | where it runs |
 |---|---|---|
 | `greca.svg` | the step-fret band (*xicalcoliuhqui*) off the friezes at Mitla | every `.rule`, the hero/strip seam, the footer cornice |
-| `talavera.svg` | the eight-point star of a Puebla azulejo | washes on navy sections, hero, CTA band, fleet panels |
 | `papel.svg` | papel picado, cut-paper fiesta bunting | once per page, above the CTA band |
 | `serpent.svg` | Quetzalcóatl, after the nose art on Aeroméxico's XA-ADL | the CTA band watermark |
 
+There was a fourth — a Puebla azulejo tiled across the hero, the CTA band, every
+navy section and every fleet panel. It is gone, and it should not come back.
+Authentic motif, wrong application: a geometric tile repeated edge to edge
+behind content is exactly the wallpaper a generated layout reaches for, and at
+that scale it read as a star field competing with the text rather than as
+tilework. **Ornament here runs as bands along an edge** — a frieze on a seam,
+bunting on a rule — the way a building carries it.
+
 Two things about how they are wired:
 
-**greca, talavera and serpent are CSS masks, not images.** They are monochrome
+**greca and serpent are CSS masks, not images.** They are monochrome
 files painted through with a brand token, so one file serves every colour and
 both themes — set `color` on the element and the motif follows. Give one a
 `background-image` instead and it will be stuck black. Papel picado is the
@@ -59,12 +66,13 @@ bug. Full-bleed friezes are exempt — they run to the viewport edge, where a
 clipped tile is just how a border behaves.
 
 The palette is the livery (navy, blue, that red) plus the colours the
-Quetzalcóatl 787 actually wears, on warm lime-washed paper rather than clinical
-grey. The national tricolour runs across the top of every page (`.flagline`),
+Quetzalcóatl 787 actually wears, on white. The greys lean very slightly navy so
+they read as chosen rather than as a default mid-grey. The national tricolour
+runs across the top of every page (`.flagline`),
 under every `.eyebrow`, beneath the active nav item, and next to *Hecho en
 México* in the footer — always with hard stops, because a flag does not have a
 gradient in it, and always with a hairline, because the middle band is white
-and on warm paper a bare white band disappears.
+and on white a bare white band disappears entirely.
 
 If you are adding something and you reach for a multi-hue gradient, reach for a
 motif instead.
@@ -157,15 +165,33 @@ frame never loading and swaps in a direct link — deliberately, rather than
 showing an empty box. If that fallback starts firing for everyone, make
 `crew.html` a branded launcher instead of a frame.
 
-**The artwork is original.** `assets/img/mark.svg` is an eagle-warrior head and
-`assets/img/serpent.svg` is a feathered serpent, both drawn from scratch in
-explicit SVG geometry. Neither is traced from, nor reproduces, Aeroméxico's
-Caballero Águila or the Quetzalcóatl nose art on XA-ADL — they are our own
-answers to those ideas, and the palette is drawn from the real livery. Keep it
-that way: do not paste in traced paths. Aeromexico Virtual is not affiliated
-with Aeroméxico; the footer disclaimer says so on every page and should stay
-there. The tricolour is used as a decorative device only — plain bands, never
-the national coat of arms.
+**The mark is a placeholder and is waiting on a trace.** `assets/img/mark.svg`
+is currently a hand-reconstruction of the Caballero Águila drawn by eye — close
+in structure, not accurate in line. Do not try to fix it by nudging path data;
+two passes of that produced a blob. Replace it properly:
+
+```bash
+# drop the logo bitmap in first — clean, 2-colour, 1000px+ on the long edge
+convert assets/img/mark-source.png -threshold 60% -negate pbm:- \
+  | potrace --svg --turdsize 8 --alphamax 1 -o assets/img/mark.svg
+```
+
+Then set the paths to `fill="currentColor"`, drop the `width`/`height` so the
+`viewBox` alone drives scaling, and **paste the same geometry into the `MARK`
+constant in `assets/js/site.js`** — that copy is what the injected nav and
+footer render, and if the two drift the chrome and the favicon disagree. The
+mark is not square (currently 1300 × 730), so size it by width everywhere and
+leave height to the aspect ratio.
+
+`assets/img/serpent.svg` *is* original — drawn from scratch, not traced from
+and not reproducing the XA-ADL nose art. Keep it that way.
+
+Aeromexico Virtual is not affiliated with Aeroméxico; the footer disclaimer
+says so on every page and should stay there. Using the airline's own
+Caballero Águila is a call the VA's staff have made — worth knowing that it is
+a real trademark, and that the disclaimer is what carries the distinction. The
+tricolour is used as a decorative device only — plain bands, never the national
+coat of arms.
 
 **Events go stale.** `data.js` events carry ISO-8601 dates with an explicit UTC
 offset; `events.html` sorts them into upcoming and flown on its own. Past events
