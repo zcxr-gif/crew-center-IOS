@@ -19,63 +19,61 @@ assets/brand.css  The design system. Every token lives here.
 assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
 assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
 assets/js/live.js Mounts the Inflight live-traffic widget
-assets/img/       The mark, and the three motifs. See "The ornament" below.
+tools/            Regenerate mark.svg and plane-hero.webp from the source art
+assets/img/       Supplied artwork, and what is generated from it. See below.
 ```
 
 ---
 
-## The ornament
+## The artwork
 
-The site used to decorate itself with one blue → plum → pink gradient — blurred
-behind the hero, painted across the CTA band, clipped into the headline, and
-used as the fill of every fleet card — plus a dot-grid. That is the house style
-of software nobody art-directed, and it said nothing about a Mexican airline.
+The decoration on this site is material the airline actually owns. Nothing is
+drawn by hand, and that is the third answer to this question rather than the
+first — the two before it are worth knowing about so they don't come back.
 
-**Two rules now. Colour comes from ornament, not from gradients — and the
-ornament is linear, not tiled.** Three motifs carry it, each drawn from scratch
-as geometry and documented at the top of its own file:
+**First** the site leaned on a blue → plum → pink gradient: blurred behind the
+hero, painted across the CTA band, clipped into the headline, and used as the
+fill of every fleet card, plus a dot-grid. That is the house style of software
+nobody art-directed, and it said nothing about a Mexican airline.
 
-| file | motif | where it runs |
+**Then** it was replaced with hand-drawn Mexican motifs — a step-fret greca, a
+Puebla azulejo, papel picado bunting, a Quetzalcóatl watermark. Authentic
+references, but invented artwork, and invented artwork standing in for a real
+airline's design reads as exactly what it is. The azulejo in particular was
+tiled edge to edge behind whole sections, which is the wallpaper a generated
+layout reaches for.
+
+**Now** it is the real thing:
+
+| file | what it is | where it runs |
 |---|---|---|
-| `greca.svg` | the step-fret band (*xicalcoliuhqui*) off the friezes at Mitla | every `.rule`, the hero/strip seam, the footer cornice |
-| `papel.svg` | papel picado, cut-paper fiesta bunting | once per page, above the CTA band |
-| `serpent.svg` | Quetzalcóatl, after the nose art on Aeroméxico's XA-ADL | the CTA band watermark |
+| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries |
+| `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
+| the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
-There was a fourth — a Puebla azulejo tiled across the hero, the CTA band, every
-navy section and every fleet panel. It is gone, and it should not come back.
-Authentic motif, wrong application: a geometric tile repeated edge to edge
-behind content is exactly the wallpaper a generated layout reaches for, and at
-that scale it read as a star field competing with the text rather than as
-tilework. **Ornament here runs as bands along an edge** — a frieze on a seam,
-bunting on a rule — the way a building carries it.
+Two build steps, both reproducible and both leaving the supplied originals
+untouched:
 
-Two things about how they are wired:
+```bash
+python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
+python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
+```
 
-**greca and serpent are CSS masks, not images.** They are monochrome
-files painted through with a brand token, so one file serves every colour and
-both themes — set `color` on the element and the motif follows. Give one a
-`background-image` instead and it will be stuck black. Papel picado is the
-exception and is a real background-image: fiesta colour is not brand colour, it
-does not re-tint, and it is the same in the dark.
+`trace-mark.py` composites the transparent source onto white, crops to the ink
+and vectorises it. Two properties of its output are load-bearing: the mark is a
+single `currentColor` group, and the white channels between the feathers are
+real **holes**, not white-filled shapes. `brand.css` paints it through a CSS
+mask, so one file serves every placement and recolours per theme — and a
+white-filled version would paint solid navy over the page instead.
 
-**The greca rule's dimensions are arithmetic, not taste.** `greca.svg` is a
-40 × 26 tile, so at height *h* a tile renders `40/26 × h` wide. `.rule` is
-13px × 120px because that is exactly six whole spirals. Any height that does
-not divide cleanly ends the rule on half a spiral, which reads as a rendering
-bug. Full-bleed friezes are exempt — they run to the viewport edge, where a
-clipped tile is just how a border behaves.
+`crop-hero.py` finds the artwork band in the supplied image and crops to it,
+dropping the second AeroMexico lockup underneath (the nav already carries the
+mark) and the surrounding white, which was pushing the aircraft below the fold.
+It detects the band rather than hard-coding it, so a re-exported source still
+works.
 
-The palette is the livery (navy, blue, that red) plus the colours the
-Quetzalcóatl 787 actually wears, on white. The greys lean very slightly navy so
-they read as chosen rather than as a default mid-grey. The national tricolour
-runs across the top of every page (`.flagline`),
-under every `.eyebrow`, beneath the active nav item, and next to *Hecho en
-México* in the footer — always with hard stops, because a flag does not have a
-gradient in it, and always with a hairline, because the middle band is white
-and on white a bare white band disappears entirely.
-
-If you are adding something and you reach for a multi-hue gradient, reach for a
-motif instead.
+**If a page needs decoration it needs a photograph or the airline's own art.**
+Not a hand-drawn motif, not a repeating geometric fill, not a gradient.
 
 ---
 
@@ -174,33 +172,13 @@ frame never loading and swaps in a direct link — deliberately, rather than
 showing an empty box. If that fallback starts firing for everyone, make
 `crew.html` a branded launcher instead of a frame.
 
-**There is no logo in the repo, deliberately.** Until the airline's own
-Caballero Águila artwork is committed, the brand lockup is the wordmark plus the
-tricolour — both real. An earlier pass shipped a hand-drawn eagle standing in
-for it; a drawn-from-memory approximation of a real mark is worse than no mark,
-because it looks like the airline chose it. It was removed rather than refined.
-
-**Adding the real logo is one file.** `brand.css` paints `assets/img/mark.svg`
-through a CSS mask (`.mark`), the same way it handles `greca.svg` and
-`serpent.svg`, so one file recolours every placement — nav, footer, hero
-watermark, favicon — and there is no second copy of the geometry to keep in
-step. To add it:
-
-1. Put the artwork at `assets/img/mark.svg`. From a bitmap:
-   ```bash
-   convert logo.png -threshold 60% -negate pbm:- \
-     | potrace --svg --turdsize 8 --alphamax 1 -o assets/img/mark.svg
-   ```
-2. Flip `HAS_MARK` to `true` in `assets/js/site.js`.
-3. Set `--mark-ratio` in `brand.css` to the artwork's real width/height.
-4. Re-add the favicon and `og:image` links in the page heads.
-
-The mask needs the logo's white cut-lines to be **actual holes**
-(`fill-rule="evenodd"`), not white-filled shapes — otherwise they will paint
-solid. `potrace` produces holes correctly from a clean two-colour bitmap.
-
-`assets/img/serpent.svg` *is* original — drawn from scratch, not traced from
-and not reproducing the XA-ADL nose art. Keep it that way.
+**The mark is generated — do not hand-edit `mark.svg`.** It is potrace output
+from `Aeromexico-Symbol.webp`; re-run `tools/trace-mark.py` instead. If you
+replace the source bitmap and the artwork's proportions change, update
+`--mark-ratio` in `brand.css` to match. There is no second copy of the geometry
+anywhere: `site.js` renders `<span class="mark">` and `brand.css` masks the file
+onto it, so the nav, the footer, the fleet entries and the favicon all move
+together.
 
 Aeromexico Virtual is not affiliated with Aeroméxico; the footer disclaimer
 says so on every page and should stay there. Using the airline's own

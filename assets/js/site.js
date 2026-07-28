@@ -12,27 +12,12 @@
     'use strict';
 
     // ---- The mark -----------------------------------------------------------
-    // THE REAL LOGO IS NOT IN THIS REPO YET, and nothing here invents one.
-    //
-    // Until the airline's own Caballero Águila artwork is committed, the brand
-    // lockup is the wordmark plus the tricolour — both of which are real. An
-    // earlier pass shipped a hand-drawn eagle standing in for the logo; a
-    // drawn-from-memory approximation of a real mark is worse than no mark,
-    // because it looks like the airline chose it.
-    //
-    // TO DROP THE REAL LOGO IN, there is exactly one file to touch:
-    //     assets/img/mark.svg
-    // brand.css paints it through a CSS mask (.mark), the same way it handles
-    // greca.svg and serpent.svg, so one file recolours everywhere — nav,
-    // footer, watermark, favicon — and there is no second copy in this file to
-    // keep in step. Set --mark-ratio in brand.css to the artwork's real
-    // width/height. The mask needs the white cut-lines to be actual holes
-    // (fill-rule="evenodd"), not white-filled shapes; potrace produces holes
-    // correctly from a two-colour bitmap.
-    const HAS_MARK = false;
-    const MARK = HAS_MARK
-        ? '<span class="mark" role="img" aria-label="Aeromexico Virtual"></span>'
-        : '';
+    // The Caballero Águila. There is no geometry in this file: brand.css paints
+    // assets/img/mark.svg through a CSS mask (.mark), so one file serves the
+    // nav, the footer and the favicon, recolours per theme, and there is no
+    // second copy here to drift out of step. See tools/trace-mark.py to
+    // regenerate it from the source bitmap.
+    const MARK = '<span class="mark" role="img" aria-label="Aeromexico Virtual"></span>';
 
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------
     const P = {
@@ -97,7 +82,7 @@
         <nav class="nav" id="siteNav">
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" aria-label="Aeromexico Virtual — home">
-                    ${MARK || '<span class="flag" aria-hidden="true"></span>'}
+                    ${MARK}
                     <span class="wordmark"><b>Aeromexico</b><span>Virtual</span></span>
                 </a>
                 <div class="nav__links">${links}</div>
@@ -148,11 +133,10 @@
     function renderFooter(host) {
         host.innerHTML = `
         <footer class="footer">
-            <div class="footer__frieze" aria-hidden="true"></div>
             <div class="wrap">
                 <div class="footer__grid">
                     <div class="footer__brand">
-                        ${MARK || '<p class="footer__wordmark">Aeromexico Virtual</p>'}
+                        ${MARK}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network — from
                            Mexico City across the Americas, Europe and the Pacific.</p>
                         <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>

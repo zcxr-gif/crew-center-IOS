@@ -6,7 +6,9 @@
 <title>Aeromexico Virtual — Fly the Eagle Warrior</title>
 <meta name="description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
 <meta name="theme-color" content="#0A1D3B">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
+<meta property="og:image" content="/assets/img/plane-hero.webp">
 <meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
 <meta property="og:description" content="An Infinite Flight virtual airline flying the Aeroméxico network out of Mexico City, Guadalajara and Monterrey.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,12 +38,15 @@
 
 <main id="main">
 
-    <!-- ==================== HERO ==================== -->
+    <!-- ==================== HERO ====================
+         White, and the aeroplane carries it. The artwork is the airline's own
+         787-9 special livery with its folk-art illustration, already drawn on
+         white, so it bleeds into the page with no panel and no cutout. It
+         replaces — in order — a blurred tri-hue gradient, a dot-grid, a tiled
+         azulejo and a hand-drawn eagle watermark. -->
     <section class="hero">
-        <div class="hero__wash"></div>
-        <div data-mark class="hero__mark" style="color:#fff"></div>
         <div class="wrap hero__inner">
-            <span class="chip chip--onink">Infinite Flight · Expert Server</span>
+            <span class="eyebrow">Infinite Flight · Expert Server</span>
             <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
             <p class="lede">
                 Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight — from
@@ -49,13 +54,17 @@
                 rank ladder, and every hour logged automatically.
             </p>
             <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                <a class="btn btn--onink" href="/network">Explore the network</a>
+                <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--ghost" href="/network">Explore the network</a>
             </div>
         </div>
-        <!-- The frieze sits on the seam where the navy meets the stat strip —
-             which is where a building would carry one too. -->
-        <div class="hero__frieze" aria-hidden="true"></div>
+        <figure class="hero__art">
+            <!-- Dimensions are on the tag so the box is reserved before decode
+                 and the facts line below it does not jump. -->
+            <img src="/assets/img/plane-hero.webp" width="1394" height="372" fetchpriority="high"
+                 alt="Aeroméxico Boeing 787-9 in its special livery, surrounded by Mexican folk-art
+                      illustration — eagles, skulls, marigolds and a feathered serpent.">
+        </figure>
         <div class="strip">
             <div class="wrap">
                 <p class="strip__facts" id="heroFacts"></p>
@@ -215,16 +224,9 @@
             </p>
         </div>
     </section>
-
-    <!-- ==================== CTA ====================
-         The bunting hangs directly above the band, so the cut edge of the
-         paper reads against the navy. This is the only papel picado on the
-         site — strung across every section it stops being a fiesta and starts
-         being wallpaper. -->
-    <div class="papel" aria-hidden="true"></div>
+    <!-- ==================== CTA ==================== -->
     <section class="band">
         <div class="band__wash"></div>
-        <div class="band__serpent"></div>
         <div class="wrap band__inner">
             <h2>The eagle flies at 0600. Be on it.</h2>
             <p>Applications take about three minutes and get a human answer inside 48 hours.</p>
