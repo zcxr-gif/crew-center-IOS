@@ -49,6 +49,7 @@ layout reaches for.
 |---|---|---|
 | `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries |
 | `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
+| `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
 Two build steps, both reproducible and both leaving the supplied originals
@@ -57,6 +58,7 @@ untouched:
 ```bash
 python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
 python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
+python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
@@ -71,6 +73,21 @@ dropping the second AeroMexico lockup underneath (the nav already carries the
 mark) and the surrounding white, which was pushing the aircraft below the fold.
 It detects the band rather than hard-coding it, so a re-exported source still
 works.
+
+`make-stripes.py` produces the ruled column that runs down the right-hand edge
+of the dark sections — bars flush right with a ragged left edge, the way the
+rules sit beside the eagle in the mark. **The bar lengths are measured, not
+invented:** the script finds the ruled block in `full-logo.webp` (the right edge
+that *recurs* across rows — the furthest-right ink is the eagle's head, which
+would give forty identical bars) and records how far left each rule reaches.
+That ragged profile is the pattern.
+
+Two things about wiring it up. It is attached as a `::after` on `.band`,
+`.footer` and `.section--ink`, so no page has to remember it, and each of those
+isolates so the `z-index: -1` cannot escape its section. And the mask is sized
+`100% var(--stripe-tile)` rather than `100% auto` — `auto` ties the vertical
+rhythm to the column width, which collapses the bars to hairlines on a phone.
+Keep `--stripe-tile` in step with what the generator prints.
 
 **If a page needs decoration it needs a photograph or the airline's own art.**
 Not a hand-drawn motif, not a repeating geometric fill, not a gradient.

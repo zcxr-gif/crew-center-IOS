@@ -102,6 +102,13 @@
     --shadow:    0 1px 2px rgba(15, 27, 46, .05), 0 10px 30px -14px rgba(15, 27, 46, .16);
     --shadow-lg: 0 28px 70px -24px rgba(15, 27, 46, .26);
 
+    /* Height of one stripes.svg tile, in px. The mask is sized 100% x this, so
+       bar thickness and pitch stay constant however wide the column gets —
+       sizing it `auto` ties the vertical rhythm to the width and collapses the
+       bars to hairlines on a phone. Keep in step with tools/make-stripes.py,
+       which prints the value it generated. */
+    --stripe-tile: 520px;
+
     --maxw: 1180px;
     color-scheme: light dark;
 }
@@ -172,6 +179,36 @@ button, input, select, textarea { font: inherit; color: inherit; }
         transition-duration: .001ms !important;
     }
 }
+
+/* The ruled-feather device, run down the right edge of dark sections.
+   Bars flush right, ragged left — the block of rules beside the eagle in the
+   logo, extended. Generated from the logo itself by tools/make-stripes.py, so
+   the ragged profile is measured rather than invented.
+
+   Attached as a pseudo-element rather than a div so it needs no markup and no
+   page can forget it. z-index -1 keeps it behind the copy; every host below
+   isolates, so it cannot escape its own section. */
+.band::after,
+.footer::after,
+.section--ink::after {
+    content: ""; position: absolute; right: 0; top: 0; bottom: 0;
+    width: clamp(1.75rem, 5vw, 4rem);
+    background: var(--am-red);
+    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+            mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+    z-index: -1; pointer-events: none;
+}
+/* The band already isolates; these two need to so the -1 stays contained. */
+.footer, .section--ink { isolation: isolate; }
+
+/* Reserve the gutter the device occupies. Below --maxw the wrap fills the
+   viewport and its own padding is the only thing between the copy and the
+   stripes, so without this the last column collides with them on tablets and
+   phones. The band centres its text, so it takes the reservation on both
+   sides and stays centred; the others only need it on the right. */
+.footer > .wrap,
+.section--ink > .wrap { padding-right: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
+.band > .wrap { padding-inline: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
 
 /* ============================ BRAND MARKS ================================
    What is left after the hand-drawn ornament came out: the tricolour, and the
