@@ -9,37 +9,28 @@
    colour.
 
    ---------------------------------------------------------------------------
-   THE ONE RULE: COLOUR COMES FROM PATTERN, NOT FROM GRADIENTS.
+   THE DECORATION IS REAL ARTWORK. NOTHING HERE IS DRAWN BY HAND.
 
-   This site used to lean on a single blue → plum → pink sweep, blurred behind
-   the hero, painted across the CTA band, clipped into the headline text, and
-   used as the fill of every fleet card. Plus a dot-grid. That combination is
-   the house style of software that has never been art-directed, and it said
-   nothing whatsoever about a Mexican airline.
+   This file has been through two wrong answers on that point. First a blue →
+   plum → pink gradient behind everything, which is the house style of software
+   nobody art-directed. Then a set of hand-drawn Mexican motifs to replace it:
+   a step-fret greca, a Puebla azulejo tiled across whole sections, papel
+   picado bunting, a Quetzalcóatl watermark. Authentic references, but invented
+   artwork — and invented artwork standing in for a real airline's design reads
+   as exactly what it is.
 
-   So the sweep is gone. What carries decoration now is real ornament, drawn as
-   geometry in assets/img/ and documented there:
+   All of it is gone. What decorates the site now is material the airline
+   actually owns:
 
-     greca.svg     the step-fret band off the stone friezes at Mitla
-     papel.svg     papel picado, cut-paper fiesta bunting
-     serpent.svg   Quetzalcóatl, after the nose art on Aeroméxico's XA-ADL
+     Aeromexico-Symbol.webp  the Caballero Águila, traced to mark.svg
+     plane-logo.webp         the 787-9 special livery and its folk-art artwork
+     the tricolour           hard stops, real flag colours
 
-   AND THE ORNAMENT IS LINEAR, NOT TILED. An earlier pass laid a repeating
-   eight-point-star azulejo across the hero, the CTA band, every navy section
-   and every fleet panel. Authentic motif, wrong application: a geometric tile
-   repeated edge to edge behind content is exactly the wallpaper that generated
-   layouts reach for, and at that scale it stopped reading as Puebla tilework
-   and started reading as a star field competing with the text. It is gone, and
-   nothing should replace it. Ornament here runs as BANDS along an edge — a
-   frieze on a seam, bunting on a rule — the way a building carries it.
+   The hero is that aircraft on white. It is the most Mexican thing available
+   and it required no drawing.
 
-   The palette is the livery (navy, blue, that red) plus the colours the
-   Quetzalcóatl 787 actually wears, on white. The greys lean very slightly navy
-   so they read as chosen. The national tricolour runs across the top of every
-   page and under every eyebrow — hard stops, never a blend.
-
-   Two things to not do: reach for a multi-hue gradient, and reach for a
-   repeating geometric fill. Reach for a band instead.
+   So: no hand-drawn motif, no repeating geometric fill, no multi-hue gradient.
+   If a page needs decoration it needs a photograph, or the airline's own art.
    ========================================================================== */
 
 :root {
@@ -51,8 +42,8 @@
     --am-red:       #D8102F;   /* the fuselage swoosh                         */
 
     /* ---- Quetzalcóatl ------------------------------------------------------
-       The glyphs down the side of XA-ADL. These are accent colours for tags,
-       fleet panels and papel picado — never body text, never large fields. */
+       Pulled off the glyphs down the side of XA-ADL. Accent colours for tags
+       and the per-type fleet rules — never body text, never large fields. */
     --am-jade:      #0E8C5A;
     --am-turquoise: #0E9BAA;
     --am-rosa:      #D6337E;   /* rosa mexicano                               */
@@ -110,6 +101,13 @@
     --ease:      cubic-bezier(.2, .8, .2, 1);
     --shadow:    0 1px 2px rgba(15, 27, 46, .05), 0 10px 30px -14px rgba(15, 27, 46, .16);
     --shadow-lg: 0 28px 70px -24px rgba(15, 27, 46, .26);
+
+    /* Height of one stripes.svg tile, in px. The mask is sized 100% x this, so
+       bar thickness and pitch stay constant however wide the column gets —
+       sizing it `auto` ties the vertical rhythm to the width and collapses the
+       bars to hairlines on a phone. Keep in step with tools/make-stripes.py,
+       which prints the value it generated. */
+    --stripe-tile: 520px;
 
     --maxw: 1180px;
     color-scheme: light dark;
@@ -182,42 +180,44 @@ button, input, select, textarea { font: inherit; color: inherit; }
     }
 }
 
-/* ============================ MOTIFS =====================================
-   The four ornaments, and the tricolour.
+/* The ruled-feather device, run down the right edge of dark sections.
+   Bars flush right, ragged left — the block of rules beside the eagle in the
+   logo, extended. Generated from the logo itself by tools/make-stripes.py, so
+   the ragged profile is measured rather than invented.
 
-   greca and serpent are loaded as CSS MASKS over a plain background
-   colour, so one monochrome file serves every colour and both themes — set
-   `color` (or override `background`) on the element and the motif follows.
-   Give them a `background-image` instead and they will be stuck black.
+   Attached as a pseudo-element rather than a div so it needs no markup and no
+   page can forget it. z-index -1 keeps it behind the copy; every host below
+   isolates, so it cannot escape its own section. */
+.band::after,
+.footer::after,
+.section--ink::after {
+    content: ""; position: absolute; right: 0; top: 0; bottom: 0;
+    width: clamp(1.75rem, 5vw, 4rem);
+    background: var(--am-red);
+    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+            mask: url('/assets/img/stripes.svg') repeat-y right top / 100% var(--stripe-tile);
+    z-index: -1; pointer-events: none;
+}
+/* The band already isolates; these two need to so the -1 stays contained. */
+.footer, .section--ink { isolation: isolate; }
 
-   papel picado is the exception and is a real background-image: fiesta colour
-   is not brand colour, it does not re-tint, and it is the same in the dark.
+/* Reserve the gutter the device occupies. Below --maxw the wrap fills the
+   viewport and its own padding is the only thing between the copy and the
+   stripes, so without this the last column collides with them on tablets and
+   phones. The band centres its text, so it takes the reservation on both
+   sides and stays centred; the others only need it on the right. */
+.footer > .wrap,
+.section--ink > .wrap { padding-right: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
+.band > .wrap { padding-inline: max(clamp(1.15rem, 4vw, 2rem), clamp(1.75rem, 5vw, 4rem) + .9rem); }
+
+/* ============================ BRAND MARKS ================================
+   What is left after the hand-drawn ornament came out: the tricolour, and the
+   airline's own symbol.
+
+   The mark is a monochrome CSS MASK over a plain background colour, so one
+   file serves every placement and both themes — set `color` on the element and
+   it follows. Give it a `background-image` instead and it will be stuck black.
    ========================================================================= */
-
-/* The step-fret band. Used as a rule, and as the edge of dark sections. */
-.greca {
-    height: 18px;
-    background: currentColor;
-    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-}
-.greca--sm { height: 13px; }
-.greca--lg { height: 26px; }
-
-/* Cut-paper bunting. Hangs from the top edge of whatever it is dropped into.
-   Use it ONCE per page — strung across every section it stops being a fiesta
-   and starts being wallpaper. */
-.papel {
-    height: 62px;
-    background: url('/assets/img/papel.svg') repeat-x left top / auto 100%;
-}
-
-/* Quetzalcóatl, as a watermark. */
-.serpent {
-    background: currentColor;
-    -webkit-mask: url('/assets/img/serpent.svg') no-repeat center / contain;
-            mask: url('/assets/img/serpent.svg') no-repeat center / contain;
-}
 
 /* La bandera. Hard stops at the thirds — this is a flag, and a flag does not
    have a gradient in it. Runs full-bleed across the top of every page. */
@@ -276,7 +276,7 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
    the class name is kept because the pages already use it. On the navy hero
    red goes muddy, so there it takes the marigold instead. */
 .grad-text { color: var(--am-red); }
-.hero .grad-text, .band .grad-text, .section--ink .grad-text { color: var(--am-marigold); }
+.band .grad-text, .section--ink .grad-text { color: var(--am-marigold); }
 
 /* ============================ LAYOUT ===================================== */
 .wrap    { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: clamp(1.15rem, 4vw, 2rem); }
@@ -418,30 +418,17 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 }
 
 /* --- Rule ---
-   A short length of greca, in the accent. This is the workhorse divider and
-   it appears under nearly every page heading.
-
-   The numbers are not arbitrary. greca.svg is a 40 × 26 tile, so at height h
-   a tile renders 40/26 × h wide; at h = 13 that is exactly 20px, and a 120px
-   rule is exactly six whole spirals. Pick a height that does not divide
-   cleanly and the rule ends on half a spiral, which reads as a rendering bug
-   rather than as a border. Keep width a multiple of (40/26 × height).
-
-   Full-bleed friezes (.hero__frieze, .footer__frieze) are exempt — they run
-   to the viewport edge, where a clipped tile is just how a border behaves. */
+   Was a length of hand-drawn greca. It is the tricolour now: real colours,
+   hard stops, no invented geometry. The hairline is load-bearing — the middle
+   band is white and would otherwise vanish into the page. */
 .rule {
-    height: 13px; width: 120px;
-    background: var(--accent);
-    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-}
-.section--ink .rule, .hero .rule, .band .rule { background: #fff; opacity: .75; }
-/* The tricolour cut of the same divider. */
-.rule--flag {
-    height: 5px; border-radius: 3px; -webkit-mask: none; mask: none;
+    height: 5px; width: 108px; border-radius: 3px;
     background: linear-gradient(90deg,
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 0 0 1px rgba(15, 27, 46, .18);
 }
+:root[data-theme="dark"] .rule,
+.section--ink .rule, .hero .rule, .band .rule { box-shadow: none; }
 
 /* --- Table --- */
 /* Scroll container only. The table rules itself with hairlines; wrapping it in
@@ -469,13 +456,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .nav.is-stuck { border-bottom-color: var(--line); }
 .nav__inner { display: flex; align-items: center; gap: 1.5rem; height: 4.5rem; }
 .nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
-/* The mark, painted through assets/img/mark.svg as a mask so ONE file serves
-   every placement and both themes — nav, footer, watermark. Set --mark-ratio
-   to the artwork's real width/height when the logo lands. Nothing renders it
-   today: site.js has HAS_MARK = false until the real artwork is committed. */
+/* The Caballero Águila, painted through assets/img/mark.svg as a mask so one
+   file serves every placement and both themes. The ratio is the traced
+   artwork's own — re-trace and this must move with it. */
 .mark {
     display: block; flex: none;
-    aspect-ratio: var(--mark-ratio, 16 / 9);
+    aspect-ratio: var(--mark-ratio, 2778 / 2118);
     background: currentColor;
     -webkit-mask: url('/assets/img/mark.svg') no-repeat center / contain;
             mask: url('/assets/img/mark.svg') no-repeat center / contain;
@@ -508,6 +494,13 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
 }
 .nav__actions { display: flex; align-items: center; gap: .55rem; }
+/* Below the desktop breakpoint the Crew Center button is dropped: the burger
+   menu already carries it, and four controls plus the wordmark do not fit —
+   the brand has `white-space: nowrap`, so instead of wrapping it overruns the
+   actions and the theme toggle lands on top of the wordmark. */
+@media (max-width: 61.99rem) {
+    .nav__actions > .btn { display: none; }
+}
 
 .icon-btn {
     width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 1px solid var(--line);
@@ -535,48 +528,114 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .nav__menu   { display: none !important; }
 }
 
-/* ============================ HERO ======================================= */
-.hero { position: relative; overflow: hidden; background: var(--am-navy); color: #fff; isolation: isolate; }
-/* A single-hue depth wash. Not decoration — the decoration is the tilework
-   and the eagle sitting on top of it. */
-.hero__wash { position: absolute; inset: 0; background: var(--am-wash); z-index: -3; }
-/* Retired. The hero carried a dot-grid, then a tiled azulejo; both were
-   wallpaper. It is now the depth wash and the eagle, and nothing else. The
-   rule is kept as a no-op so an older cached page does not paint a stray box
-   over the hero — delete it once the pages have all cycled. */
-.hero__grid { display: none; }
-.hero__inner { padding-block: clamp(4.5rem, 13vw, 9rem); position: relative; }
-.hero h1 { margin-block: 1.3rem; max-width: 16ch; }
-.hero .lede { color: #C3D0E4; max-width: 50ch; }
-.hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.3rem; }
-/* The hero watermark. Empty until the real logo is committed — site.js renders
-   nothing into it, so it collapses and the hero is simply the depth wash. */
-.hero__mark {
-    position: absolute; right: 2%; top: 50%; translate: 0 -50%;
-    width: min(40vw, 26rem); opacity: .13; z-index: -1; pointer-events: none;
-}
-.hero__mark:empty { display: none; }
-@media (max-width: 48rem) { .hero__mark { right: -14%; opacity: .09; } }
+/* ============================ HERO =======================================
+   Two columns of content over a full-bleed aircraft.
 
-/* The greca runs along the bottom edge of the hero, where the navy meets the
-   stat strip — the seam a frieze would actually sit on. */
-.hero__frieze {
-    position: relative; z-index: 1; height: 20px; background: #fff; opacity: .3;
-    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
+   The previous version was a left-aligned block of copy with the entire right
+   half of the viewport left white, and the artwork as a separate slab beneath
+   it. That is the stock landing-page hero, and no amount of adjusting the
+   padding fixes it — the composition was the problem. So:
+
+     · the copy keeps the left, but the right carries the airline in four
+       counted figures, which is real information rather than filler;
+     · the artwork is genuinely full-bleed and slightly overscanned, so it runs
+       off both edges and reads as a crop of something larger rather than an
+       object floating in a box with margins.
+   ========================================================================= */
+.hero { position: relative; background: var(--bg); color: var(--ink); overflow: hidden; }
+.hero__inner {
+    display: grid; gap: clamp(1.75rem, 4vw, 3.5rem);
+    padding-block: clamp(2.25rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+}
+/* Two columns only once there is genuinely room; below that the figures stack
+   under the copy rather than squeezing it. `end` alignment sits the last rule
+   of the figures on the same baseline as the buttons. */
+@media (min-width: 62rem) {
+    .hero__inner {
+        grid-template-columns: minmax(0, 1.3fr) minmax(16rem, .7fr);
+        align-items: end;
+    }
+}
+.hero h1 { margin-block: 1rem; max-width: 15ch; text-wrap: balance; }
+.hero .lede { max-width: 46ch; }
+.hero .eyebrow { margin-bottom: .3rem; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
+
+/* --- The four figures --- */
+.hero__facts { margin: 0; display: grid; }
+.hero__facts > div {
+    display: flex; align-items: baseline; gap: clamp(.9rem, 2vw, 1.4rem);
+    padding: .8rem 0; border-top: 1px solid var(--line);
+}
+.hero__facts > div:last-child { border-bottom: 1px solid var(--line); }
+.hero__facts dt {
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 60, 'WONK' 0;
+    font-size: 1.9rem; line-height: 1; letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.4ch; text-align: right; color: var(--accent);
+}
+.hero__facts dd { margin: 0; display: grid; }
+.hero__facts dd b { font-size: .95rem; font-weight: 700; letter-spacing: -.005em; }
+.hero__facts dd span { font-size: .84rem; color: var(--muted); }
+
+/* --- The aircraft --- */
+/* Full-bleed and overscanned. `width: 108%` on a centred flex child inside an
+   overflow-hidden figure bleeds it off both edges at every viewport width. */
+.hero__art {
+    margin: 0; width: 100%; padding: 0;
+    display: flex; justify-content: center; overflow: hidden;
+}
+.hero__art img {
+    flex: none; width: 108%; max-width: none; height: auto;
+    aspect-ratio: 1394 / 372;
 }
 
-/* Under the hero this was four boxed cells counting up four big numbers, three
-   of which were invented. It is one line of facts now, each of them counted off
-   the arrays in data.js so it cannot overstate the airline. Same class is used
-   on the fleet page over white, so the colour comes from context. */
-.strip { border-top: 1px solid rgba(255, 255, 255, .14); background: rgba(0, 0, 0, .2); }
+/* The artwork is drawn on white, so in the dark theme it needs its own band
+   rather than a glaring slab with nothing holding it. Full width, no radius —
+   an overscanned image cannot have rounded corners, they are off-screen. */
+:root[data-theme="dark"] .hero__art img { background: #fff; padding-block: 1rem; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .hero__art img { background: #fff; padding-block: 1rem; }
+}
+
+/* Below this the aircraft stops fitting and is sized by height instead: fitted
+   whole to a phone it is ~100px tall and illegible, which was the single worst
+   thing on the page. ~1.35x the viewport keeps the airframe complete while the
+   illustration bleeds off. */
+@media (max-width: 48rem) {
+    .hero__art img {
+        width: auto; height: clamp(9rem, 36vw, 13rem);
+    }
+    .hero__inner { padding-block: 1.75rem 1.5rem; }
+    .hero h1 { margin-block: .8rem; }
+    .hero__cta { margin-top: 1.6rem; gap: .6rem; }
+    .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
+
+    /* Two up. Stacked one per row these four figures run to ~600px and push
+       the aircraft off the bottom of the screen entirely, which is the thing
+       the hero is here to show. */
+    .hero__facts { grid-template-columns: 1fr 1fr; column-gap: clamp(1rem, 4vw, 1.6rem); }
+    .hero__facts > div:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+    .hero__facts dt { font-size: 1.6rem; }
+    .hero__facts dd b { font-size: .9rem; }
+    .hero__facts dd span { font-size: .78rem; }
+}
+
+/* On a phone the sub-notes wrap to three lines each and cost ~160px, which is
+   the difference between the aircraft being on the first screen and not. The
+   figure and its label carry the meaning on their own at this size. */
+@media (max-width: 34rem) {
+    .hero__facts dd span { display: none; }
+    .hero__facts > div { padding: .7rem 0; }
+}
+
+/* A single line of counted facts. The hero used to use this; it now runs its
+   own four-figure block, but fleet.html still sets its type counts this way. */
 .strip__facts {
     display: flex; flex-wrap: wrap; align-items: center; gap: .3rem 1.2rem;
-    padding-block: 1.15rem;
     font-size: .88rem; color: var(--muted);
 }
-.strip .strip__facts { color: #B7C6DE; padding-block: 1.25rem; }
 .strip__facts span { display: inline-flex; align-items: center; gap: 1.2rem; }
 .strip__facts span + span::before {
     content: ""; width: 4px; height: 4px; border-radius: 50%;
@@ -678,14 +737,6 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .band { position: relative; overflow: hidden; background: var(--am-navy); color: #fff; isolation: isolate; }
 .band__wash { position: absolute; inset: 0; background: var(--am-wash); z-index: -3; }
 .band__tile { display: none; }   /* retired with .hero__grid */
-.band__serpent {
-    position: absolute; left: -4%; top: 50%; translate: 0 -50%;
-    width: min(46vw, 30rem); aspect-ratio: 3 / 2;
-    background: #fff; opacity: .1; z-index: -1; pointer-events: none;
-    -webkit-mask: url('/assets/img/serpent.svg') no-repeat center / contain;
-            mask: url('/assets/img/serpent.svg') no-repeat center / contain;
-}
-@media (max-width: 52rem) { .band__serpent { opacity: .06; left: -18%; } }
 .band__inner { padding-block: clamp(3.5rem, 8vw, 6rem); text-align: center; position: relative; }
 .band h2 { max-width: 20ch; margin-inline: auto; }
 .band p { color: rgba(255, 255, 255, .84); max-width: 52ch; margin: 1.1rem auto 0; }
@@ -693,15 +744,6 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 
 /* ============================ FOOTER ===================================== */
 .footer { position: relative; background: var(--am-navy); color: #C3D0E4; padding-block: clamp(3rem, 6vw, 4.5rem) 2rem; }
-/* A frieze along the top edge, the way a building carries one along a cornice.
-   Absolute so it sits on the actual edge — in flow it would be pushed down by
-   the footer's own top padding and float in the middle of nothing. */
-.footer__frieze {
-    position: absolute; left: 0; right: 0; top: 0;
-    height: 18px; background: #fff; opacity: .22;
-    -webkit-mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-            mask: url('/assets/img/greca.svg') repeat-x left center / auto 100%;
-}
 .footer a { color: #C3D0E4; transition: color .2s var(--ease); }
 .footer a:hover { color: #fff; }
 .footer__grid { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
