@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleet — Aeromexico Virtual</title>
+<meta name="description" content="The Aeromexico Virtual fleet: 787-9, 787-8, 777-200ER, 737 MAX 8, 737-800 and the E190 Connect regional fleet — every type available in Infinite Flight with an Aeroméxico livery.">
+<meta name="theme-color" content="#0C2C64">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/brand.css">
+<script>
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">The fleet</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Six types, one livery</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    We only operate aircraft that exist in Infinite Flight wearing an Aeroméxico
+                    livery. No paper fleet, no types you can't actually load into the sim.
+                </p>
+            </div>
+            <div class="grid grid-4" id="fleetStats" style="margin-bottom:clamp(2.5rem,5vw,4rem)"></div>
+            <div class="grid grid-3" id="fleetGrid"></div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">Why the names look like that</span>
+                    <h2 style="margin:.9rem 0">Fleet names are matching keys</h2>
+                    <div class="rule"></div>
+                    <p class="lede" style="margin-top:1.4rem">
+                        Each type below is written exactly as Infinite Flight's API names it —
+                        "Boeing 787-9 Dreamliner", not "789". The Inflight Crew Center matches your
+                        live flight to our fleet on that string to credit the hours automatically.
+                        Fly the right type in the right livery and the logbook takes care of itself.
+                    </p>
+                    <p style="margin-top:1.6rem">
+                        <a class="btn btn--ghost" href="/network">See where they fly <span data-icon="arrow"></span></a>
+                    </p>
+                </div>
+                <div class="table-scroll" data-reveal>
+                    <table id="fleetTable">
+                        <thead><tr><th>Infinite Flight type</th><th>Livery</th><th>Fleet</th><th>Seats</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Pick your type. Fly your first sector.</h2>
+            <p>Cadets start on the E190 and 737-800. Widebodies unlock at 100 hours.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js"></script>
+<script src="/assets/js/site.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const total = D.fleet.reduce((n, a) => n + a.count, 0);
+    const widebody = D.fleet.filter(a => /787|777/.test(a.type)).reduce((n, a) => n + a.count, 0);
+    const seats = D.fleet.reduce((n, a) => n + a.count * a.seats, 0);
+
+    document.getElementById('fleetStats').innerHTML = [
+        { n: total,        label: 'Aircraft' },
+        { n: D.fleet.length, label: 'Types' },
+        { n: widebody,     label: 'Widebodies' },
+        { n: seats,        label: 'Seats' },
+    ].map(c => `
+        <div class="card" data-reveal>
+            <b class="stat__num" data-count="${c.n}">0</b>
+            <span class="stat__label">${esc(c.label)}</span>
+        </div>`).join('');
+
+    document.getElementById('fleetGrid').innerHTML = D.fleet.map((a, i) => `
+        <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${(i % 3) * 80}">
+            <div class="fleet-card__media">${window.AMV.MARK.replace('class="mark"', 'class="mark" style="color:#fff"')}</div>
+            <div class="fleet-card__body">
+                <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
+                <h3>${esc(a.type)}</h3>
+                <p>${esc(a.note)}</p>
+                <div class="fleet-card__specs">
+                    <span>Fleet <b>${a.count}</b></span>
+                    <span>Seats <b>${a.seats}</b></span>
+                    <span>Range <b>${esc(a.range)}</b></span>
+                    <span>Livery <b>${esc(a.livery)}</b></span>
+                </div>
+            </div>
+        </article>`).join('');
+
+    document.querySelector('#fleetTable tbody').innerHTML = D.fleet.map(a => `
+        <tr>
+            <td class="mono">${esc(a.type)}</td>
+            <td>${esc(a.livery)}</td>
+            <td class="mono">${a.count}</td>
+            <td class="mono">${a.seats}</td>
+        </tr>`).join('');
+
+    window.AMV.refresh();
+})();
+</script>
+</body>
+</html>

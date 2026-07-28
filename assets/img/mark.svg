@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Aeromexico Virtual — the Caballero Águila mark.
+
+  Original geometry: an eagle-warrior head in profile facing right, under a
+  three-blade feather headdress. Drawn from scratch (no traced or lifted
+  artwork) so the VA owns what it ships. Uses `currentColor` throughout, so a
+  single fill on the parent recolours the whole mark.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Aeromexico Virtual">
+  <title>Aeromexico Virtual</title>
+
+  <!-- Headdress: three blades fanning up and back from the crown. -->
+  <g fill="currentColor">
+    <path d="M54 50C38 46 22 36 10 22c6 18 20 32 40 38z" opacity=".55"/>
+    <path d="M60 44C48 36 38 22 34 6c-4 18 4 34 18 44z"   opacity=".75"/>
+    <path d="M70 42C64 32 62 18 66 2c-10 12-12 28-6 42z"  opacity=".9"/>
+  </g>
+
+  <!-- Head + hooked beak. The eye is a counter-form (evenodd punches it out). -->
+  <path fill="currentColor" fill-rule="evenodd" d="M30 74c0-18 14-30 32-28 8 1 13 5 15 11l33 12c2 4 0 9-5 11-7-2-15-5-25-7-2 9-10 16-22 19l-14 12-10-6c-4-8-5-16-4-24zM58 62a5 5 0 1 0 .1 0z"/>
+</svg>

@@ -1,0 +1,15 @@
+# Clean URLs. Status 200 = rewrite, so the address bar keeps /fleet rather than
+# bouncing to /fleet.html — site.js highlights the active nav item by comparing
+# the normalised path, and these forms all normalise to the same thing.
+/fleet      /fleet.html     200
+/network    /network.html   200
+/routes     /network.html   200
+/events     /events.html    200
+/join       /join.html      200
+/apply      /join.html      200
+/crew       /crew.html      200
+
+# The crew center proper lives on Inflight. /crew (above) frames it in our own
+# chrome; these send anyone who lands on a deeper crew path straight there.
+/crew/join      https://inflight.info/crew/aeromexico-virtual/join    302
+/crew/status    https://inflight.info/crew/aeromexico-virtual/status  302

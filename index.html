@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aeromexico Virtual — Fly the Eagle Warrior</title>
+<meta name="description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
+<meta name="theme-color" content="#0C2C64">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
+<meta property="og:description" content="An Infinite Flight virtual airline flying the Aeroméxico network. 640 pilots, 70 aircraft, 23 destinations.">
+<meta property="og:image" content="/assets/img/mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/brand.css">
+<script>
+/* Paint the stored theme before first paint so there's no light flash. */
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+<noscript>
+    <nav class="wrap section--tight"><a href="/fleet">Fleet</a> · <a href="/network">Network</a> ·
+    <a href="/events">Events</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
+
+<main id="main">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="hero">
+        <div class="hero__wash"></div>
+        <div class="hero__grid"></div>
+        <div data-mark class="hero__mark" style="color:#fff"></div>
+        <div class="wrap hero__inner">
+            <span class="chip chip--onink">Infinite Flight · Expert Server</span>
+            <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
+            <p class="lede">
+                Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight — from
+                Mexico City out to New York, Madrid, Tokyo and Buenos Aires. Real routes, a real
+                rank ladder, and every hour logged automatically.
+            </p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/network">Explore the network</a>
+            </div>
+        </div>
+        <div class="strip">
+            <div class="wrap" style="padding:0">
+                <div class="strip__inner" id="heroStats"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== LIVE NOW ==================== -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="chip chip--live"><i class="dot-live"></i> Live now</span>
+                <h2 style="margin-top:.9rem">Who's airborne right now</h2>
+                <p class="lede">
+                    Straight from Infinite Flight's live traffic — every Aeromexico Virtual pilot
+                    currently in the air on the Expert Server. This is the same feed the Inflight
+                    tracker runs on.
+                </p>
+            </div>
+            <div data-live-roster data-height="440" data-reveal>
+                <div class="frame-host muted" style="padding:3rem;text-align:center">
+                    Loading live traffic…
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== WHY ==================== -->
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Why fly with us</span>
+                <h2>An airline, not a spreadsheet</h2>
+                <p class="lede">
+                    Everything a pilot needs sits in one crew center — logbook, roster, route
+                    network and events. You fly; the paperwork files itself.
+                </p>
+            </div>
+            <div class="grid grid-3">
+                <article class="card card--hover" data-reveal>
+                    <div class="card__icon" data-icon="radio"></div>
+                    <h3>Flights log themselves</h3>
+                    <p>Fly under an Aeromexico callsign on the Expert Server and the crew center
+                       captures the leg, matches it to the fleet and route network, and credits the
+                       hours. No forms unless something needs fixing.</p>
+                </article>
+                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                    <div class="card__icon" data-icon="route"></div>
+                    <h3>A network worth flying</h3>
+                    <p>23 destinations built on the real Aeroméxico map — regional Connect hops on
+                       the E190, transcons on the MAX, and 787 flagship sectors to Europe and
+                       the Pacific.</p>
+                </article>
+                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                    <div class="card__icon" data-icon="award"></div>
+                    <h3>Rank that means something</h3>
+                    <p>Seven ranks from Cadet to Line Check Captain, each unlocking real fleet and
+                       route access. Promotions come off logged hours, not vibes.</p>
+                </article>
+                <article class="card card--hover" data-reveal>
+                    <div class="card__icon" data-icon="calendar"></div>
+                    <h3>Events with ATC</h3>
+                    <p>Group departures and fly-ins run with staffed controllers, published slots
+                       and a proper briefing — not a Discord message and a hope.</p>
+                </article>
+                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                    <div class="card__icon" data-icon="users"></div>
+                    <h3>Staffed by people who fly</h3>
+                    <p>Our staff are line pilots first. Applications get a human answer inside
+                       48 hours, and every decision is explained.</p>
+                </article>
+                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                    <div class="card__icon" data-icon="shield"></div>
+                    <h3>Grade 3 and up</h3>
+                    <p>We fly the Expert Server exclusively. A clean violation record keeps the
+                       line professional and the events flyable.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FLEET ==================== -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">The fleet</span>
+                <h2>Six types, one livery</h2>
+                <p class="lede">
+                    Every aircraft below exists in Infinite Flight with an Aeroméxico livery, so
+                    what you see on the map is what we actually fly.
+                </p>
+            </div>
+            <div class="grid grid-3" id="fleetPreview"></div>
+            <p style="margin-top:2rem" data-reveal>
+                <a class="btn btn--ghost" href="/fleet">See the full fleet <span data-icon="arrow"></span></a>
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== NETWORK ==================== -->
+    <section class="section section--ink">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">The network</span>
+                <h2>Out of the Valley of Mexico</h2>
+                <p class="lede">
+                    Three bases, 23 destinations, five regions. Pick a leg, file it, fly it.
+                </p>
+            </div>
+            <div class="grid grid-3" style="margin-bottom:2.5rem" id="hubList"></div>
+            <div class="table-scroll" data-reveal style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.14)">
+                <table id="routePreview">
+                    <thead><tr><th>Route</th><th>Destination</th><th>Region</th><th>Aircraft</th><th>Block</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p style="margin-top:2rem" data-reveal>
+                <a class="btn btn--onink" href="/network">All 23 routes <span data-icon="arrow"></span></a>
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== RANKS ==================== -->
+    <section class="section">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">Progression</span>
+                    <h2 style="margin:.9rem 0">From Cadet to the left seat</h2>
+                    <div class="rule"></div>
+                    <p class="lede" style="margin-top:1.4rem">
+                        Hours are credited the moment a flight is verified against the network.
+                        Cross a threshold and the promotion lands in your crew center — no
+                        application, no waiting for someone to notice.
+                    </p>
+                    <p style="margin-top:1.6rem">
+                        <a class="btn btn--primary" href="/join">Start at Cadet <span data-icon="arrow"></span></a>
+                    </p>
+                </div>
+                <div class="card" data-reveal data-reveal-delay="80">
+                    <div id="rankList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== NEXT EVENT ==================== -->
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Next up</span>
+                <h2>The next departure</h2>
+            </div>
+            <div id="nextEvent" data-reveal></div>
+            <p style="margin-top:2rem" data-reveal>
+                <a class="btn btn--ghost" href="/events">Full event calendar <span data-icon="arrow"></span></a>
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== CTA ==================== -->
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>The eagle flies at 0600. Be on it.</h2>
+            <p>Applications take about three minutes and get a human answer inside 48 hours.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/crew">Crew sign in</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js"></script>
+<script src="/assets/js/site.js"></script>
+<script src="/assets/js/live.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, icon = window.AMV.icon;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // ---- Hero stat strip ----
+    const fleetCount = D.fleet.reduce((n, a) => n + a.count, 0);
+    const cells = [
+        { n: D.stats.pilots,       s: '+', label: 'Pilots on the roster' },
+        { n: D.stats.hoursFlown,   s: '+', label: 'Hours flown' },
+        { n: D.stats.destinations, s: '',  label: 'Destinations' },
+        { n: fleetCount,           s: '',  label: 'Aircraft in fleet' },
+    ];
+    document.getElementById('heroStats').innerHTML = cells.map(c => `
+        <div class="strip__cell">
+            <b class="stat__num" data-count="${c.n}" data-suffix="${c.s}">0</b>
+            <span class="stat__label">${esc(c.label)}</span>
+        </div>`).join('');
+
+    // ---- Fleet preview (the three biggest sub-fleets) ----
+    const top = D.fleet.slice().sort((a, b) => b.count - a.count).slice(0, 3);
+    document.getElementById('fleetPreview').innerHTML = top.map((a, i) => `
+        <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${i * 80}">
+            <div class="fleet-card__media">${window.AMV.MARK.replace('class="mark"', 'class="mark" style="color:#fff"')}</div>
+            <div class="fleet-card__body">
+                <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
+                <h3>${esc(a.type)}</h3>
+                <p>${esc(a.note)}</p>
+                <div class="fleet-card__specs">
+                    <span>Fleet <b>${a.count}</b></span>
+                    <span>Seats <b>${a.seats}</b></span>
+                    <span>Range <b>${esc(a.range)}</b></span>
+                </div>
+            </div>
+        </article>`).join('');
+
+    // ---- Hubs ----
+    document.getElementById('hubList').innerHTML = D.hubs.map((h, i) => `
+        <article class="card" data-reveal data-reveal-delay="${i * 80}"
+                 style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)">
+            <div class="card__icon" style="background:rgba(255,255,255,.1);color:#fff">${icon('pin')}</div>
+            <span class="tag tag--hub">${esc(h.role)}</span>
+            <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
+            <p style="color:#93A4C2">${esc(h.name)}</p>
+            <p class="mono" style="margin-top:.7rem;color:#fff;font-size:.85rem">${esc(h.icao)} · ${esc(h.iata)}</p>
+        </article>`).join('');
+
+    // ---- Route preview: the six longest sectors ----
+    const long = D.routes.slice().sort((a, b) => b.dist - a.dist).slice(0, 6);
+    document.querySelector('#routePreview tbody').innerHTML = long.map(r => `
+        <tr>
+            <td><span class="route-pair">${esc(r.from)} <span class="arrow">→</span> ${esc(r.to)}</span></td>
+            <td>${esc(r.city)}</td>
+            <td><span class="tag">${esc(r.region)}</span></td>
+            <td class="mono">${esc(r.ac)}</td>
+            <td class="mono">${esc(r.block)}</td>
+        </tr>`).join('');
+
+    // ---- Rank ladder ----
+    document.getElementById('rankList').innerHTML = D.ranks.map((r, i) => `
+        <div class="rank">
+            <span class="rank__bars">${'<i></i>'.repeat(Math.min(4, i + 1))}</span>
+            <span>
+                <span class="rank__name">${esc(r.name)}</span>
+                <span style="display:block;font-size:.82rem" class="muted">${esc(r.note)}</span>
+            </span>
+            <span class="rank__hours">${r.minHours === 0 ? 'Day one' : r.minHours + ' h'}</span>
+        </div>`).join('');
+
+    // ---- Next event (the soonest one still ahead of us) ----
+    const now = Date.now();
+    const next = D.events.filter(e => Date.parse(e.date) > now)
+                         .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))[0];
+    const host = document.getElementById('nextEvent');
+    if (!next) {
+        host.innerHTML = `<div class="card"><p>No event on the calendar right now — check the
+            <a href="/events" style="color:var(--accent);font-weight:600">events page</a> shortly.</p></div>`;
+    } else {
+        const when = new Date(next.date);
+        const fmt = new Intl.DateTimeFormat(undefined, {
+            weekday: 'long', day: 'numeric', month: 'long',
+            hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+        }).format(when);
+        host.innerHTML = `
+            <article class="card" style="display:grid;gap:1.6rem;grid-template-columns:1fr">
+                <div>
+                    <span class="chip">${esc(next.server)} Server</span>
+                    <h3 style="margin:.9rem 0 .5rem;font-size:clamp(1.4rem,3vw,2rem)">${esc(next.title)}</h3>
+                    <p class="mono muted" style="font-size:.86rem">${esc(fmt)}</p>
+                    <p style="margin-top:1rem;max-width:60ch">${esc(next.blurb)}</p>
+                    <div class="fleet-card__specs" style="padding-top:1.3rem">
+                        <span>Route <b>${esc(next.from)} → ${esc(next.to)}</b></span>
+                        <span>Aircraft <b>${esc(next.ac)}</b></span>
+                        ${next.slots ? `<span>Slots <b>${next.slots}</b></span>` : ''}
+                    </div>
+                </div>
+            </article>`;
+    }
+
+    // Everything above was injected after site.js exported itself — hand the new
+    // nodes back so their reveals, counters and icons get wired.
+    window.AMV.refresh();
+})();
+</script>
+</body>
+</html>

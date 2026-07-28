@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events — Aeromexico Virtual</title>
+<meta name="description" content="Group departures, fly-ins and long-haul events flown by Aeromexico Virtual on the Infinite Flight Expert Server, with staffed ATC and published slots.">
+<meta name="theme-color" content="#0C2C64">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+    .event { display:grid; gap:1.5rem; grid-template-columns:1fr; align-items:start; }
+    @media (min-width:52rem){ .event { grid-template-columns:12rem 1fr; } }
+    .event__when {
+        border-left:3px solid var(--accent); padding-left:1.1rem;
+    }
+    .event__day  { font-family:var(--font-display); font-weight:800; font-size:2.4rem; line-height:1; letter-spacing:-.04em; }
+    .event__mon  { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:var(--muted); display:block; margin-top:.4rem; }
+    .event__time { font-family:var(--font-mono); font-size:.82rem; color:var(--muted); display:block; margin-top:.7rem; }
+    .event--past { opacity:.55; }
+    .event--past .event__when { border-left-color:var(--line); }
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">Events</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Fly together</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    Group departures and fly-ins on the Expert Server, run with staffed ATC,
+                    published slots and a briefing that goes out 48 hours ahead. Times below are
+                    shown in your own timezone.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+        <div class="wrap">
+            <h2 style="margin-bottom:1.6rem">Upcoming</h2>
+            <div class="grid" id="upcoming" style="gap:1.2rem"></div>
+        </div>
+    </section>
+
+    <section class="section section--alt" id="pastSection" hidden>
+        <div class="wrap">
+            <h2 style="margin-bottom:1.6rem">Flown</h2>
+            <div class="grid" id="past" style="gap:1.2rem"></div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Events are announced in the crew center first.</h2>
+            <p>Sign in for slot bookings, briefings and the group-flight channel.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/crew">Crew sign in <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/join">Not a member yet</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js"></script>
+<script src="/assets/js/site.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const now = Date.now();
+    const sorted = D.events.slice().sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    const upcoming = sorted.filter(e => Date.parse(e.date) > now);
+    const past = sorted.filter(e => Date.parse(e.date) <= now).reverse();
+
+    const dayFmt  = new Intl.DateTimeFormat(undefined, { day: 'numeric' });
+    const monFmt  = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
+    const timeFmt = new Intl.DateTimeFormat(undefined, {
+        weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+    function card(e, isPast) {
+        const d = new Date(e.date);
+        return `
+        <article class="card event${isPast ? ' event--past' : ''}" data-reveal>
+            <div class="event__when">
+                <span class="event__day">${esc(dayFmt.format(d))}</span>
+                <span class="event__mon">${esc(monFmt.format(d))}</span>
+                <span class="event__time">${esc(timeFmt.format(d))}</span>
+            </div>
+            <div>
+                <span class="chip">${esc(e.server)} Server</span>
+                <h3 style="margin:.8rem 0 .5rem;font-size:clamp(1.25rem,2.4vw,1.6rem)">${esc(e.title)}</h3>
+                <p style="max-width:60ch">${esc(e.blurb)}</p>
+                <div class="fleet-card__specs" style="padding-top:1.2rem">
+                    <span>Route <b>${esc(e.from)} → ${esc(e.to)}</b></span>
+                    <span>Aircraft <b>${esc(e.ac)}</b></span>
+                    ${e.slots ? `<span>Slots <b>${e.slots}</b></span>` : '<span>Slots <b>Open</b></span>'}
+                </div>
+            </div>
+        </article>`;
+    }
+
+    const up = document.getElementById('upcoming');
+    up.innerHTML = upcoming.length
+        ? upcoming.map(e => card(e, false)).join('')
+        : `<div class="card"><p>Nothing on the calendar right now. New events go up in the crew
+             center first — <a href="/crew"
+             style="color:var(--accent);font-weight:600">sign in</a> to catch them early.</p></div>`;
+
+    if (past.length) {
+        document.getElementById('pastSection').hidden = false;
+        document.getElementById('past').innerHTML = past.map(e => card(e, true)).join('');
+    }
+
+    window.AMV.refresh();
+})();
+</script>
+</body>
+</html>

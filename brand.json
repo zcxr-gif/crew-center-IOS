@@ -1,0 +1,57 @@
+{
+  "$comment": "Aeromexico Virtual brand manifest. This file is the contract between this website and the Inflight Crew Center. Paste the `theme` object into the Crew Center's Appearance → Brand theme field (or POST it to /api/crew/aeromexico-virtual/settings as {\"theme\": …}) and the crew center renders in this exact design system. Every value here mirrors a token in assets/brand.css — keep the two in step.",
+
+  "va": {
+    "name": "Aeromexico Virtual",
+    "shortName": "AM Virtual",
+    "slug": "aeromexico-virtual",
+    "code": "AEROMEXICO",
+    "iata": "AM",
+    "icao": "AMX",
+    "callsignPrefix": "AEROMEXICO",
+    "tagline": "Fly the Eagle Warrior.",
+    "site": "https://aeromexicova.org",
+    "crewCenter": "https://inflight.info/crew/aeromexico-virtual",
+    "hubs": ["MMMX", "MMGL", "MMMY"],
+    "network": "Infinite Flight"
+  },
+
+  "theme": {
+    "mode": "auto",
+
+    "font": "Inter",
+    "displayFont": "Sora",
+    "monoFont": "JetBrains Mono",
+
+    "radius": 14,
+
+    "$comment_gradient": "Stored as the ARGUMENTS to linear-gradient(), not the whole function. The crew center wraps it, so nothing but colours, angles and stops can cross the boundary.",
+    "gradient": "115deg, #0C2C64 0%, #6B2A72 52%, #E5417E 100%",
+
+    "light": {
+      "bg":        "#F5F2ED",
+      "surface":   "#FFFFFF",
+      "surface2":  "#FBF9F6",
+      "line":      "#E3DED4",
+      "lineSoft":  "#EEEAE2",
+      "ink":       "#101828",
+      "muted":     "#5C6577",
+      "faint":     "#98A0B0",
+      "accent":    "#0C2C64",
+      "accentInk": "#FFFFFF"
+    },
+
+    "dark": {
+      "bg":        "#08111F",
+      "surface":   "#0E2039",
+      "surface2":  "#10253F",
+      "line":      "#1E3557",
+      "lineSoft":  "#172B48",
+      "ink":       "#EAF0FA",
+      "muted":     "#97A6BF",
+      "faint":     "#61728E",
+      "accent":    "#5B86D6",
+      "accentInk": "#08111F"
+    }
+  }
+}

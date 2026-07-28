@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Route network — Aeromexico Virtual</title>
+<meta name="description" content="23 destinations across North America, Europe, Asia Pacific, South America and Mexico, flown from our hubs at Mexico City, Guadalajara and Monterrey.">
+<meta name="theme-color" content="#0C2C64">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+    .filters { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.6rem; }
+    .filter {
+        padding:.5rem 1.05rem; border-radius:999px; cursor:pointer;
+        border:1px solid var(--line); background:transparent; color:var(--muted);
+        font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em;
+        transition:all .25s var(--ease);
+    }
+    .filter:hover { color:var(--ink); border-color:var(--ink); }
+    .filter[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">The network</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Out of the Valley of Mexico</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    Every route below is a real Aeroméxico sector, flyable end to end in Infinite
+                    Flight. File it in the crew center, fly it on the Expert Server, and the hours
+                    land in your logbook.
+                </p>
+            </div>
+            <div class="grid grid-3" id="hubs"></div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" style="margin-bottom:1.6rem">
+                <span class="eyebrow">All routes</span>
+                <h2 style="margin-top:.9rem"><span id="routeCount">23</span> sectors</h2>
+            </div>
+            <div class="filters" id="filters" role="group" aria-label="Filter routes by region"></div>
+            <div class="table-scroll">
+                <table id="routes">
+                    <thead>
+                        <tr><th>Route</th><th>Destination</th><th>Region</th><th>Aircraft</th><th>Distance</th><th>Block</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
+                Distances are great-circle nautical miles. Block times are scheduled and will vary
+                with routing, winds and the day's traffic.
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="chip chip--live"><i class="dot-live"></i> Live now</span>
+                <h2 style="margin-top:.9rem">Who's flying the network</h2>
+                <p class="lede">Aeromexico Virtual pilots airborne on the Expert Server this minute.</p>
+            </div>
+            <div data-live-roster data-height="420" data-reveal>
+                <div class="frame-host muted" style="padding:3rem;text-align:center">Loading live traffic…</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Twenty-three destinations. Pick one.</h2>
+            <p>Route access opens up as you rank. Cadets start domestic; captains take the 787 to Narita.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js"></script>
+<script src="/assets/js/site.js"></script>
+<script src="/assets/js/live.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, icon = window.AMV.icon;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // ---- Hubs ----
+    document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
+        const legs = D.routes.filter(r => r.from === h.icao || r.to === h.icao).length;
+        return `
+        <article class="card card--hover" data-reveal data-reveal-delay="${i * 80}">
+            <div class="card__icon">${icon('pin')}</div>
+            <span class="tag tag--hub">${esc(h.role)}</span>
+            <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
+            <p>${esc(h.name)}</p>
+            <div class="fleet-card__specs" style="padding-top:1.1rem">
+                <span>ICAO <b>${esc(h.icao)}</b></span>
+                <span>IATA <b>${esc(h.iata)}</b></span>
+                <span>Sectors <b>${legs}</b></span>
+            </div>
+        </article>`;
+    }).join('');
+
+    // ---- Region filter ----
+    const regions = ['All', ...Array.from(new Set(D.routes.map(r => r.region)))];
+    let active = 'All';
+
+    document.getElementById('filters').innerHTML = regions.map(r =>
+        `<button class="filter" type="button" data-region="${esc(r)}"
+                 aria-pressed="${r === 'All'}">${esc(r)}</button>`).join('');
+
+    const tbody = document.querySelector('#routes tbody');
+    const count = document.getElementById('routeCount');
+
+    function render() {
+        const rows = active === 'All' ? D.routes : D.routes.filter(r => r.region === active);
+        count.textContent = rows.length;
+        tbody.innerHTML = rows.map(r => `
+            <tr>
+                <td><span class="route-pair">${esc(r.from)} <span class="arrow">→</span> ${esc(r.to)}</span></td>
+                <td>${esc(r.city)}</td>
+                <td><span class="tag">${esc(r.region)}</span></td>
+                <td class="mono">${esc(r.ac)}</td>
+                <td class="mono">${r.dist.toLocaleString()} nm</td>
+                <td class="mono">${esc(r.block)}</td>
+            </tr>`).join('');
+    }
+
+    document.getElementById('filters').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-region]');
+        if (!btn) return;
+        active = btn.dataset.region;
+        document.querySelectorAll('#filters .filter').forEach(b =>
+            b.setAttribute('aria-pressed', String(b.dataset.region === active)));
+        render();
+    });
+
+    render();
+    window.AMV.refresh();
+})();
+</script>
+</body>
+</html>

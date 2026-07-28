@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crew Center — Aeromexico Virtual</title>
+<meta name="description" content="Sign in to the Aeromexico Virtual crew center: logbook, roster, route network, PIREPs and events.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0C2C64">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/brand.css">
+<style>
+    /* The crew center fills the viewport under our own nav, so signing in here
+       feels like a section of this site rather than a trip to another product. */
+    .crew-stage {
+        position: relative;
+        height: calc(100dvh - 4.5rem);
+        min-height: 32rem;
+        background: var(--bg);
+    }
+    .crew-stage iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+    .crew-fallback {
+        position: absolute; inset: 0; display: grid; place-items: center;
+        padding: 2rem; text-align: center; background: var(--bg);
+        transition: opacity .3s var(--ease);
+    }
+    .crew-fallback[hidden] { display: none; }
+    .crew-fallback .mark { width: 3.4rem; margin: 0 auto 1.4rem; color: var(--accent); }
+    .crew-fallback .spinner {
+        width: 1.9rem; height: 1.9rem; margin: 1.4rem auto 0; border-radius: 50%;
+        border: 2px solid var(--line); border-top-color: var(--accent);
+        animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<div data-site-nav></div>
+
+<main>
+    <div class="crew-stage">
+        <iframe id="crewFrame" title="Aeromexico Virtual Crew Center"
+                src="https://inflight.info/crew/aeromexico-virtual?embed=1"
+                allow="clipboard-write"></iframe>
+
+        <div class="crew-fallback" id="crewFallback">
+            <div>
+                <div data-mark></div>
+                <h2 style="font-size:1.5rem">Opening the crew center…</h2>
+                <p class="muted" style="margin-top:.7rem;max-width:44ch">
+                    Signing in here keeps you on our site. If nothing appears, your browser is
+                    blocking embedded sign-ins — open it directly instead.
+                </p>
+                <div class="spinner" id="crewSpinner"></div>
+                <p style="margin-top:1.6rem">
+                    <a class="btn btn--ghost btn--sm" id="crewDirect"
+                       href="https://inflight.info/crew/aeromexico-virtual" target="_blank" rel="noopener">
+                        Open in a new tab <span data-icon="external"></span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/assets/js/site.js"></script>
+<script>
+(function () {
+    const frame    = document.getElementById('crewFrame');
+    const fallback = document.getElementById('crewFallback');
+    const spinner  = document.getElementById('crewSpinner');
+
+    // Hide the placeholder as soon as the crew center paints. `load` is the only
+    // signal we get cross-origin, so a frame that's refused (CSP/X-Frame-Options,
+    // or a browser blocking third-party storage) simply never fires it — the
+    // placeholder then stays up with the direct link, which is the right
+    // outcome rather than an empty white box.
+    let done = false;
+    frame.addEventListener('load', () => {
+        done = true;
+        fallback.hidden = true;
+    });
+
+    setTimeout(() => {
+        if (done) return;
+        spinner.hidden = true;
+        document.querySelector('#crewFallback h2').textContent = 'Open the crew center';
+        document.querySelector('#crewFallback p').textContent =
+            'Your browser is blocking the embedded sign-in. Open the crew center directly — ' +
+            'it is the same crew center, same account.';
+        document.getElementById('crewDirect').className = 'btn btn--primary';
+    }, 6000);
+
+    // Keep the framed crew center on the same theme the visitor picked here.
+    // crewBrand.js on the other side listens for this and re-paints instantly.
+    function pushTheme() {
+        try {
+            frame.contentWindow.postMessage(
+                { type: 'inflight:crew:theme', theme: window.AMV.currentTheme() },
+                'https://inflight.info');
+        } catch (_) {}
+    }
+    frame.addEventListener('load', pushTheme);
+    new MutationObserver(pushTheme).observe(document.documentElement, {
+        attributes: true, attributeFilter: ['data-theme'],
+    });
+})();
+</script>
+</body>
+</html>
