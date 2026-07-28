@@ -494,6 +494,13 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
 }
 .nav__actions { display: flex; align-items: center; gap: .55rem; }
+/* Below the desktop breakpoint the Crew Center button is dropped: the burger
+   menu already carries it, and four controls plus the wordmark do not fit —
+   the brand has `white-space: nowrap`, so instead of wrapping it overruns the
+   actions and the theme toggle lands on top of the wordmark. */
+@media (max-width: 61.99rem) {
+    .nav__actions > .btn { display: none; }
+}
 
 .icon-btn {
     width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 1px solid var(--line);
@@ -535,6 +542,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .hero h1 { margin-block: 1.2rem; max-width: 15ch; text-wrap: balance; }
 .hero .lede { max-width: 46ch; }
 .hero .eyebrow { margin-bottom: .3rem; }
+@media (max-width: 48rem) {
+    .hero__inner { padding-block: 1.75rem 1.5rem; }
+    .hero h1 { margin-block: .8rem; }
+    .hero__cta { margin-top: 1.6rem; gap: .6rem; }
+    .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
+}
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2.2rem; }
 
 /* Wider than the text measure on purpose: the artwork runs out toward the
@@ -546,16 +559,44 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .hero__art img { width: 100%; height: auto; aspect-ratio: 1394 / 372; }
 
+/* The artwork is 3.7:1. Fitted to a phone that is ~100px tall and the aircraft
+   is illegible, which is the single worst thing about the page on a handset.
+   So below this width it stops fitting: it is sized by HEIGHT, overflows the
+   viewport, and is centred and clipped — the aircraft reads at a usable size
+   and the illustration bleeds off both edges, which is a deliberate crop
+   rather than a shrunken whole. */
+@media (max-width: 48rem) {
+    .hero__art {
+        display: flex; justify-content: center;
+        overflow: hidden; padding-inline: 0;
+    }
+    .hero__art img {
+        flex: none; width: auto; max-width: none;
+        /* ~1.35x the viewport: enough that the aircraft reads, little enough
+           that the whole airframe still fits and only the illustration
+           bleeds off. Larger and the nose and tail get cut, which looks like
+           a mistake rather than a crop. */
+        height: clamp(9rem, 36vw, 13rem); aspect-ratio: 1394 / 372;
+    }
+}
+
 /* The livery art is drawn on white, so in the dark theme it needs its own
    plate rather than a glaring full-bleed slab — a light insert in a dark page,
    the way a printed plate reads. */
-:root[data-theme="dark"] .hero__art img,
-:root[data-theme="dark"] .fleet-card__media img {
+:root[data-theme="dark"] .hero__art img {
     background: #fff; border-radius: var(--radius); padding: 1.25rem 1rem;
 }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .hero__art img {
         background: #fff; border-radius: var(--radius); padding: 1.25rem 1rem;
+    }
+}
+/* Once the artwork bleeds past the viewport the rounded plate would be a card
+   with its corners off-screen. It becomes a full-width band instead. */
+@media (max-width: 48rem) {
+    :root[data-theme="dark"] .hero__art img { border-radius: 0; padding: .9rem 0; }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .hero__art img { border-radius: 0; padding: .9rem 0; }
     }
 }
 
