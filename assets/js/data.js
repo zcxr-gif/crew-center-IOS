@@ -17,36 +17,67 @@ window.AMV_DATA = {
         { icao: 'MMMY', iata: 'MTY', city: 'Monterrey',    name: 'Mariano Escobedo Intl',     role: 'Focus city' },
     ],
 
+    // `photo` is one of the VA's own airframes, shot in the sim and uploaded to
+    // the tracker's community-aircraft gallery — the same bucket the live map
+    // serves them from, so a re-upload there lands here without a deploy. It
+    // carries `reg` (which airframe this actually is) and the image's real
+    // pixel dimensions, which the card puts on the <img> tag so the box is
+    // reserved before decode. A type without a photo falls back to the mark;
+    // see AMV.fleetMedia in site.js.
     fleet: [
         {
             type: 'Boeing 787-9 Dreamliner', livery: 'Aeromexico', short: '789',
             role: 'Long haul flagship', seats: 274, range: '7,635 nm',
             note: 'The backbone of the transatlantic and transpacific network.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAADD-1775817369312.webp',
+                reg: 'XA-ADD', w: 1920, h: 886,
+            },
         },
         {
             type: 'Boeing 787-8 Dreamliner', livery: 'Aeromexico', short: '788',
             role: 'Long haul', seats: 243, range: '7,355 nm',
             note: 'Thinner long-haul routes and the South America runs.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/N961AM-1776329131824.webp',
+                reg: 'N961AM', w: 1920, h: 864,
+            },
         },
         {
             type: 'Boeing 777-200ER', livery: 'Aeromexico', short: '772',
             role: 'Heavy long haul', seats: 277, range: '7,065 nm',
             note: 'Reserved for high-demand event flights and legacy schedules.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/N774AM-1768671388140.webp',
+                reg: 'N774AM', w: 1920, h: 886,
+            },
         },
         {
             type: 'Boeing 737 MAX 8', livery: 'Aeromexico', short: '38M',
             role: 'Narrowbody', seats: 166, range: '3,550 nm',
             note: 'Domestic trunk routes plus the deeper US and Caribbean network.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAMLI-1776275631124.webp',
+                reg: 'XA-MLI', w: 1920, h: 886,
+            },
         },
         {
             type: 'Boeing 737-800', livery: 'Aeromexico', short: '738',
             role: 'Narrowbody', seats: 160, range: '2,935 nm',
             note: 'The everyday workhorse across Mexico and the southern US.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAAMA-1776252960171.webp',
+                reg: 'XA-AMA', w: 1920, h: 864,
+            },
         },
         {
             type: 'Embraer E190', livery: 'Aeromexico Connect', short: 'E90',
             role: 'Regional', seats: 99, range: '2,400 nm',
             note: 'Flown as Aeromexico Connect on regional and feeder sectors.',
+            photo: {
+                src: 'https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAGAH-1768151925204.webp',
+                reg: 'XA-GAH', w: 1920, h: 886,
+            },
         },
     ],
 

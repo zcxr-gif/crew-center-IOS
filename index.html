@@ -273,7 +273,7 @@
     const top = D.fleet.filter(a => /737|E190/.test(a.type)).slice(0, 3);
     document.getElementById('fleetPreview').innerHTML = top.map((a, i) => `
         <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${i * 80}">
-            <div class="fleet-card__media">${window.AMV.MARK}</div>
+            <div class="fleet-card__media">${window.AMV.fleetMedia(a)}</div>
             <div class="fleet-card__body">
                 <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
                 <h3>${esc(a.type)}</h3>

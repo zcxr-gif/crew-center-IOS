@@ -51,7 +51,24 @@ layout reaches for.
 | `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
+| the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
+
+**The fleet photographs are hotlinked, deliberately.** They live in the
+tracker's `community-aircraft` bucket — the same objects the live map serves —
+so re-uploading a shot there updates this site with no deploy, and there is one
+copy of each rather than one here that quietly goes stale. The trade is a
+runtime dependency on that bucket: if it moves, the fleet cards fall back to
+nothing rather than to the mark, because the `<img>` is already in the DOM by
+then. `img-src` in `_headers` is `'self' data: https:`, so no CSP change was
+needed and none is needed for a future bucket either.
+
+Each entry carries the airframe's registration and the file's real pixel
+dimensions. The dimensions go on the tag: these are off-site images, so without
+them a card has no height until the image lands, and the grid jumps when it
+does. A type with no `photo` falls back to the mark — `AMV.fleetMedia` in
+`site.js` owns that choice, because both the home-page preview and the fleet
+page render entries and the fallback has to behave the same in each.
 
 Two build steps, both reproducible and both leaving the supplied originals
 untouched:

@@ -754,6 +754,26 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .fleet-card:nth-child(6n+6) .fleet-card__media .mark { color: var(--am-cobalt); }
 .fleet-card__media img { width: 100%; height: auto; }
 
+/* The airframe itself, where there is a photograph of it. These are the VA's
+   own sim shots off the community-aircraft gallery — real material, which is
+   the only kind this site decorates with.
+
+   Fixed aspect box with object-fit, not `height: auto`: the gallery's shots are
+   not all the same ratio (some 1920x886, some 1920x864), and left to their own
+   heights a row of three cards has three different photo heights and the type
+   names below them stop lining up. The ratio here is the gallery's own, so the
+   crop it applies is a hair off the top and bottom of the taller ones rather
+   than anything that cuts an aircraft.
+
+   The tinted surface behind is what shows while an off-site image is still in
+   flight, so the card holds its shape instead of flashing white. */
+.fleet-card__media .fleet-photo {
+    aspect-ratio: 1920 / 886;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+
 .fleet-card__body { padding: 0; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
 .fleet-card__body .type {
     font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;

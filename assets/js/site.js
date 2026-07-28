@@ -264,6 +264,29 @@
         nums.forEach(el => io.observe(el));
     }
 
+    // ---- Fleet media --------------------------------------------------------
+    // A type's own airframe when the airline has a photograph of it, the mark
+    // when it doesn't. Both the home page preview and the fleet page render
+    // fleet entries, and the fallback has to behave the same in each, so this
+    // lives here rather than being written out twice and drifting.
+    //
+    // The dimensions come off the file (see data.js) and go on the tag: the
+    // photos are hosted off-site, so without them the card has no height until
+    // the image lands and the whole grid jumps when it does.
+    function attr(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function fleetMedia(a) {
+        const p = a && a.photo;
+        if (!p || !p.src) return MARK;
+        const reg = p.reg ? ` ${p.reg}` : '';
+        return `<img class="fleet-photo" src="${attr(p.src)}"
+                     width="${Number(p.w) || 1920}" height="${Number(p.h) || 886}"
+                     loading="lazy" decoding="async"
+                     alt="${attr((a.livery || 'Aeromexico') + ' ' + a.type + reg)}">`;
+    }
+
     // ---- Boot ---------------------------------------------------------------
     // refresh() is the same pass boot() runs, minus the chrome. Page scripts that
     // inject markup call AMV.refresh() afterwards so their [data-reveal] /
@@ -287,5 +310,5 @@
     else boot();
 
     // Exported for live.js and page-level scripts.
-    window.AMV = { MARK, icon, refresh, CREW_URL, CREW_DIRECT, THEME_KEY, currentTheme };
+    window.AMV = { MARK, icon, refresh, fleetMedia, CREW_URL, CREW_DIRECT, THEME_KEY, currentTheme };
 })();
