@@ -73,6 +73,62 @@
         </figure>
     </section>
 
+    <!-- ==================== THE AIRLINE IN NUMBERS ====================
+         The one place on this site that states operating figures, and every
+         one of them is read live from the crew center's own database — pilots
+         on the roster, hours credited to them, flight reports approved. None
+         of it is typed into this repo; see the note at the foot of data.js
+         about why that matters.
+
+         Starts [hidden]. crew.js reveals it only when real figures arrive and
+         deletes any figure it could not fill, so a slow backend costs the page
+         a section rather than filling it with zeroes. -->
+    <section class="section section--ink" id="ops" hidden data-va-when="pilots">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">The airline in numbers</span>
+                <h2 style="margin-top:.9rem">Every hour on this page was flown.</h2>
+                <p class="lede">
+                    Read live from our crew center. Hours are credited from flight reports
+                    captured automatically off each pilot's real Infinite Flight history —
+                    nothing here is self-reported, and nothing here is decoration.
+                </p>
+            </div>
+
+            <div class="ops__grid" data-reveal>
+                <div class="stat" data-va-figure>
+                    <span class="stat__num" data-va-stat="pilots" data-count="0">0</span>
+                    <span class="stat__label">Pilots on the roster</span>
+                    <span class="stat__note">Everyone currently flying for the airline.</span>
+                </div>
+                <div class="stat" data-va-figure>
+                    <span class="stat__num" data-va-stat="hours" data-count="0">0</span>
+                    <span class="stat__label">Hours logged</span>
+                    <span class="stat__note">Credited across the roster since day one.</span>
+                </div>
+                <div class="stat" data-va-figure>
+                    <span class="stat__num" data-va-stat="pireps" data-count="0">0</span>
+                    <span class="stat__label">Flight reports filed</span>
+                    <span class="stat__note">Approved sectors, each checked against our network.</span>
+                </div>
+                <div class="stat" data-va-figure>
+                    <span class="stat__num" data-va-stat="landings" data-count="0">0</span>
+                    <span class="stat__label">Landings</span>
+                    <span class="stat__note">Counted from the sim, not from the logbook.</span>
+                </div>
+            </div>
+
+            <!-- The 30-day clause is its own [data-va-figure]: if that single
+                 field is missing the sentence loses the clause and still reads. -->
+            <p class="ops__asof">
+                <i class="dot-live" aria-hidden="true"></i>
+                <span>Live from the Aeromexico Virtual crew center.</span>
+                <span data-va-figure><b class="num" data-va-stat="flights30d">0</b>
+                    sectors flown in the last 30 days.</span>
+            </p>
+        </div>
+    </section>
+
     <!-- ==================== LIVE NOW ==================== -->
     <section class="section">
         <div class="wrap">
@@ -244,6 +300,7 @@
 
 <script src="/assets/js/data.js?v=2"></script>
 <script src="/assets/js/site.js?v=2"></script>
+<script src="/assets/js/crew.js?v=2"></script>
 <script src="/assets/js/live.js?v=2"></script>
 <script>
 (function () {
@@ -352,6 +409,14 @@
     // Everything above was injected after site.js exported itself — hand the new
     // nodes back so their reveals, counters and icons get wired.
     window.AMV.refresh();
+
+    // ---- The airline in numbers ----
+    // The only figures on this page that are not derived from data.js. They come
+    // from the crew center's database over the network, so they arrive after
+    // everything else and the section stays hidden until they do. Nothing to
+    // handle on failure: crew.js removes what it cannot fill, and the section is
+    // gated on `pilots`, so a dead backend simply costs us this band.
+    if (window.AMV_CREW) window.AMV_CREW.mountStats();
 })();
 </script>
 </body>

@@ -73,21 +73,127 @@
         return live.length ? live : null;
     }
 
-    /* ---- Roster -------------------------------------------------------------
-       GET /api/crew/<slug>/roster → { roster: [{ name, callsign, hours, ... }] }
+    /* ---- Operating figures --------------------------------------------------
+       GET /api/crew/<slug>/stats → { connected, stats: { pilots, hours,
+       pireps, flightHours, … } }
 
-       Only the aggregate is used here. The endpoint is public and returns
-       members individually, but a public marketing page has no reason to list
-       who flies for the airline — the count and the hours are the airline's
-       figures, the names are its people. */
+       The airline's real numbers, aggregated inside the airline's own database
+       and returned as one small object. This used to pull the entire roster
+       down and count it client-side; it does not any more, for three reasons.
+       The roster is people — a marketing page has no business downloading a
+       list of them to arrive at a number. It grew linearly with the airline.
+       And the aggregate it produced could not see anything the roster does not
+       hold, so flights filed and hours actually flown were out of reach.
+
+       Returns null unless there is something real to show:
+         - the request failed, or
+         - the VA has not connected a data store, or
+         - the roster is empty.
+       "Zero pilots" is a true statement and still not one to print in 48px
+       numerals next to genuinely impressive facts. Callers treat null as
+       "leave the page as it is". */
     async function stats() {
-        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/roster`);
-        if (!data || !Array.isArray(data.roster)) return null;
-        const pilots = data.roster.length;
-        if (!pilots) return null;
-        const hours = data.roster.reduce((n, m) => n + (Number(m.hours) || 0), 0);
-        return { pilots, hours: Math.round(hours) };
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/stats`);
+        if (!data || !data.stats || data.connected === false) return null;
+        const s = data.stats;
+
+        // ABSENT IS NOT ZERO. A field the backend did not send is a field we
+        // did not learn, and coercing it to 0 would print a fabricated figure —
+        // exactly the thing this site removed from data.js. `pick` yields
+        // undefined for anything non-numeric, and paint() deletes the figure
+        // rather than rendering it. A real 0 that the backend did send is a
+        // true answer and is shown.
+        const pick = (...vals) => {
+            for (const v of vals) if (v != null && Number.isFinite(Number(v))) return Number(v);
+            return undefined;
+        };
+        const round = (v) => (v === undefined ? undefined : Math.round(v));
+
+        if (!pick(s.pilots)) return null;
+        return {
+            pilots:       pick(s.pilots),
+            pilotsActive: pick(s.pilotsActive),
+            // Credited roster hours — the figure the rank ladder is read
+            // against, and the one the crew center shows a pilot.
+            hours:        round(pick(s.hours)),
+            // Hours on approved flight reports. Tracks `hours` closely; the two
+            // part company when staff hand-adjust a pilot's total.
+            flightHours:  round(pick(s.flightHours)),
+            pireps:       pick(s.pirepsApproved, s.pireps),
+            flights30d:   pick(s.flights30d),
+            landings:     pick(s.landings),
+            destinations: pick(s.destinations),
+            routesActive: pick(s.routesActive),
+            lastFlightAt: s.lastFlightAt || null,
+            topPilots:    Array.isArray(s.topPilots) ? s.topPilots : [],
+        };
     }
 
-    window.AMV_CREW = { get, routes, stats, BACKEND, SLUG };
+    /* ---- Declarative rendering ----------------------------------------------
+       Mark up the figure with the truth already in the page, then name the
+       field that should replace it:
+
+           <dt><b data-va-stat="pilots" data-count="0">—</b></dt>
+           <span data-va-stat="hours" data-va-suffix="+"></span>
+
+       An element inside a [data-va-figure] is treated as the whole figure: if
+       the number never arrives, that ancestor is removed rather than left
+       showing a dash. Nothing is ever filled with 0 as a stand-in for "we did
+       not find out" — that is the failure mode this whole file is arranged to
+       avoid.
+
+       Numbers are handed to site.js's count-up when the element opts in with
+       [data-count]; otherwise they are written straight in. */
+    function paint(figures, root) {
+        const scope = root || document;
+        const slots = scope.querySelectorAll('[data-va-stat]');
+        if (!slots.length) return;
+
+        slots.forEach((el) => {
+            const key = el.dataset.vaStat;
+            const value = figures ? figures[key] : undefined;
+            const missing = !Number.isFinite(Number(value));
+            const holder = el.closest('[data-va-figure]');
+
+            if (missing) {
+                // Drop the whole figure, not just the number, so the page never
+                // carries a label with nothing under it.
+                if (holder) holder.remove(); else el.remove();
+                return;
+            }
+            const n = Number(value);
+            const suffix = el.dataset.vaSuffix || '';
+            if (el.hasAttribute('data-count')) {
+                el.dataset.count = String(n);
+                if (suffix) el.dataset.suffix = suffix;
+                el.textContent = '0';
+                // site.js stamps [data-count-wired] on its first pass, which
+                // happened while this element still read 0 and its section was
+                // still hidden (so the observer never fired). Clear the stamp so
+                // the refresh below picks it up with the real target.
+                delete el.dataset.countWired;
+            } else {
+                el.textContent = n.toLocaleString() + suffix;
+            }
+            if (holder) holder.removeAttribute('hidden');
+        });
+
+        // Blocks that only make sense once there are figures at all.
+        scope.querySelectorAll('[data-va-when]').forEach((el) => {
+            const key = el.dataset.vaWhen;
+            const ok = !!(figures && Number(figures[key]) > 0);
+            if (!ok) el.remove(); else el.removeAttribute('hidden');
+        });
+
+        // Re-run site.js's passes so injected counters actually count.
+        if (window.AMV && typeof window.AMV.refresh === 'function') window.AMV.refresh(scope);
+    }
+
+    /* Fetch once, paint every slot on the page. Pages call this and nothing
+       else. Safe to call before or after DOMContentLoaded. */
+    function mountStats(root) {
+        return stats().then((figures) => { paint(figures, root); return figures; });
+    }
+
+    window.AMV_CREW = { get, routes, stats, paint, mountStats, BACKEND, SLUG };
 })();

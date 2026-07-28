@@ -220,7 +220,8 @@ nothing to keep out of git — writes are gated, reads are not.
 | helper | endpoint | used for |
 |---|---|---|
 | `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` |
-| `AMV_CREW.stats()` | `GET /api/crew/<slug>/roster` | aggregate pilots + hours |
+| `AMV_CREW.stats()` | `GET /api/crew/<slug>/stats` | the operating figures |
+| `AMV_CREW.mountStats()` | — | fetches once, fills every figure slot on the page |
 | `AMV_CREW.get(path)` | anything else public | adding a feed |
 
 **The rule for every feed: the page must already be correct before the fetch
@@ -252,7 +253,41 @@ that origin added there or the fetch is blocked.
 Roster data is read as an **aggregate only**. The endpoint is public and returns
 members individually, but a public marketing page has no reason to list who
 flies for the airline — the count and the hours are the airline's figures, the
-names are its people.
+names are its people. `/stats` exists precisely so the aggregate can be had
+without downloading the people: it is computed inside the airline's own
+database and comes back as one small object.
+
+### The operating figures
+
+The band under the hero (`#ops` on the home page) is the one place on this site
+that states pilots, hours logged, flight reports filed and landings. Every one
+of those is live; none of them is in this repo. See the note at the foot of
+`data.js` for why that is a hard rule here.
+
+Mark up a figure with the truth already on the page and name the field:
+
+```html
+<div class="stat" data-va-figure>
+  <span class="stat__num" data-va-stat="pilots" data-count="0">0</span>
+  <span class="stat__label">Pilots on the roster</span>
+</div>
+```
+
+Then call `AMV_CREW.mountStats()` once. What the contract guarantees:
+
+- **Absent is not zero.** A field the backend did not send is deleted, along
+  with its whole `[data-va-figure]` ancestor, so the page never carries a label
+  with nothing under it — and never prints a `0` it made up. A `0` the backend
+  *did* send is a true answer and is shown.
+- **The section is gated.** `[data-va-when="pilots"]` on the band means a VA
+  with no connected data store, an empty roster, or an unreachable backend
+  simply does not get the section. It ships `hidden` and is only ever revealed
+  by real figures — there is no skeleton and no zero state.
+- `[data-count]` opts a figure into `site.js`'s count-up; without it the number
+  is written straight in.
+
+Adding a figure to another page is: include `crew.js`, add the markup, call
+`mountStats()`. Nothing else.
 
 ---
 
