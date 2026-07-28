@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Events — Aeromexico Virtual</title>
 <meta name="description" content="Group departures, fly-ins and long-haul events flown by Aeromexico Virtual on the Infinite Flight Expert Server, with staffed ATC and published slots.">
-<meta name="theme-color" content="#0C2C64">
-<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0A1D3B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Fonts load asynchronously. A render-blocking third-party stylesheet also
-     blocks the body scripts that inject the nav and footer, so a slow or
-     unreachable fonts.googleapis.com would leave the page chrome missing, not
-     merely unstyled. display=swap shows text in the fallback and swaps in. -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/brand.css">
 <style>
     .event { display:grid; gap:1.5rem; grid-template-columns:1fr; align-items:start; }
@@ -70,6 +70,7 @@
 
     <section class="band">
         <div class="band__wash"></div>
+        <div class="band__serpent"></div>
         <div class="wrap band__inner">
             <h2>Events are announced in the crew center first.</h2>
             <p>Sign in for slot bookings, briefings and the group-flight channel.</p>

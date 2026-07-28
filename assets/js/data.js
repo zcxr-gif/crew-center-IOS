@@ -20,32 +20,32 @@ window.AMV_DATA = {
     fleet: [
         {
             type: 'Boeing 787-9 Dreamliner', livery: 'Aeromexico', short: '789',
-            role: 'Long haul flagship', count: 8, seats: 274, range: '7,635 nm',
+            role: 'Long haul flagship', seats: 274, range: '7,635 nm',
             note: 'The backbone of the transatlantic and transpacific network.',
         },
         {
             type: 'Boeing 787-8 Dreamliner', livery: 'Aeromexico', short: '788',
-            role: 'Long haul', count: 6, seats: 243, range: '7,355 nm',
+            role: 'Long haul', seats: 243, range: '7,355 nm',
             note: 'Thinner long-haul routes and the South America runs.',
         },
         {
             type: 'Boeing 777-200ER', livery: 'Aeromexico', short: '772',
-            role: 'Heavy long haul', count: 2, seats: 277, range: '7,065 nm',
+            role: 'Heavy long haul', seats: 277, range: '7,065 nm',
             note: 'Reserved for high-demand event flights and legacy schedules.',
         },
         {
             type: 'Boeing 737 MAX 8', livery: 'Aeromexico', short: '38M',
-            role: 'Narrowbody', count: 22, seats: 166, range: '3,550 nm',
+            role: 'Narrowbody', seats: 166, range: '3,550 nm',
             note: 'Domestic trunk routes plus the deeper US and Caribbean network.',
         },
         {
             type: 'Boeing 737-800', livery: 'Aeromexico', short: '738',
-            role: 'Narrowbody', count: 18, seats: 160, range: '2,935 nm',
+            role: 'Narrowbody', seats: 160, range: '2,935 nm',
             note: 'The everyday workhorse across Mexico and the southern US.',
         },
         {
             type: 'Embraer E190', livery: 'Aeromexico Connect', short: 'E90',
-            role: 'Regional', count: 14, seats: 99, range: '2,400 nm',
+            role: 'Regional', seats: 99, range: '2,400 nm',
             note: 'Flown as Aeromexico Connect on regional and feeder sectors.',
         },
     ],
@@ -127,13 +127,17 @@ window.AMV_DATA = {
         },
     ],
 
-    // Roster figures. These are airline facts the staff maintain by hand — the
-    // site never invents a live pilot count. Anything genuinely live on this
-    // site comes from the Inflight embed (see live.js).
-    stats: {
-        pilots: 640,
-        hoursFlown: 48200,
-        flightsFiled: 21400,
-        destinations: 23,
-    },
+    // NO ROSTER FIGURES HERE, DELIBERATELY.
+    //
+    // This used to carry pilots: 640, hoursFlown: 48200, flightsFiled: 21400 —
+    // and a `count` on every fleet type. None of it was real. They were
+    // plausible-looking placeholders that the site then printed as fact, in
+    // big animated numerals, next to genuinely true things. That is the worst
+    // way to be wrong: it reads as authoritative.
+    //
+    // Everything the site states is now either verifiable from this file
+    // (destinations = routes.length, types = fleet.length, hubs = hubs.length)
+    // or comes live from the Inflight embed. If the VA wants a pilot count or
+    // an hours total on the site, wire it to the crew center's real figure —
+    // do not type a number in here.
 };

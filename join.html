@@ -5,25 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join the crew — Aeromexico Virtual</title>
 <meta name="description" content="Apply to fly for Aeromexico Virtual on Infinite Flight. Grade 3 and up, three minutes to apply, a human answer inside 48 hours.">
-<meta name="theme-color" content="#0C2C64">
-<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0A1D3B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Fonts load asynchronously. A render-blocking third-party stylesheet also
-     blocks the body scripts that inject the nav and footer, so a slow or
-     unreachable fonts.googleapis.com would leave the page chrome missing, not
-     merely unstyled. display=swap shows text in the fallback and swaps in. -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
 <link rel="stylesheet" href="/assets/brand.css">
 <style>
     .req { display:flex; gap:.9rem; align-items:flex-start; padding:1rem 0; border-bottom:1px solid var(--line-soft); }
     .req:last-child { border-bottom:0; }
-    .req__tick {
-        width:1.55rem; height:1.55rem; border-radius:999px; flex:none; display:grid; place-items:center;
-        background:color-mix(in srgb, var(--accent) 14%, transparent); color:var(--accent);
-    }
-    .req__tick svg { width:.9rem; height:.9rem; }
+    /* Just the glyph — the tinted disc behind it was another small block. */
+    .req__tick { flex:none; display:grid; place-items:center; color:var(--accent); padding-top:.2rem; }
+    .req__tick svg { width:1.05rem; height:1.05rem; }
     .req b { display:block; font-family:var(--font-display); letter-spacing:-.01em; }
     .req span { font-size:.9rem; color:var(--muted); }
     .apply-frame { min-height:640px; }
@@ -86,7 +84,7 @@
                     <p class="muted" style="margin-bottom:.9rem;font-size:.92rem">
                         From application to your first logged sector.
                     </p>
-                    <div class="card" style="display:grid;gap:1.4rem">
+                    <div class="card" style="display:grid;gap:1.6rem">
                         <div class="step">
                             <span class="step__n">1</span>
                             <span><b style="font-family:var(--font-display)">Apply</b>

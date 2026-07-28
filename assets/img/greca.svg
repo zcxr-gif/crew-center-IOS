@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  greca.svg — the step-fret band (xicalcoliuhqui).
+
+  The rectangular spiral cut into the stone friezes at Mitla and Teotihuacán,
+  and the single most recognisably Mesoamerican piece of ornament there is.
+  One tile is one spiral sitting on a continuous baseline; tile it along X and
+  it becomes a running band.
+
+  MONOCHROME ON PURPOSE. This file is never drawn as an image — brand.css
+  loads it as a CSS mask (`.greca`) and paints through it with a brand token,
+  so one file serves every colour and both themes. Give it a fill and it will
+  look wrong; change the colour in CSS instead.
+
+  Geometry: baseline runs the full tile width and overhangs by 1px at each end
+  so tiled copies join with no seam. The spiral rises off the baseline at x=4,
+  winds inward clockwise and ends free at the centre — one attached arm, one
+  open arm, which is what makes it a spiral rather than a maze.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 26" width="40" height="26">
+  <g fill="none" stroke="#000" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M-1 24.5H41"/>
+    <path d="M4 24.5V4H36V18H14V10H28"/>
+  </g>
+</svg>

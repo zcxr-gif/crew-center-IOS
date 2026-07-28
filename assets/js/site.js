@@ -11,18 +11,28 @@
 (function () {
     'use strict';
 
-    // ---- The mark (kept in step with assets/img/mark.svg) -------------------
-    // See that file for what each shape is doing and why none of them is
-    // optional — the brow, the hooked beak and the gape are what make it read
-    // as a raptor rather than a generic snouted animal.
-    const MARK = `<svg class="mark" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-        <g fill="currentColor">
-            <path d="M54 52C42 52 28 50 15 47C28 55 41 60 53 62Z" opacity=".5"/>
-            <path d="M52 44C40 41 27 35 16 28C27 39 39 47 51 54Z" opacity=".72"/>
-            <path d="M54 37C46 30 38 21 32 12C36 24 43 33 52 42Z" opacity=".95"/>
-        </g>
-        <path fill="currentColor" fill-rule="evenodd" d="M32 54C36 38 50 32 63 36C73 39 79 43 81 50L110 60C113 67 110 78 102 80C100 72 95 68 86 65C84 75 77 82 66 86L56 95L40 89C32 79 30 65 32 54ZM67 56a5.5 5.5 0 1 0 .1 0zM83 62L99 66L97 70L82 67Z"/>
-    </svg>`;
+    // ---- The mark -----------------------------------------------------------
+    // THE REAL LOGO IS NOT IN THIS REPO YET, and nothing here invents one.
+    //
+    // Until the airline's own Caballero Águila artwork is committed, the brand
+    // lockup is the wordmark plus the tricolour — both of which are real. An
+    // earlier pass shipped a hand-drawn eagle standing in for the logo; a
+    // drawn-from-memory approximation of a real mark is worse than no mark,
+    // because it looks like the airline chose it.
+    //
+    // TO DROP THE REAL LOGO IN, there is exactly one file to touch:
+    //     assets/img/mark.svg
+    // brand.css paints it through a CSS mask (.mark), the same way it handles
+    // greca.svg and serpent.svg, so one file recolours everywhere — nav,
+    // footer, watermark, favicon — and there is no second copy in this file to
+    // keep in step. Set --mark-ratio in brand.css to the artwork's real
+    // width/height. The mask needs the white cut-lines to be actual holes
+    // (fill-rule="evenodd"), not white-filled shapes; potrace produces holes
+    // correctly from a two-colour bitmap.
+    const HAS_MARK = false;
+    const MARK = HAS_MARK
+        ? '<span class="mark" role="img" aria-label="Aeromexico Virtual"></span>'
+        : '';
 
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------
     const P = {
@@ -83,10 +93,11 @@
         ).join('');
 
         host.innerHTML = `
+        <div class="flagline" aria-hidden="true"></div>
         <nav class="nav" id="siteNav">
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" aria-label="Aeromexico Virtual — home">
-                    ${MARK}
+                    ${MARK || '<span class="flag" aria-hidden="true"></span>'}
                     <span class="wordmark"><b>Aeromexico</b><span>Virtual</span></span>
                 </a>
                 <div class="nav__links">${links}</div>
@@ -137,12 +148,14 @@
     function renderFooter(host) {
         host.innerHTML = `
         <footer class="footer">
+            <div class="footer__frieze" aria-hidden="true"></div>
             <div class="wrap">
                 <div class="footer__grid">
                     <div class="footer__brand">
-                        ${MARK}
+                        ${MARK || '<p class="footer__wordmark">Aeromexico Virtual</p>'}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network — from
                            Mexico City across the Americas, Europe and the Pacific.</p>
+                        <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>
                     </div>
                     <div>
                         <h4>Airline</h4>
