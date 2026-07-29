@@ -45,17 +45,23 @@
 
     <!-- The calendar is the crew center's own events feed, not a copy of it
          kept by hand on this site. Whatever staff publish in the portal shows
-         up here the moment it is saved. -->
+         up here the moment it is saved.
+
+         That sentence used to be aspirational: this section carried an iframe
+         pointed at the VA-ads events widget, which is a different feed filled
+         in somewhere else, so scheduling a group flight in the crew center
+         changed nothing here. It reads GET /api/crew/<slug>/events now.
+
+         Rendered from data.js FIRST and upgraded in place when the live feed
+         lands — the rule this whole site follows. A visitor whose request is
+         slow, blocked or offline gets the calendar this repo knows about, not
+         a spinner that never resolves. -->
     <section class="section" style="padding-top:0">
         <div class="wrap">
-            <div data-live-events data-reveal>
-                <div class="frame-host muted" style="padding:3rem;text-align:center">
-                    Loading the calendar…
-                </div>
-            </div>
+            <div class="grid grid-2" id="eventGrid" data-reveal></div>
             <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
-                Times are shown in your own timezone. Slot bookings and the briefing pack open
-                in the crew center 48 hours before each departure.
+                Times are shown in your own timezone. Stand bookings and the briefing pack open
+                in the crew center — sign in to pick your gate off the map.
             </p>
         </div>
     </section>
@@ -76,7 +82,80 @@
 
 <div data-site-footer></div>
 
+<script src="/assets/js/data.js?v=2"></script>
 <script src="/assets/js/site.js?v=2"></script>
-<script src="/assets/js/live.js?v=2"></script>
+<script src="/assets/js/crew.js?v=2"></script>
+<script>
+(function () {
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const grid = document.getElementById('eventGrid');
+
+    // The visitor's own clock, never Z. A departure time is the single most
+    // misread thing an airline publishes, and "22:00Z" is why.
+    const when = (iso) => {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return '';
+        return d.toLocaleString(undefined, {
+            weekday: 'long', day: 'numeric', month: 'long',
+            hour: '2-digit', minute: '2-digit',
+        });
+    };
+
+    // Only what we actually know. `slots: 0` means uncapped, so it prints
+    // nothing rather than "0 slots"; `going` is undefined unless the backend
+    // counted, and an uncounted event says nothing about attendance at all.
+    function facts(e) {
+        const out = [];
+        if (e.from && e.to) out.push(`${esc(e.from)} → ${esc(e.to)}`);
+        else if (e.to) out.push(`Arrivals · ${esc(e.to)}`);
+        if (e.ac) out.push(esc(e.ac));
+        if (e.server) out.push(esc(e.server) + ' Server');
+        if (e.slots) out.push(`${e.slots} slots`);
+        if (e.going !== undefined) out.push(`${e.going} signed up`);
+        return out;
+    }
+
+    function render(list) {
+        if (!list.length) {
+            // Says so plainly rather than leaving an empty box under a heading
+            // that promises a calendar.
+            grid.innerHTML = '<p class="lede" style="grid-column:1/-1">'
+                + 'Nothing on the calendar right now — the next one is announced in the crew center first.</p>';
+            return;
+        }
+        // Plain `.card`: a rule, an eyebrow, a heading, prose. This site took
+        // the boxes out on purpose (see brand.css) — an event does not get to
+        // reintroduce one, and a banner sits under the rule rather than turning
+        // the card back into a tile.
+        grid.innerHTML = list.map((e, i) => `
+            <article class="card card--hover" data-reveal data-reveal-delay="${(i % 2) * 80}">
+                <span class="type">${esc(when(e.date))}</span>
+                <h3>${esc(e.title)}</h3>
+                ${e.banner ? `<img src="${esc(e.banner)}" alt="" loading="lazy"
+                    style="width:100%;aspect-ratio:16/7;object-fit:cover;display:block;margin:.2rem 0 1rem;border-radius:var(--radius,0)">` : ''}
+                ${e.blurb ? `<p>${esc(e.blurb)}</p>` : ''}
+                <p class="strip__facts" style="margin-top:1.2rem">
+                    ${facts(e).map(f => `<span>${f}</span>`).join('')}
+                </p>
+                ${e.gate ? `<p class="muted" style="margin-top:.7rem;font-size:.82rem">
+                    Stands at ${esc(e.gate)} — pick yours in the crew center.</p>` : ''}
+            </article>`).join('');
+        if (window.AMV && typeof window.AMV.refresh === 'function') window.AMV.refresh(grid);
+    }
+
+    // Correct before the network is involved: the calendar this repo carries,
+    // minus anything already flown.
+    const fallback = (window.AMV_DATA && window.AMV_DATA.events || [])
+        .filter(e => new Date(e.date).getTime() > Date.now() - 6 * 3600e3);
+    render(fallback.length ? fallback : []);
+
+    // …then the airline's real one, when it answers. null means "leave what is
+    // already on the page", which is the point of rendering the fallback first.
+    if (window.AMV_CREW) {
+        window.AMV_CREW.events().then(live => { if (live) render(live); });
+    }
+})();
+</script>
 </body>
 </html>

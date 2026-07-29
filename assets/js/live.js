@@ -1,21 +1,27 @@
 /* ============================================================================
    Aeromexico Virtual — live.js
-   Mounts the two Inflight embeds this site carries, both driven by the one
-   embed token issued to Aeromexico Virtual:
+   Mounts the Inflight embed this site carries, driven by the embed token
+   issued to Aeromexico Virtual:
 
      <div data-live-roster></div>   pilots airborne right now
-     <div data-live-events></div>   events + calendar
 
-   The token is what configures each widget — which VA, which callsign
-   prefixes, which servers, the theme, the accent, the radius, the events
-   template. All of that lives on the token in the VA portal, not here, so a
-   look-and-feel change is made once over there and lands on every page. That
-   is also why nothing below appends appearance parameters: once ?token= is
-   present, both widgets resolve their config from the backend and ignore
-   query-string overrides.
+   The token is what configures the widget — which VA, which callsign prefixes,
+   which servers, the theme, the accent, the radius. All of that lives on the
+   token in the VA portal, not here, so a look-and-feel change is made once over
+   there and lands on every page. That is also why nothing below appends
+   appearance parameters: once ?token= is present, the widget resolves its
+   config from the backend and ignores query-string overrides.
 
    The token is a public, origin-restricted embed credential — it is meant to
    ship in the page source, exactly like the iframes the VA portal hands out.
+
+   THE EVENTS WIDGET HAS GONE, deliberately. It rendered the VA-ads events feed,
+   which is filled in on the partnership listing — a different place from where
+   the airline is actually run. The events page said it was showing "the live
+   one out of the crew center" and was not; it reads the crew center's own
+   calendar directly now (AMV_CREW.events in crew.js), as cards in this site's
+   own design rather than a themed iframe. Nothing here is left pointed at the
+   old feed, so the two cannot quietly diverge again.
    ========================================================================== */
 
 (function () {
@@ -23,20 +29,12 @@
 
     const TOKEN = 'tok_d9689dd5ee39acb3fd09c3bbffad6dcd';
 
-    // The live-traffic widget is fronted by the tracker site; the events widget
-    // is served straight off the InGdo backend so its own /api and /assets
-    // calls resolve without a forwarding rule. Two origins, one token — both
-    // are in frame-src in _headers.
+    // The live-traffic widget is fronted by the tracker site.
     const WIDGETS = {
         roster: {
             src:    'https://inflight.info/embed.html',
             height: 520,
             title:  'Aeromexico Virtual pilots airborne now',
-        },
-        events: {
-            src:    'https://site--indgo-backend--6dmjph8ltlhv.code.run/embed-events.html',
-            height: 720,
-            title:  'Aeromexico Virtual events and calendar',
         },
     };
 
@@ -61,8 +59,6 @@
     function boot() {
         document.querySelectorAll('[data-live-roster]')
             .forEach(el => mount(el, WIDGETS.roster));
-        document.querySelectorAll('[data-live-events]')
-            .forEach(el => mount(el, WIDGETS.events));
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

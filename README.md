@@ -10,7 +10,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 index.html        Home — hero, live roster, fleet, network, ranks, next event
 fleet.html        The six operated types
 network.html      Hubs + all 23 sectors, filterable by region
-events.html       The live events + calendar embed
+events.html       The calendar, live out of the crew center
 join.html         Requirements + the real application form (framed)
 crew.html         The Crew Center, framed in our own chrome
 
@@ -18,7 +18,7 @@ brand.json        ← the brand contract. See "One brand, two products" below.
 assets/brand.css  The design system. Every token lives here.
 assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
 assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
-assets/js/live.js Mounts both Inflight embeds — live traffic and events
+assets/js/live.js Mounts the live-traffic embed
 assets/js/crew.js Read-only client for the crew center's public feeds
 tools/            Regenerate mark.svg and plane-hero.webp from the source art
 assets/img/       Supplied artwork, and what is generated from it. See below.
@@ -293,25 +293,39 @@ Adding a figure to another page is: include `crew.js`, add the markup, call
 
 ## The live data
 
-Two things on this site are live, and both are Inflight embeds mounted by
-`assets/js/live.js`:
+Two things on this site are live, and they arrive by different routes.
+
+**Who's airborne** is an Inflight embed, mounted by `assets/js/live.js`:
 
 | Placeholder            | Widget                     | Served from |
 |------------------------|----------------------------|-------------|
 | `<div data-live-roster>` | Who's airborne right now | `inflight.info/embed.html` |
-| `<div data-live-events>` | Events + calendar        | the InGdo backend's `/embed-events.html` |
 
-The roster runs on the home page and the network page; the calendar is the
-whole of `events.html`.
+It runs on the home page and the network page.
 
-**One embed token drives both.** `live.js` holds the token Aeromexico Virtual
-was issued and appends nothing else, because nothing else would be read: once
-`?token=` is present, each widget resolves its own configuration from the
+**The events calendar** is not an embed. It is `AMV_CREW.events()` in `crew.js`
+reading `GET /api/crew/<slug>/events` — the crew center's own calendar — drawn
+as cards in this site's design on `events.html`, and as the "next event" card on
+the home page.
+
+It used to be an iframe pointed at the VA-ads events widget, which is a
+different feed filled in on the partnership listing rather than where the
+airline is run. So staff scheduling a group flight in the crew center changed
+nothing here, while the events page said in so many words that the calendar
+below was "the live one out of the crew center". Both pages read the real one
+now, and `live.js` no longer carries the old mount, so they cannot quietly
+diverge again.
+
+An event's stand board lives in the crew center: the page names the airport and
+sends people there to pick a gate off the map.
+
+**One embed token drives the roster.** `live.js` holds the token Aeromexico
+Virtual was issued and appends nothing else, because nothing else would be read:
+once `?token=` is present, the widget resolves its own configuration from the
 backend and ignores query-string overrides. Which callsign prefixes count, which
-servers are scanned, roster vs map, the theme, the accent, the corner radius,
-the events template — all of it is set **on the token, in the VA portal**
-(Embed tab → Customize), not in this repo. Change the look there and both pages
-follow without a deploy.
+servers are scanned, roster vs map, the theme, the accent, the corner radius —
+all of it is set **on the token, in the VA portal** (Embed tab → Customize), not
+in this repo. Change the look there and both pages follow without a deploy.
 
 That is also why the site's own light/dark toggle no longer re-themes the
 roster: the widget's theme is whatever the token says. If it clashes with the
@@ -358,12 +372,12 @@ both forms when it highlights the active nav item, so nav looks right either way
 ## Deploying
 
 Netlify, publish directory `.`, no build command. `_redirects` and `_headers`
-are picked up automatically. `_headers` sets a CSP with exactly two permitted
-frame targets — `inflight.info` (crew center, application form, live traffic)
-and the InGdo backend origin that serves the events embed — and one connect
-target, `inflight.info`. Adding an embed served from a new origin means adding
-that origin to `frame-src`, or the frame is blocked with nothing in the page to
-show for it.
+are picked up automatically. `_headers` sets a CSP with two permitted frame
+targets — `inflight.info` (crew center, application form, live traffic) and the
+InGdo backend origin — and the same two as connect targets, which is what lets
+`crew.js` read the roster figures, the route network and the events calendar.
+Adding an embed served from a new origin means adding that origin to
+`frame-src`, or the frame is blocked with nothing in the page to show for it.
 
 **Assets revalidate, and must keep revalidating.** `/assets/*` was served
 `max-age=31536000, immutable`. Nothing under it is content-hashed — there is no
@@ -415,12 +429,12 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**One hand-typed copy of the events is left, on the home page.** `events.html`
-is now the live calendar out of the crew center, but the "next event" card on
-`index.html` still reads `data.js`, so the two can disagree — the home page can
-advertise a departure the calendar has never heard of. Whoever picks this up
-should close that: either drop the home-page card in favour of a second
-`data-live-events` mount on a compact events template, or wire it to the same
-feed. Until then, if you edit `data.js` events, check the home page against the
-real calendar. Those entries carry ISO-8601 dates with an explicit UTC offset
-and past ones age out on their own — nothing needs deleting.
+**The home page and the calendar now read the same feed.** Both paint from
+`data.js` first and upgrade to `AMV_CREW.events()` when it answers, so the home
+page can no longer advertise a departure the calendar has never heard of — which
+it could for as long as that card was hand-typed only.
+
+`data.js` events stay as the fallback, and they earn their place: a visitor who
+is offline, blocked or on a slow connection gets a calendar rather than a
+spinner. Keep them roughly true. Entries carry ISO-8601 dates with an explicit
+UTC offset and past ones age out on their own — nothing needs deleting.

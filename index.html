@@ -377,33 +377,46 @@
         </div>`).join('');
 
     // ---- Next event (the soonest one still ahead of us) ----
-    const now = Date.now();
-    const next = D.events.filter(e => Date.parse(e.date) > now)
-                         .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))[0];
+    //
+    // Reads data.js first and the crew center's calendar second, exactly as the
+    // events page does. Both pages now answer to the same feed, so the home
+    // page can no longer advertise a departure the calendar has never heard of
+    // — which it could for as long as this card was hand-typed only.
     const host = document.getElementById('nextEvent');
-    if (!next) {
-        host.innerHTML = `<div class="card"><p>No event on the calendar right now — check the
-            <a href="/events" style="color:var(--accent);font-weight:600">events page</a> shortly.</p></div>`;
-    } else {
-        const when = new Date(next.date);
+
+    function paintNextEvent(list) {
+        const next = (list || []).filter(e => Date.parse(e.date) > Date.now())
+                                 .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))[0];
+        if (!next) {
+            host.innerHTML = `<div class="card"><p>No event on the calendar right now — check the
+                <a href="/events" style="color:var(--accent);font-weight:600">events page</a> shortly.</p></div>`;
+            return;
+        }
         const fmt = new Intl.DateTimeFormat(undefined, {
             weekday: 'long', day: 'numeric', month: 'long',
             hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
-        }).format(when);
+        }).format(new Date(next.date));
         host.innerHTML = `
             <article class="card" style="display:grid;gap:1.6rem;grid-template-columns:1fr">
                 <div>
-                    <span class="chip">${esc(next.server)} Server</span>
+                    ${next.server ? `<span class="chip">${esc(next.server)} Server</span>` : ''}
                     <h3 style="margin:.9rem 0 .5rem;font-size:clamp(1.4rem,3vw,2rem)">${esc(next.title)}</h3>
                     <p class="mono muted" style="font-size:.86rem">${esc(fmt)}</p>
-                    <p style="margin-top:1rem;max-width:60ch">${esc(next.blurb)}</p>
+                    ${next.blurb ? `<p style="margin-top:1rem;max-width:60ch">${esc(next.blurb)}</p>` : ''}
                     <div class="fleet-card__specs" style="padding-top:1.3rem">
-                        <span>Route <b>${esc(next.from)} → ${esc(next.to)}</b></span>
-                        <span>Aircraft <b>${esc(next.ac)}</b></span>
+                        ${next.from && next.to ? `<span>Route <b>${esc(next.from)} → ${esc(next.to)}</b></span>` : ''}
+                        ${next.ac ? `<span>Aircraft <b>${esc(next.ac)}</b></span>` : ''}
                         ${next.slots ? `<span>Slots <b>${next.slots}</b></span>` : ''}
+                        ${next.going !== undefined ? `<span>Signed up <b>${next.going}</b></span>` : ''}
                     </div>
                 </div>
             </article>`;
+        if (window.AMV && typeof window.AMV.refresh === 'function') window.AMV.refresh(host);
+    }
+
+    paintNextEvent(D.events);
+    if (window.AMV_CREW) {
+        window.AMV_CREW.events({ limit: 4 }).then(live => { if (live) paintNextEvent(live); });
     }
 
     // Everything above was injected after site.js exported itself — hand the new

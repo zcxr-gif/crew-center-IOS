@@ -73,6 +73,60 @@
         return live.length ? live : null;
     }
 
+    /* ---- Events -------------------------------------------------------------
+       GET /api/crew/<slug>/events → { events: [{ title, description, origin,
+       destination, aircraft, server, startsAt, slots, going, seatsLeft,
+       bannerUrl, gateIcao, status }] }
+
+       The calendar the crew center publishes, which is the one the events page
+       has always said it was showing. Until now that page carried the VA-ads
+       events widget in an iframe — a different feed, filled in somewhere else —
+       so staff scheduling a group flight in the crew center changed nothing
+       here, and the page's own copy ("the live one out of the crew center")
+       was not true.
+
+       Unauthenticated, so drafts never arrive; cancelled ones do, and are
+       dropped here — a public calendar is a list of things you can turn up to.
+       Anything already flown goes too, with the same six-hour grace the crew
+       center uses so an event under way is still listed.
+
+       Attendance rides along only when the backend counted it. `going` is null
+       for a caller it did not count for, and null is passed through as
+       undefined rather than 0, because "0 going" printed under an event nobody
+       has counted is the kind of wrong that puts people off coming. */
+    async function events({ limit = 12 } = {}) {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/events`);
+        if (!data || !Array.isArray(data.events)) return null;
+
+        const grace = Date.now() - 6 * 60 * 60 * 1000;
+        const live = data.events
+            .filter(e => e && e.status === 'published' && e.startsAt)
+            .filter(e => new Date(e.startsAt).getTime() > grace)
+            .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))
+            .slice(0, limit)
+            .map(e => ({
+                title:  (e.title || '').trim(),
+                blurb:  (e.description || '').trim(),
+                date:   e.startsAt,
+                from:   (e.origin || '').trim().toUpperCase(),
+                to:     (e.destination || '').trim().toUpperCase(),
+                ac:     (e.aircraft || '').trim(),
+                server: (e.server || '').trim(),
+                slots:  Number(e.slots) || 0,
+                going:  Number.isFinite(Number(e.going)) ? Number(e.going) : undefined,
+                seatsLeft: Number.isFinite(Number(e.seatsLeft)) ? Number(e.seatsLeft) : undefined,
+                banner: /^https:\/\//i.test(e.bannerUrl || '') ? e.bannerUrl : '',
+                gate:   (e.gateIcao || '').trim().toUpperCase(),
+            }))
+            .filter(e => e.title);
+
+        // An empty calendar is a real answer and still not the one to show: the
+        // page would go from four events to nothing because the crew center has
+        // not been filled in yet. data.js stays the fallback, as everywhere
+        // else in this file.
+        return live.length ? live : null;
+    }
+
     /* ---- Operating figures --------------------------------------------------
        GET /api/crew/<slug>/stats → { connected, stats: { pilots, hours,
        pireps, flightHours, … } }
@@ -195,5 +249,5 @@
         return stats().then((figures) => { paint(figures, root); return figures; });
     }
 
-    window.AMV_CREW = { get, routes, stats, paint, mountStats, BACKEND, SLUG };
+    window.AMV_CREW = { get, routes, events, stats, paint, mountStats, BACKEND, SLUG };
 })();
