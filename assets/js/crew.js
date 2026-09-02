@@ -46,7 +46,8 @@
 
     /* ---- Routes -------------------------------------------------------------
        GET /api/crew/<slug>/routes → { routes: [{ flightNumber, origin,
-       destination, aircraft, distanceNm, notes, active }] }
+       destination, aircraft, distanceNm, notes, active, kind, partnerName,
+       partnerLogo }] }
 
        Drafts come back too — the endpoint returns everything so managers see
        their unpublished work in the crew center. A public website is not the
@@ -66,6 +67,15 @@
                 dist:   Number(r.distanceNm) || 0,
                 flight: (r.flightNumber || '').trim(),
                 notes:  (r.notes || '').trim(),
+                // A codeshare sector is flown under a partner airline's name,
+                // and the crew center records whose. Passed through so the
+                // network page can say so instead of presenting somebody else's
+                // route as one of ours. `partner` is the airline; `partnerLogo`
+                // is their mark, which the crew center only has if they pasted
+                // one in — so it is optional and the name is not.
+                codeshare: r.kind === 'codeshare',
+                partner:   (r.partnerName || '').trim(),
+                partnerLogo: /^https:\/\//i.test(String(r.partnerLogo || '')) ? r.partnerLogo : '',
             }));
         // An empty list is a real answer, but it is not one worth showing: a VA
         // that has not filled in its crew center yet would get a blank network

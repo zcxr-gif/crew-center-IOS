@@ -190,6 +190,9 @@
                     ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
                     ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
                     ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
+                    ${r.codeshare ? `<span class="route-meta"><i>Codeshare</i><b class="route-partner">${
+                        r.partnerLogo ? `<img src="${esc(r.partnerLogo)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">` : ''
+                    }${esc(r.partner || 'Partner airline')}</b></span>` : ''}
                 </div>
             </article>`;
         }).join('');
@@ -241,6 +244,12 @@
                     dist:   r.dist   || m.dist || 0,
                     block:  m.block  || '',
                     flight: r.flight,
+                    // Only the crew center knows this; data.js has no twin for
+                    // it, so there is nothing to fall back to and nothing to
+                    // merge — it is carried straight through.
+                    codeshare:   r.codeshare,
+                    partner:     r.partner,
+                    partnerLogo: r.partnerLogo,
                 };
             });
             renderHubs();

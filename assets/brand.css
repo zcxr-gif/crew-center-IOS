@@ -1114,6 +1114,18 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .route-meta b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
 
+/* A codeshare partner's mark, immediately before their name.
+   The HEIGHT is fixed and the width is free, because airline marks arrive as
+   roundels and as wordmarks in roughly equal numbers: squash a 3:1 wordmark
+   into a square and you render the partner's name at a size nobody can read,
+   next to the partner's name at a size everybody can. The ceiling stops a very
+   wide mark from pushing the rest of the meta row off the card. */
+.route-partner { display: inline-flex; align-items: center; gap: .4rem; }
+.route-partner img {
+    height: 1.15em; width: auto; max-width: 3.6em;
+    object-fit: contain; border-radius: .2em; flex: none;
+}
+
 /* Stacked, the arrow points down — an arrow still pointing right between two
    panels that are now one above the other reads as the wrong diagram. */
 @media (max-width: 44rem) {
