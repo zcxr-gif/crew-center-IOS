@@ -462,6 +462,32 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
+**The home page opens on the airline's own poster.** `assets/img/hero-poster.webp`
+is the VA's artwork — the 787-9 special livery ringed by the folk-art
+illustration it carries, over the wordmark — trimmed to the composition and set
+on the navy it was made on. It replaced a two-column white hero that was a
+perfectly good landing-page header and, in the VA's own words, not memorable.
+
+Two things about it are deliberate. The artwork's ground is a tiled navy, so its
+edge would land as a pasted rectangle; `.hero__poster-frame::after` paints the
+section colour back over the outer tenth from each side to dissolve the join —
+an overlay rather than a mask, because fading four straight edges with a mask
+needs `mask-composite`, which browsers still disagree about. And below 40rem a
+crop of the same file is served (`hero-poster-sm.webp`): at full width the
+aeroplane is about 250px across and its wordmark plate 85, which is smaller than
+the same wordmark in the nav directly above it.
+
+The old hero's CSS was deleted rather than left behind — one of its rules was
+already leaking a light hairline into the dark figures band. If a second hero is
+ever needed, write it; do not resurrect that one from git.
+
+**The one box on this site is `.panel`.** The rule in `brand.css` is that prose
+is opened by a hairline, never wrapped in a card, and that still holds. But that
+rule always allowed a box around "something that is genuinely a surface (a
+table, a framed embed)", and the sector list floated onto the greca field read
+as loose rows on a pattern. Each tier is a panel now, and so is every
+`.table-scroll`. Do not put a paragraph in one.
+
 **The route map is generated, not drawn.** `assets/js/world.js` is Natural
 Earth's public-domain 1:110m land, reprojected Robinson and simplified by
 `tools/make-worldmap.py`; the arcs are real great circles interpolated in
@@ -482,6 +508,14 @@ same reason. And the crop is computed twice — once from the arcs, then again t
 contain the labels that were placed inside it — because Mexico City, Monterrey,
 Guadalajara and Cancún sit within a few degrees of each other and their names
 end up outside the first box.
+
+The map is sized by HEIGHT and allowed to be wider than the page, inside a
+scroller you can drag, swipe or scroll. Fitted to the container's width instead,
+a network running from Los Angeles to Tokyo is 258 degrees of longitude squeezed
+into one column — about 130px tall on a phone, which is a diagram of a map
+rather than a map. It opens with the primary hub brought to the middle of the
+view, and the "drag sideways" hint only appears when there is more than 64px of
+pan to be had.
 
 A sector whose airports are not in `AMV_DATA.airports` is listed by the network
 page and left off the map, and the legend says how many. Do not add coordinates

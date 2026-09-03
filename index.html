@@ -52,34 +52,57 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         White, and the aeroplane carries it. The artwork is the airline's own
-         787-9 special livery with its folk-art illustration, already drawn on
-         white, so it bleeds into the page with no panel and no cutout. -->
-    <section class="hero">
-        <div class="wrap hero__inner">
-            <div class="hero__copy">
-                <span class="eyebrow">Infinite Flight · Expert Server</span>
-                <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
-                <p class="lede">
-                    Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight — from
-                    Mexico City out to New York, Madrid, Tokyo and Buenos Aires. Real routes, a real
-                    rank ladder, and every hour logged automatically.
-                </p>
-                <div class="hero__cta">
-                    <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                    <a class="btn btn--ghost" href="/network">See the route map</a>
-                </div>
-            </div>
-            <!-- The airline in four counted figures, every one derived from
-                 data.js so none of them can drift from what the site lists. -->
-            <dl class="hero__facts" id="heroFacts"></dl>
+         A title card, not a landing-page header.
+
+         What was here was the stock arrangement: copy left, figures right,
+         artwork underneath, all on white. It was tidy and it was not memorable,
+         which is what the VA said about it. This is the airline's own poster —
+         the 787-9 in its special livery, ringed by the folk-art illustration
+         that livery carries, over the wordmark — set on the navy it was made
+         on, at the size it was drawn for.
+
+         The poster's ground is a tiled navy, so its edges are masked into the
+         section rather than stopping at a hard rectangle. Below it the tagline,
+         and below that the airline in four counted figures. Nothing overlaps
+         the artwork: it was composed as a whole and it is used as one. -->
+    <section class="hero hero--poster">
+        <div class="hero__poster">
+          <div class="hero__poster-frame">
+            <picture>
+                <!-- On a phone the full poster puts the aeroplane at about
+                     250px across and its wordmark plate at 85 — smaller than
+                     the same wordmark in the nav right above it. Below 40rem
+                     the artwork is served cropped to the aircraft so it fills
+                     the screen, and the nav carries the name. -->
+                <source media="(max-width: 39.99rem)" srcset="/assets/img/hero-poster-sm.webp"
+                        width="756" height="228">
+                <img src="/assets/img/hero-poster.webp" width="848" height="376" fetchpriority="high"
+                     alt="Aeroméxico Boeing 787-9 XA-ADD in its Quetzalcóatl special livery, ringed by
+                          Mexican folk-art illustration — eagles, skulls, marigolds and a feathered
+                          serpent — above the Aeromexico Virtual wordmark.">
+            </picture>
+          </div>
         </div>
-        <figure class="hero__art">
-            <!-- Dimensions are on the tag so the box is reserved before decode. -->
-            <img src="/assets/img/plane-hero.webp" width="1394" height="372" fetchpriority="high"
-                 alt="Aeroméxico Boeing 787-9 in its special livery, surrounded by Mexican folk-art
-                      illustration — eagles, skulls, marigolds and a feathered serpent.">
-        </figure>
+
+        <div class="wrap hero__poster-copy">
+            <span class="eyebrow">Infinite Flight · Expert Server</span>
+            <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
+            <p class="lede">
+                We fly the Aeroméxico network inside Infinite Flight — Mexico City out to
+                New York, Madrid, Tokyo and Buenos Aires. Real routes, a rank ladder that
+                actually opens things up, and every hour logged for you.
+            </p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/network">See the route map</a>
+            </div>
+        </div>
+
+        <!-- The airline in four counted figures, every one derived from data.js
+             so none of them can drift from what the site lists. -->
+        <div class="wrap">
+            <dl class="hero__facts hero__facts--band" id="heroFacts"></dl>
+        </div>
     </section>
 
     <!-- ==================== THE AIRLINE IN NUMBERS ====================
@@ -210,6 +233,7 @@
                 </p>
             </div>
             <div class="map-host" id="mapHost" data-reveal></div>
+            <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
             <p style="margin-top:1.6rem" data-reveal>
                 <a class="btn btn--ghost" href="/network">Every sector, by tier <span data-icon="arrow"></span></a>
             </p>

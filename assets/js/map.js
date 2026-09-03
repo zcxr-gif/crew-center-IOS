@@ -99,6 +99,21 @@
         const W = world.w, H = world.h;
         const plotted = routes.filter(r => pos[r.from] && pos[r.to]);
 
+        // The scroller and an empty SVG go in FIRST so the map's height can be
+        // measured rather than assumed: the stylesheet sizes it by height and
+        // lets the width fall out of the aspect ratio, and the label type size
+        // is computed from that. Reusing the shell on a redraw also keeps the
+        // pan position and the listeners wired to it.
+        let shell = host.querySelector('.map-scroll');
+        if (!shell) {
+            host.innerHTML = '<div class="map-scroll" tabindex="0" role="region"'
+                + ' aria-label="Route map — drag or scroll sideways to pan">'
+                + '<svg class="map"></svg></div>';
+            shell = host.querySelector('.map-scroll');
+        }
+        const svgEl  = shell.querySelector('.map');
+        const mapPx  = Math.max(160, svgEl.clientHeight || shell.clientHeight || 320);
+
         // Crop to the network rather than to the world. A full world map is
         // 2000x1014 with Antarctica across the bottom and empty ocean down both
         // sides; on a phone that leaves the airline about 130px tall. The box
@@ -169,9 +184,12 @@
         // this did. The crop varies with the filter too, so there is no fixed
         // font size that works: it is computed from how many map units the host
         // is actually painting per pixel, and the map redraws on resize.
-        const hostPx   = Math.max(280, host.clientWidth || 900);
-        const perPx    = box[2] / hostPx;
-        const smallMap = hostPx < 560;
+        // Map units per screen pixel, taken from the height — the one dimension
+        // the stylesheet actually fixes.
+        const perPx    = box[3] / mapPx;
+        // Whether to name anything beyond the bases is about how much SCREEN
+        // there is, which is the host's width, not the map's.
+        const smallMap = (host.clientWidth || 900) < 560;
         const FONT     = (smallMap ? 12.5 : 13.5) * perPx;
         const FONT_HUB = (smallMap ? 13.5 : 15) * perPx;
         const CH = FONT * 0.56, LH = FONT * 1.5;
@@ -249,16 +267,69 @@
         }
         const finalBox = box.map(v => v.toFixed(0)).join(' ');
 
-        host.innerHTML = `
-            <svg class="map" viewBox="${finalBox}" role="list"
-                 aria-label="Route map: ${plotted.length} sectors from our bases"
-                 preserveAspectRatio="xMidYMid meet">
-                <path class="map__land" d="${world.land}"/>
+        svgEl.setAttribute('viewBox', finalBox);
+        svgEl.setAttribute('role', 'list');
+        svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        svgEl.setAttribute('aria-label',
+            `Route map: ${plotted.length} sectors from our bases`);
+        svgEl.innerHTML = `<path class="map__land" d="${world.land}"/>
                 <g class="map__arcs">${arcs}</g>
-                <g class="map__pts">${dots}</g>
-            </svg>`;
+                <g class="map__pts">${dots}</g>`;
 
+        const home = hubs.find(h => h.role === 'Primary hub') || hubs[0];
+        wireScroll(shell, home && pos[home.icao], box, W, H);
         return plotted.length;
+    }
+
+    /* The map is wider than the page, so it opens somewhere sensible rather than
+       at longitude zero: the primary hub is brought to the middle of the view.
+       Dragging pans it as well as the scrollbar and a swipe, because on a
+       desktop there is no obvious way to move a map that has no grab handle. */
+    function wireScroll(scroller, homeLL, box, W, H) {
+        if (!scroller) return;
+
+        const settle = () => {
+            const slack = scroller.scrollWidth - scroller.clientWidth;
+            scroller.classList.toggle('is-whole', slack < 4);
+            // Only advertise panning when there is enough of it to be worth
+            // saying. A wide desktop usually fits the network within a few dozen
+            // pixels, and "drag the map sideways" under a map that moves 30px is
+            // an instruction to do nothing.
+            scroller.classList.toggle('has-pan', slack > 64);
+            if (slack < 4 || !homeLL) return;
+            // Where the hub sits along the map, as a fraction of its width.
+            const [hx] = project(homeLL[0], homeLL[1]);
+            const frac = (hx * W - box[0]) / box[2];
+            scroller.scrollLeft = Math.max(0, Math.min(slack,
+                frac * scroller.scrollWidth - scroller.clientWidth / 2));
+        };
+        // The SVG has no width until it has laid out, so measure on the next frame.
+        requestAnimationFrame(settle);
+
+        // The listeners belong to the scroller, which survives a redraw. Adding
+        // them again on every filter press would stack them up.
+        if (scroller.__amvPan) return;
+        scroller.__amvPan = true;
+
+        let down = false, startX = 0, startLeft = 0, moved = 0;
+        scroller.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch') return;      // native scrolling is better
+            down = true; moved = 0;
+            startX = e.clientX; startLeft = scroller.scrollLeft;
+            scroller.classList.add('is-dragging');
+        });
+        scroller.addEventListener('pointermove', (e) => {
+            if (!down) return;
+            const dx = e.clientX - startX;
+            moved = Math.max(moved, Math.abs(dx));
+            scroller.scrollLeft = startLeft - dx;
+        });
+        const release = () => { down = false; scroller.classList.remove('is-dragging'); };
+        scroller.addEventListener('pointerup', release);
+        scroller.addEventListener('pointercancel', release);
+        scroller.addEventListener('pointerleave', release);
+        // A drag that ended on a dot must not also count as a click on it.
+        scroller.addEventListener('click', (e) => { if (moved > 5) e.stopPropagation(); }, true);
     }
 
     /* Label sizing is computed from how wide the host actually is, so a map
