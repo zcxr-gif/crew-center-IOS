@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff — Aeromexico Virtual</title>
+<meta name="description" content="The people running Aeromexico Virtual: the executive team, the directors and what each of them owns, with their Infinite Flight Community profiles.">
+<link rel="canonical" href="https://aeromexicova.org/staff">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/staff">
+<meta property="og:title" content="Staff — Aeromexico Virtual">
+<meta property="og:description" content="The people running Aeromexico Virtual: the executive team, the directors and what each of them owns, with their Infinite Flight Community profiles.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<script>
+/* Paint the stored theme before first paint so there's no light flash. */
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">Who runs the airline</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Staff</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    An executive team of two, supported by departmental directors. Departments own
+                    their area day to day and answer to the COO; policy, partnerships and appeals sit
+                    with the CEO. Every staff role exists to take work off pilots.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+        <div class="wrap">
+            <div class="staff-grid staff-grid--exec" id="staffExec"></div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Departments</span>
+                <h2>Directors</h2>
+                <p class="lede">
+                    Appointed by the CEO on the COO's recommendation. Every position has a named
+                    deputy, so absence never stops the airline operating — and any role left vacant
+                    for more than thirty days is either filled or formally absorbed into another.
+                </p>
+            </div>
+            <div class="staff-grid" id="staffDirectors"></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Supporting the line</span>
+                <h2>Trainers and moderators</h2>
+            </div>
+            <div class="staff-grid" id="staffTeams"></div>
+        </div>
+    </section>
+
+    <section class="section section--ink">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">How the airline is run</span>
+                    <h2 style="margin:.9rem 0">Decisions are written down</h2>
+                    <div class="rule"></div>
+                </div>
+                <ul style="list-style:none;padding:0;display:grid;gap:0" data-reveal>
+                    <li style="padding:1rem 0;border-top:1px solid rgba(255,255,255,.16)">
+                        Staff meet at a fixed time each month. Notes and decisions are posted to the
+                        staff channel within 48 hours.</li>
+                    <li style="padding:1rem 0;border-top:1px solid rgba(255,255,255,.16)">
+                        Every staff position has a named deputy, so absence never stops the airline
+                        operating.</li>
+                    <li style="padding:1rem 0;border-top:1px solid rgba(255,255,255,.16);border-bottom:1px solid rgba(255,255,255,.16)">
+                        Rule changes and disciplinary outcomes are communicated in plain terms,
+                        promptly — including the ones nobody enjoys announcing.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Some of these seats are empty.</h2>
+            <p>If you want one of them, fly with us first — every director we appoint is a line pilot who was already doing the work.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/about">About the airline</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, A = window.AMV;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const IFC = 'https://community.infiniteflight.com/u/';
+
+    // A role with nobody in it says so. Filling the grid with invented names
+    // would be the same mistake the fabricated roster figures were, and a
+    // vacancy is genuinely useful to a reader — it is a job going.
+    function card(s, cls) {
+        const initials = s.name
+            ? s.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
+            : '—';
+        const who = s.name
+            ? (s.ifc
+                ? `<a href="${IFC}${encodeURIComponent(s.ifc)}/summary" rel="noopener"
+                     target="_blank">${esc(s.name)}</a>`
+                : esc(s.name))
+            : `<span class="staff__vacant">${s.team ? 'Recruiting' : 'Vacant'}</span>`;
+        return `
+        <article class="staff ${cls || ''}" data-reveal>
+            <span class="staff__role">${esc(s.short)}</span>
+            <div class="staff__id">
+                <span class="staff__av${s.name ? '' : ' staff__av--vacant'}" aria-hidden="true">${esc(initials)}</span>
+                <span class="staff__name">${who}</span>
+            </div>
+            <p class="staff__owns">${esc(s.owns)}</p>
+            <span class="staff__reports">${s.reports ? 'Reports to ' + esc(s.reports) : esc(s.role)}</span>
+        </article>`;
+    }
+
+    const exec = D.staff.filter(s => !s.reports || s.reports === 'CEO');
+    const dirs = D.staff.filter(s => s.reports === 'COO');
+    const team = D.staff.filter(s => s.team);
+
+    document.getElementById('staffExec').innerHTML = exec.map(s => card(s, 'staff--exec')).join('');
+    document.getElementById('staffDirectors').innerHTML = dirs.map(s => card(s)).join('');
+    document.getElementById('staffTeams').innerHTML = team.map(s => card(s)).join('');
+
+    A.refresh();
+})();
+</script>
+</body>
+</html>

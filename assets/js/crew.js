@@ -127,6 +127,44 @@
         return live.length ? live : null;
     }
 
+    /* ---- Flown events -------------------------------------------------------
+       The same feed, read the other way round: events that have already
+       happened, most recent first, with whatever attendance the crew centre
+       counted. The review's finding on the events page was that it showed a
+       calendar and nothing else — no history, no attendance, no sign the
+       airline actually holds these — and it was right.
+
+       This is the one section on the site with NO data.js fallback, on purpose.
+       An event the airline has flown is a matter of record, and a record is not
+       something this repo may invent: if the crew centre has no history to
+       give, the section removes itself and the page says nothing rather than
+       showing a past the airline did not have. */
+    async function pastEvents({ limit = 6 } = {}) {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/events`);
+        if (!data || !Array.isArray(data.events)) return null;
+
+        const grace = Date.now() - 6 * 60 * 60 * 1000;
+        const flown = data.events
+            .filter(e => e && e.status === 'published' && e.startsAt)
+            .filter(e => new Date(e.startsAt).getTime() <= grace)
+            .sort((a, b) => new Date(b.startsAt) - new Date(a.startsAt))
+            .slice(0, limit)
+            .map(e => ({
+                title:  (e.title || '').trim(),
+                date:   e.startsAt,
+                from:   (e.origin || '').trim().toUpperCase(),
+                to:     (e.destination || '').trim().toUpperCase(),
+                ac:     (e.aircraft || '').trim(),
+                // Attendance is only ever what the backend counted. Undefined
+                // stays undefined and prints nothing — "0 flew" under an event
+                // nobody counted is worse than no figure at all.
+                going:  Number.isFinite(Number(e.going)) ? Number(e.going) : undefined,
+            }))
+            .filter(e => e.title);
+
+        return flown.length ? flown : null;
+    }
+
     /* ---- Operating figures --------------------------------------------------
        GET /api/crew/<slug>/stats → { connected, stats: { pilots, hours,
        pireps, flightHours, … } }
@@ -249,5 +287,5 @@
         return stats().then((figures) => { paint(figures, root); return figures; });
     }
 
-    window.AMV_CREW = { get, routes, events, stats, paint, mountStats, BACKEND, SLUG };
+    window.AMV_CREW = { get, routes, events, pastEvents, stats, paint, mountStats, BACKEND, SLUG };
 })();

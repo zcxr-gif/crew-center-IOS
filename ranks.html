@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ranks and progression — Aeromexico Virtual</title>
+<meta name="description" content="Seven ranks from Cadet to Senior Captain. Each one releases more of the fleet and raises the longest sector you may file — plus the Aeroméxico Airman award.">
+<link rel="canonical" href="https://aeromexicova.org/ranks">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/ranks">
+<meta property="og:title" content="Ranks and progression — Aeromexico Virtual">
+<meta property="og:description" content="Seven ranks from Cadet to Senior Captain. Each one releases more of the fleet and raises the longest sector you may file — plus the Aeroméxico Airman award.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<script>
+/* Paint the stored theme before first paint so there's no light flash. */
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">Progression</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">From Cadet to the left seat</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    Rank does two things here. It releases more of the fleet, and it raises the
+                    longest sector you are allowed to file. That second one is the part that makes
+                    the ladder mean something: a Cadet flies Guadalajara, and Tokyo is a sector no
+                    rank below Senior Captain may book at all.
+                </p>
+            </div>
+            <p class="strip__facts" id="rankStats"></p>
+        </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+        <div class="wrap">
+            <div class="ladder" id="ladder"></div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">How the ladder is applied</span>
+                    <h2 style="margin:.9rem 0">Promotion is arithmetic, not a favour</h2>
+                    <div class="rule"></div>
+                    <p class="lede" style="margin-top:1.4rem">
+                        Hours are credited the moment a flight report is validated. Cross a threshold
+                        and the promotion lands in your crew center — no application, no waiting for
+                        somebody to notice you.
+                    </p>
+                </div>
+                <ul id="rankRules" style="list-style:none;padding:0;display:grid;gap:0" data-reveal></ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- What each rank can actually fly today, counted off the published
+         network rather than described. This is the answer to "what do I get",
+         and it is a fact about the route list, not a promise. -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">What opens up</span>
+                <h2>Sectors released at each rank</h2>
+                <p class="lede">
+                    Counted off the published network. Each rank keeps everything the ranks below it
+                    opened, so the running total is what you can file the day you are promoted.
+                </p>
+            </div>
+            <div class="table-scroll" data-reveal>
+                <table id="rankRoutes" class="stack">
+                    <thead><tr><th>Rank</th><th>Hours</th><th>Longest sector</th><th>New sectors</th><th>Total flyable</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Everyone starts at Cadet.</h2>
+            <p>Ten hours is one long-haul or four Connect sectors. The ladder moves faster than it reads.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/network">See the network</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, A = window.AMV;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const earned = A.earnedRanks(D.ranks);
+    const cap = r => r.sectorHours == null ? 'No limit'
+        : (Number.isInteger(r.sectorHours) ? r.sectorHours : r.sectorHours.toFixed(1)) + ' hours';
+
+    document.getElementById('rankStats').innerHTML = [
+        `${D.ranks.length} ranks`,
+        'Cadet on day one',
+        'Promotion on validated hours',
+        'Sector limits enforced at booking',
+    ].map(t => `<span>${esc(t)}</span>`).join('');
+
+    // Which types each rank releases, read off the fleet rather than repeated
+    // here — a type moved to a different rank in data.js moves on this page too.
+    const releases = {};
+    D.fleet.forEach(a => { (releases[a.releasedAt] = releases[a.releasedAt] || []).push(a); });
+
+    document.getElementById('ladder').innerHTML = D.ranks.map((r, i) => {
+        const opens = releases[r.name] || [];
+        const bars = earned.indexOf(r) < 0 ? earned.length : earned.indexOf(r) + 1;
+        return `
+        <div class="ladder__row${r.appointed ? ' is-appointed' : ''}" data-reveal data-reveal-delay="${Math.min(i, 5) * 60}">
+            <div class="ladder__lead">
+                <span class="ladder__bars" aria-hidden="true">${
+                    Array.from({ length: bars }, (_, k) =>
+                        `<i style="height:${30 + k * 12}%"></i>`).join('')}</span>
+                <span class="ladder__name">${esc(r.name)}</span>
+                <span class="ladder__hours">${r.appointed ? 'By appointment'
+                    : r.minHours === 0 ? 'Day one' : r.minHours + ' hours'}</span>
+            </div>
+            <div class="ladder__body">
+                <p>${esc(r.note)}</p>
+                <p style="font-size:.92rem">${esc(r.duty)}</p>
+                <div class="ladder__facts">
+                    <span class="ladder__fact"><i>Longest sector</i><b>${esc(cap(r))}</b></span>
+                    <span class="ladder__fact"><i>Releases</i><b>${
+                        opens.length ? opens.map(a => esc(a.short)).join(' · ')
+                        : (r.appointed || r.minHours >= 500 ? 'Full fleet' : '—')}</b></span>
+                    ${r.multiplier ? `<span class="ladder__fact"><i>Hours multiplier</i><b>${r.multiplier}×</b></span>` : ''}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('rankRules').innerHTML = D.rankRules.map((t, i) => `
+        <li style="padding:1rem 0;border-top:1px solid var(--line)${
+            i === D.rankRules.length - 1 ? ';border-bottom:1px solid var(--line)' : ''}">
+            <span class="muted" style="font-size:.95rem">${esc(t)}</span>
+        </li>`).join('');
+
+    // The running total of what a rank may file. minRankFor does the work, so
+    // this table can never disagree with the rank chips on the network page.
+    let running = 0;
+    document.querySelector('#rankRoutes tbody').innerHTML = earned.map(r => {
+        const n = D.routes.filter(x => (A.minRankFor(x, D.ranks, D.fleet) || {}).name === r.name).length;
+        running += n;
+        return `<tr>
+            <td data-th="Rank"><b>${esc(r.name)}</b></td>
+            <td class="mono" data-th="Hours">${r.minHours === 0 ? 'Day one' : r.minHours + ' h'}</td>
+            <td class="mono" data-th="Longest sector">${esc(cap(r))}</td>
+            <td class="mono" data-th="New sectors">${n ? '+' + n : '—'}</td>
+            <td class="mono" data-th="Total flyable"><b>${running}</b></td>
+        </tr>`;
+    }).join('');
+
+    A.refresh();
+})();
+</script>
+</body>
+</html>

@@ -7,22 +7,55 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 `index.html` and it works.
 
 ```
-index.html        Home — hero, live roster, fleet, network, ranks, next event
-fleet.html        The six operated types
-network.html      Hubs + all 23 sectors, filterable by region
-events.html       The calendar, live out of the crew center
-join.html         Requirements + the real application form (framed)
-crew.html         The Crew Center, framed in our own chrome
+index.html         Home — hero, live figures, why, the route map, next event
+fleet.html         The six operated types, what each one flies, and what is planned
+network.html       The route map, then all 23 sectors grouped by publication tier
+ranks.html         The ladder: hours, aircraft released, sector limits
+events.html        The calendar, the programme, and what has been flown
+about.html         Mission, the CEO's message, standards, the first twelve months
+staff.html         Who runs the airline, and what each of them owns
+join.html          Requirements, the real application form (framed), and life after joining
+crew.html          The Crew Center, framed in our own chrome
 
-brand.json        ← the brand contract. See "One brand, two products" below.
-assets/brand.css  The design system. Every token lives here.
-assets/js/data.js Fleet, routes, hubs, ranks, events, roster figures
-assets/js/site.js Nav, footer, mark, icons, theme, reveal, counters
-assets/js/live.js Mounts the live-traffic embed
-assets/js/crew.js Read-only client for the crew center's public feeds
-tools/            Regenerate mark.svg and plane-hero.webp from the source art
-assets/img/       Supplied artwork, and what is generated from it. See below.
+brand.json         ← the brand contract. See "One brand, two products" below.
+assets/brand.css   The design system. Every token lives here.
+assets/js/data.js  Identity, staff, fleet, hubs, network, ranks, events — from the Operations Plan
+assets/js/site.js  Nav, footer, mark, icons, theme, reveal, counters, rank arithmetic
+assets/js/map.js   Draws the route map: great circles, dots, label placement
+assets/js/world.js GENERATED coastlines — see tools/make-worldmap.py
+assets/js/live.js  Mounts the live-traffic embed
+assets/js/crew.js  Read-only client for the crew center's public feeds
+tools/             Regenerate mark.svg, plane-hero.webp and world.js from source
+assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
+
+---
+
+## The Operations Plan is the source
+
+Everything the site states about how the airline works comes from Aeromexico
+Virtual's **Operations Plan** — the rank ladder and its sector limits (§4), the
+fleet and what each type is for (§5), the route tiers and their flight-number
+series (§6), joining and activity (§3), the event programme (§9), the staff
+structure (§2). `assets/js/data.js` is a transcription of it, not a second
+opinion. **Where the two disagree, the plan is right and `data.js` is a bug.**
+
+Two things follow from that and are worth not undoing:
+
+**Minimum ranks are derived, never typed.** The plan says a route is offered to
+a pilot whose rank permits both the aircraft and the block time. So
+`AMV.minRankFor()` in `site.js` computes it — the higher of the rank that
+releases the aircraft and the rank whose sector limit covers the filed block.
+Change a threshold in `data.js` and every sector re-ranks itself, the ranks page
+re-counts, and the two cannot drift. Typing a rank onto a route would undo all
+of that within a month.
+
+**A type is in the fleet only when it exists in the sim.** The plan names an
+A320, an A321 and a heritage 757; its own closing checklist has those liveries
+down as still to be confirmed against Infinite Flight. They are in
+`fleetPlanned`, shown on the fleet page as development, and they move into
+`fleet` on the day someone confirms the livery — not before. This site does not
+publish a paper fleet.
 
 ---
 
@@ -428,6 +461,31 @@ Caballero Águila is a call the VA's staff have made — worth knowing that it i
 a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
+
+**The route map is generated, not drawn.** `assets/js/world.js` is Natural
+Earth's public-domain 1:110m land, reprojected Robinson and simplified by
+`tools/make-worldmap.py`; the arcs are real great circles interpolated in
+`assets/js/map.js`; the airports are their real aerodrome reference points in
+`AMV_DATA.airports`. Nothing about it is illustrated, which is what lets it
+past the rule at the top of `brand.css`. To regenerate it:
+
+```sh
+curl -O https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson
+python3 tools/make-worldmap.py ne_110m_land.geojson
+```
+
+Two details in `map.js` are load-bearing and look like fussiness until you
+remove them. Label type is sized from how many map units the host paints per
+pixel, because an SVG scales its text with the viewBox and a label that reads on
+a desktop map is nine pixels tall on a phone; the map redraws on resize for the
+same reason. And the crop is computed twice — once from the arcs, then again to
+contain the labels that were placed inside it — because Mexico City, Monterrey,
+Guadalajara and Cancún sit within a few degrees of each other and their names
+end up outside the first box.
+
+A sector whose airports are not in `AMV_DATA.airports` is listed by the network
+page and left off the map, and the legend says how many. Do not add coordinates
+you have not looked up.
 
 **The home page and the calendar now read the same feed.** Both paint from
 `data.js` first and upgrade to `AMV_CREW.events()` when it answers, so the home

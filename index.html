@@ -5,12 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aeromexico Virtual — Fly the Eagle Warrior</title>
 <meta name="description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
-<meta name="theme-color" content="#0A1D3B">
+<link rel="canonical" href="https://aeromexicova.org/">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
-<meta property="og:image" content="/assets/img/plane-hero.webp">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/">
 <meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
-<meta property="og:description" content="An Infinite Flight virtual airline flying the Aeroméxico network out of Mexico City, Guadalajara and Monterrey.">
+<meta property="og:description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
@@ -20,7 +29,7 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css?v=2">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
 <script>
 /* Paint the stored theme before first paint so there's no light flash. */
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
@@ -30,9 +39,13 @@
 
 <a class="skip" href="#main">Skip to content</a>
 <div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
 <noscript>
-    <nav class="wrap section--tight"><a href="/fleet">Fleet</a> · <a href="/network">Network</a> ·
-    <a href="/events">Events</a> · <a href="/join">Join</a> ·
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
     <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
 </noscript>
 
@@ -41,9 +54,7 @@
     <!-- ==================== HERO ====================
          White, and the aeroplane carries it. The artwork is the airline's own
          787-9 special livery with its folk-art illustration, already drawn on
-         white, so it bleeds into the page with no panel and no cutout. It
-         replaces — in order — a blurred tri-hue gradient, a dot-grid, a tiled
-         azulejo and a hand-drawn eagle watermark. -->
+         white, so it bleeds into the page with no panel and no cutout. -->
     <section class="hero">
         <div class="wrap hero__inner">
             <div class="hero__copy">
@@ -56,13 +67,11 @@
                 </p>
                 <div class="hero__cta">
                     <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                    <a class="btn btn--ghost" href="/network">Explore the network</a>
+                    <a class="btn btn--ghost" href="/network">See the route map</a>
                 </div>
             </div>
-            <!-- The airline in four counted figures. This used to be a strip
-                 under the artwork; it sits here because the right half of the
-                 hero was otherwise empty white, which is what made the page
-                 read as a template. -->
+            <!-- The airline in four counted figures, every one derived from
+                 data.js so none of them can drift from what the site lists. -->
             <dl class="hero__facts" id="heroFacts"></dl>
         </div>
         <figure class="hero__art">
@@ -74,11 +83,10 @@
     </section>
 
     <!-- ==================== THE AIRLINE IN NUMBERS ====================
-         The one place on this site that states operating figures, and every
-         one of them is read live from the crew center's own database — pilots
-         on the roster, hours credited to them, flight reports approved. None
-         of it is typed into this repo; see the note at the foot of data.js
-         about why that matters.
+         Moved directly under the hero. The review's finding was that the
+         opening screen said nothing about the airline's operational scale, and
+         these are the only figures on this site that state it — every one read
+         live from the crew center's own database.
 
          Starts [hidden]. crew.js reveals it only when real figures arrive and
          deletes any figure it could not fill, so a slow backend costs the page
@@ -129,26 +137,6 @@
         </div>
     </section>
 
-    <!-- ==================== LIVE NOW ==================== -->
-    <section class="section">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="chip chip--live"><i class="dot-live"></i> Live now</span>
-                <h2 style="margin-top:.9rem">Who's airborne right now</h2>
-                <p class="lede">
-                    Straight from Infinite Flight's live traffic — every Aeromexico Virtual pilot
-                    currently in the air on the Expert Server. This is the same feed the Inflight
-                    tracker runs on.
-                </p>
-            </div>
-            <div data-live-roster data-reveal>
-                <div class="frame-host muted" style="padding:3rem;text-align:center">
-                    Loading live traffic…
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ==================== WHY ==================== -->
     <section class="section section--alt">
         <div class="wrap">
@@ -171,98 +159,110 @@
                 <article class="card card--hover" data-reveal data-reveal-delay="80">
                     <div class="card__icon" data-icon="route"></div>
                     <h3>A network worth flying</h3>
-                    <p>23 destinations built on the real Aeroméxico map — regional Connect hops on
-                       the E190, transcons on the MAX, and 787 flagship sectors to Europe and
-                       the Pacific.</p>
+                    <p>The real Aeroméxico map, published in five tiers — regional Connect hops on
+                       the E190, transborder sectors on the MAX, and 787 flagship runs to Europe
+                       and the Pacific.</p>
                 </article>
                 <article class="card card--hover" data-reveal data-reveal-delay="160">
                     <div class="card__icon" data-icon="award"></div>
                     <h3>Rank that means something</h3>
-                    <p>Seven ranks from Cadet to Line Check Captain, each unlocking real fleet and
-                       route access. Promotions come off logged hours, not vibes.</p>
+                    <p>Each rank releases more of the fleet <em>and</em> raises the longest sector
+                       you may file — three hours at Cadet, no limit at Senior Captain. Promotions
+                       come off validated hours, not vibes.</p>
                 </article>
                 <article class="card card--hover" data-reveal>
                     <div class="card__icon" data-icon="calendar"></div>
                     <h3>Events with ATC</h3>
-                    <p>Group departures and fly-ins run with staffed controllers, published slots
-                       and a proper briefing — not a Discord message and a hope.</p>
+                    <p>At least two a month, published a fortnight ahead, run with staffed
+                       controllers, published slots and a proper briefing — not a Discord message
+                       and a hope.</p>
                 </article>
                 <article class="card card--hover" data-reveal data-reveal-delay="80">
                     <div class="card__icon" data-icon="users"></div>
                     <h3>Staffed by people who fly</h3>
-                    <p>Our staff are line pilots first. Applications get a human answer inside
-                       48 hours, and every decision is explained.</p>
+                    <p>Our staff are line pilots first, and every one of them is named on the staff
+                       page. Applications get a human answer inside 72 hours, and every decision is
+                       explained.</p>
                 </article>
                 <article class="card card--hover" data-reveal data-reveal-delay="160">
                     <div class="card__icon" data-icon="shield"></div>
-                    <h3>Grade 3 and up</h3>
-                    <p>We fly the Expert Server exclusively. A clean violation record keeps the
-                       line professional and the events flyable.</p>
+                    <h3>Run to a written plan</h3>
+                    <p>How the airline is governed, what is expected of a pilot and how flights are
+                       validated are all written down, published, and reviewed every quarter. We
+                       operate in compliance with the IFVARB.</p>
                 </article>
             </div>
         </div>
     </section>
 
-    <!-- ==================== FLEET ==================== -->
+    <!-- ==================== NETWORK ====================
+         One map instead of the six-row route table and the three hub cards that
+         used to sit here. The review found the home page was a scroll through
+         previews of pages that already exist; this is the network at a glance,
+         and the page it belongs to is one tap away. -->
     <section class="section">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="eyebrow">The fleet</span>
-                <h2>Six types, one livery</h2>
-                <p class="lede">
-                    Every aircraft below exists in Infinite Flight with an Aeroméxico livery, so
-                    what you see on the map is what we actually fly.
-                </p>
-            </div>
-            <div class="grid grid-3" id="fleetPreview"></div>
-            <p style="margin-top:2rem" data-reveal>
-                <a class="btn btn--ghost" href="/fleet">See the full fleet <span data-icon="arrow"></span></a>
-            </p>
-        </div>
-    </section>
-
-    <!-- ==================== NETWORK ==================== -->
-    <section class="section section--ink">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">The network</span>
                 <h2>Out of the Valley of Mexico</h2>
-                <p class="lede">
-                    Three bases, 23 destinations, five regions. Pick a leg, file it, fly it.
+                <p class="lede" id="networkLede">
+                    One hub, three bases, and the whole thing flown on the Expert Server.
                 </p>
             </div>
-            <div class="grid grid-3" style="margin-bottom:2.5rem" id="hubList"></div>
-            <div class="table-scroll" data-reveal>
-                <table id="routePreview">
-                    <thead><tr><th>Route</th><th>Destination</th><th>Region</th><th>Aircraft</th><th>Block</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <p style="margin-top:2rem" data-reveal>
-                <a class="btn btn--onink" href="/network">All 23 routes <span data-icon="arrow"></span></a>
+            <div class="map-host" id="mapHost" data-reveal></div>
+            <p style="margin-top:1.6rem" data-reveal>
+                <a class="btn btn--ghost" href="/network">Every sector, by tier <span data-icon="arrow"></span></a>
             </p>
         </div>
     </section>
 
-    <!-- ==================== RANKS ==================== -->
+    <!-- ==================== LIVE NOW ==================== -->
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="chip chip--live"><i class="dot-live" aria-hidden="true"></i> Live now</span>
+                <h2 style="margin-top:.9rem">Who's airborne right now</h2>
+                <p class="lede">
+                    Straight from Infinite Flight's live traffic — every Aeromexico Virtual pilot
+                    currently in the air on the Expert Server.
+                </p>
+            </div>
+            <div data-live-roster data-reveal>
+                <div class="frame-host muted" style="padding:3rem;text-align:center">
+                    Loading live traffic…
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FROM THE CEO ==================== -->
     <section class="section">
         <div class="wrap">
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
-                <div data-reveal>
-                    <span class="eyebrow">Progression</span>
-                    <h2 style="margin:.9rem 0">From Cadet to the left seat</h2>
-                    <div class="rule"></div>
-                    <p class="lede" style="margin-top:1.4rem">
-                        Hours are credited the moment a flight is verified against the network.
-                        Cross a threshold and the promotion lands in your crew center — no
-                        application, no waiting for someone to notice.
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center">
+                <div class="quote" data-reveal>
+                    <p>
+                        Most virtual airlines are a spreadsheet with a logo on it. We wanted the
+                        opposite: an operation you could actually join, fly, and get somewhere in.
                     </p>
-                    <p style="margin-top:1.6rem">
-                        <a class="btn btn--primary" href="/join">Start at Cadet <span data-icon="arrow"></span></a>
-                    </p>
+                    <div class="quote__by">
+                        <span class="staff__av" aria-hidden="true" id="ceoInitials">RA</span>
+                        <span>
+                            <b id="ceoName">Randomaviator2</b>
+                            <span>Chief Executive Officer</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="card" data-reveal data-reveal-delay="80">
-                    <div id="rankList"></div>
+                <div data-reveal data-reveal-delay="80">
+                    <p class="lede">
+                        Aeromexico Virtual is run by an executive team of two and five departmental
+                        directors, to a written Operations Plan that is reviewed every quarter.
+                        Everything the airline expects of you is in it, and so is everything you can
+                        expect back.
+                    </p>
+                    <p style="margin-top:1.6rem;display:flex;gap:.8rem;flex-wrap:wrap">
+                        <a class="btn btn--ghost" href="/about">About the airline <span data-icon="arrow"></span></a>
+                        <a class="btn btn--ghost" href="/staff">Meet the staff</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -281,12 +281,13 @@
             </p>
         </div>
     </section>
+
     <!-- ==================== CTA ==================== -->
     <section class="band">
         <div class="band__wash"></div>
         <div class="wrap band__inner">
             <h2>The eagle flies at 0600. Be on it.</h2>
-            <p>Applications take about three minutes and get a human answer inside 48 hours.</p>
+            <p>Applications take about three minutes and get a human answer inside 72 hours.</p>
             <div class="hero__cta">
                 <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/crew">Crew sign in</a>
@@ -298,90 +299,57 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js?v=2"></script>
-<script src="/assets/js/site.js?v=2"></script>
-<script src="/assets/js/crew.js?v=2"></script>
-<script src="/assets/js/live.js?v=2"></script>
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/world.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
+<script src="/assets/js/map.js?v=3"></script>
+<script src="/assets/js/crew.js?v=3"></script>
+<script src="/assets/js/live.js?v=3"></script>
 <script>
 (function () {
-    const D = window.AMV_DATA, icon = window.AMV.icon;
+    const D = window.AMV_DATA, A = window.AMV;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     // ---- Hero facts ----
     // Every figure counted off the arrays in data.js, so none of them can drift
-    // from what the site actually lists. This block used to animate a fabricated
-    // pilot count and hours total; nothing here is typed in by hand any more.
+    // from what the site actually lists.
     const dests = new Set(D.routes.map(r => r.to)).size;
     document.getElementById('heroFacts').innerHTML = [
-        [D.hubs.length,  'Hubs',           'Mexico City, Guadalajara, Monterrey'],
-        [dests,          'Destinations',   'Across five regions'],
-        [D.fleet.length, 'Aircraft types', 'Every one flyable in the sim'],
-        [D.ranks.length, 'Ranks',          'Cadet to Line Check Captain'],
+        [D.hubs.length,   'Bases',          'Mexico City, Monterrey, Guadalajara, Cancún'],
+        [dests,           'Destinations',   'Across five regions'],
+        [D.fleet.length,  'Aircraft types', 'Every one flyable in the sim'],
+        [D.ranks.length,  'Ranks',          'Cadet to Aeroméxico Airman'],
     ].map(([n, label, note]) => `
         <div>
             <dt>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
 
-    // ---- Fleet preview ----
-    // The types a new pilot actually starts on. It used to sort by a
-    // fabricated airframe count.
-    const top = D.fleet.filter(a => /737|E190/.test(a.type)).slice(0, 3);
-    document.getElementById('fleetPreview').innerHTML = top.map((a, i) => `
-        <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${i * 80}">
-            <div class="fleet-card__media">${window.AMV.fleetMedia(a)}</div>
-            <div class="fleet-card__body">
-                <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
-                <h3>${esc(a.type)}</h3>
-                <p>${esc(a.note)}</p>
-                <div class="fleet-card__specs">
-                    <span>Seats <b>${a.seats}</b></span>
-                    <span>Range <b>${esc(a.range)}</b></span>
-                </div>
-            </div>
-        </article>`).join('');
+    // ---- The CEO, read off the staff list ----
+    const ceo = D.staff.find(s => s.short === 'CEO');
+    if (ceo && ceo.name) {
+        document.getElementById('ceoName').textContent = ceo.name;
+        document.getElementById('ceoInitials').textContent =
+            ceo.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase();
+    }
 
-    // ---- Hubs ----
-    // No inline colours here — brand.css styles cards, icons and tags inside a
-    // .section--ink, so this markup is the same as it is on a light section.
-    document.getElementById('hubList').innerHTML = D.hubs.map((h, i) => `
-        <article class="card" data-reveal data-reveal-delay="${i * 80}">
-            <div class="card__icon">${icon('pin')}</div>
-            <span class="tag tag--hub">${esc(h.role)}</span>
-            <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
-            <p>${esc(h.name)}</p>
-            <p class="mono" style="margin-top:.7rem;font-size:.86rem">${esc(h.icao)} · ${esc(h.iata)}</p>
-        </article>`).join('');
-
-    // ---- Route preview: the six longest sectors ----
-    const long = D.routes.slice().sort((a, b) => b.dist - a.dist).slice(0, 6);
-    document.querySelector('#routePreview tbody').innerHTML = long.map(r => `
-        <tr>
-            <td><span class="route-pair">${esc(r.from)} <span class="arrow">→</span> ${esc(r.to)}</span></td>
-            <td>${esc(r.city)}</td>
-            <td><span class="tag">${esc(r.region)}</span></td>
-            <td class="mono">${esc(r.ac)}</td>
-            <td class="mono">${esc(r.block)}</td>
-        </tr>`).join('');
-
-    // ---- Rank ladder ----
-    document.getElementById('rankList').innerHTML = D.ranks.map((r, i) => `
-        <div class="rank">
-            <span class="rank__bars">${'<i></i>'.repeat(Math.min(4, i + 1))}</span>
-            <span>
-                <span class="rank__name">${esc(r.name)}</span>
-                <span style="display:block;font-size:.82rem" class="muted">${esc(r.note)}</span>
-            </span>
-            <span class="rank__hours">${r.minHours === 0 ? 'Day one' : r.minHours + ' h'}</span>
-        </div>`).join('');
+    // ---- The network, at a glance ----
+    const hub = D.hubs.find(h => h.role === 'Primary hub') || D.hubs[0];
+    document.getElementById('networkLede').textContent =
+        `${D.routes.length} published sectors from ${hub.city} and our bases, in `
+        + `${D.tiers.filter(t => D.routes.some(r => r.tier === t.name)).length} tiers — `
+        + `the shortest is an hour on the E190, the longest is fourteen to Seoul.`;
+    if (window.AMV_MAP) {
+        window.AMV_MAP.draw(document.getElementById('mapHost'), D.routes,
+                            { hubs: D.hubs, airports: D.airports });
+    }
 
     // ---- Next event (the soonest one still ahead of us) ----
     //
     // Reads data.js first and the crew center's calendar second, exactly as the
-    // events page does. Both pages now answer to the same feed, so the home
-    // page can no longer advertise a departure the calendar has never heard of
-    // — which it could for as long as this card was hand-typed only.
+    // events page does. Both pages answer to the same feed, so the home page
+    // cannot advertise a departure the calendar has never heard of.
     const host = document.getElementById('nextEvent');
 
     function paintNextEvent(list) {
@@ -411,7 +379,7 @@
                     </div>
                 </div>
             </article>`;
-        if (window.AMV && typeof window.AMV.refresh === 'function') window.AMV.refresh(host);
+        A.refresh(host);
     }
 
     paintNextEvent(D.events);
@@ -421,7 +389,7 @@
 
     // Everything above was injected after site.js exported itself — hand the new
     // nodes back so their reveals, counters and icons get wired.
-    window.AMV.refresh();
+    A.refresh();
 
     // ---- The airline in numbers ----
     // The only figures on this page that are not derived from data.js. They come

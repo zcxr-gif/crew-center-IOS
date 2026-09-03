@@ -13,8 +13,9 @@
     "crewCenter": "https://inflight.info/crew/aeromexico-virtual",
     "hubs": [
       "MMMX",
+      "MMMY",
       "MMGL",
-      "MMMY"
+      "MMUN"
     ],
     "network": "Infinite Flight"
   },

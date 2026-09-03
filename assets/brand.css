@@ -704,7 +704,19 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     display: block; padding: .85rem 0; border-bottom: 1px solid var(--line-soft);
     font-size: 1rem; font-weight: 600;
 }
-.nav__menu .btn { width: 100%; margin-top: 1.15rem; }
+/* `.nav__menu a` is a class AND a type, so it outranks `.btn` and was winning:
+   the Crew Center button in the open menu became display:block with zero side
+   padding, which put its icon hard against the left edge of the pill and
+   wrapped the label onto a second line. That is the "crew center and its icon
+   at the extreme edge of the rectangle" the mobile review reported. Restated
+   here at equal weight rather than by reordering the file, so a future edit to
+   either rule cannot quietly bring it back. */
+.nav__menu a.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; margin-top: 1.15rem;
+    padding: .95rem 1.7rem; border-bottom: 0;
+    font-size: .95rem; font-weight: 700;
+}
 
 @media (min-width: 62rem) {
     .nav__links  { display: flex; }
@@ -1114,13 +1126,29 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .route-meta b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
 
-/* Stacked, the arrow points down — an arrow still pointing right between two
-   panels that are now one above the other reads as the wrong diagram. */
+/* On a phone the two panels used to stack, which doubled the height of every
+   sector and turned twenty-three of them into a very long scroll — which is
+   what the mobile review said about this page. They stay side by side instead:
+   a pair of four-letter codes and two city names fit across 390px comfortably
+   once the panel chrome comes off and the codes come down a size. */
 @media (max-width: 44rem) {
-    .route-card__ends { grid-template-columns: 1fr; }
-    .route-end--to { text-align: left; }
-    .route-end--to .route-end__place { justify-content: flex-start; }
-    .route-card__arrow { transform: rotate(90deg); justify-self: center; }
+    .route-card { padding-block: .8rem; gap: .55rem; }
+    .route-card__ends { gap: .35rem; align-items: center; }
+    .route-end {
+        background: none; border: 0; padding: 0;
+        border-radius: 0;
+    }
+    .route-end__code { font-size: clamp(1.15rem, 6.5vw, 1.55rem); }
+    .route-end__place { font-size: .78rem; gap: .3rem; }
+    .route-end__name { display: none; }
+    .route-card__arrow { width: 1.5rem; height: 1.5rem; }
+    .route-card__arrow svg { width: .8rem; height: .8rem; }
+    .route-card__meta { gap: .3rem .9rem; }
+    .route-meta { font-size: .76rem; }
+    .route-meta i { font-size: .6rem; letter-spacing: .1em; }
+    .rank-chip { font-size: .62rem; }
+    /* The chip has nowhere to sit on a narrow row, so it leads instead. */
+    .route-card__meta .rank-chip { margin-left: 0; order: -1; flex-basis: 100%; }
 }
 
 /* Visible to a screen reader, gone from the page: the arrow between the two
@@ -1137,3 +1165,326 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     padding: .7rem 1.15rem; border-radius: 0 0 var(--radius-sm) 0; z-index: 100;
 }
 .skip:focus { left: 0; }
+
+/* ============================ ROUTE MAP ==================================
+   The network drawn as a network. Land comes from assets/js/world.js (Natural
+   Earth, reprojected by tools/make-worldmap.py); the arcs are real great
+   circles computed in assets/js/map.js. Everything below is colour and weight.
+
+   The map is the one place on this site that gets a filled shape rather than a
+   hairline, and it earns it: a coastline IS a filled shape. */
+.map-host {
+    position: relative;
+    margin-inline: calc(clamp(1.15rem, 4vw, 2rem) * -1);   /* full-bleed of .wrap */
+}
+/* No overflow: the viewBox is the crop, and letting the SVG paint outside it
+   puts Antarctica and half the Pacific back on the page. */
+.map { display: block; width: 100%; height: auto; }
+
+.map__land {
+    fill: #E7ECF4;
+    stroke: #CFD8E6;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+}
+:root[data-theme="dark"] .map__land { fill: #0E2542; stroke: #1E3556; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__land { fill: #0E2542; stroke: #1E3556; }
+}
+
+.map__arc {
+    fill: none;
+    stroke: var(--am-blue);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: .34;
+    vector-effect: non-scaling-stroke;
+    transition: opacity .25s var(--ease), stroke .25s var(--ease);
+}
+.map__arc.is-flagship { stroke: var(--am-red); opacity: .72; stroke-width: 2.6; }
+/* The dark override is more specific than `.map__arc.is-flagship`, so the
+   flagship rule has to be restated inside it or the red sectors come out blue
+   like everything else. */
+:root[data-theme="dark"] .map__arc { stroke: var(--am-blue-300); opacity: .42; }
+:root[data-theme="dark"] .map__arc.is-flagship { stroke: #FF7C90; opacity: .85; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__arc { stroke: var(--am-blue-300); opacity: .42; }
+    :root:not([data-theme="light"]) .map__arc.is-flagship { stroke: #FF7C90; opacity: .85; }
+}
+
+.map__leader { stroke: var(--am-red); stroke-width: 1.4; opacity: .55; vector-effect: non-scaling-stroke; }
+.map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue); opacity: .4; }
+:root[data-theme="dark"] .map__leader { stroke: #FF7C90; }
+:root[data-theme="dark"] .map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue-300); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__leader { stroke: #FF7C90; }
+    :root:not([data-theme="light"]) .map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue-300); }
+}
+.map__dot  { fill: var(--am-blue); }
+.map__halo { fill: var(--am-blue); opacity: 0; transition: opacity .2s var(--ease); }
+.map__pt.is-hub .map__dot  { fill: var(--am-red); }
+.map__pt.is-hub .map__halo { fill: var(--am-red); opacity: .16; }
+:root[data-theme="dark"] .map__dot { fill: var(--am-blue-300); }
+:root[data-theme="dark"] .map__pt.is-hub .map__dot  { fill: #FF7C90; }
+:root[data-theme="dark"] .map__pt.is-hub .map__halo { fill: #FF7C90; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__dot { fill: var(--am-blue-300); }
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__dot  { fill: #FF7C90; }
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__halo { fill: #FF7C90; }
+}
+
+.map__label {
+    font-family: var(--font-body); font-weight: 700;
+    fill: var(--ink); paint-order: stroke; stroke: var(--bg);
+    stroke-linejoin: round; pointer-events: none;
+}
+.map__pt.is-hub .map__label { fill: var(--am-red); }
+:root[data-theme="dark"] .map__pt.is-hub .map__label { fill: #FF7C90; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__label { fill: #FF7C90; }
+}
+
+/* Hover and keyboard focus name the airport without needing a permanent label
+   on all twenty-three. `outline: none` is safe here only because the halo IS
+   the focus indicator and it is far more visible than a browser ring on a dot. */
+.map__pt { cursor: default; }
+.map__pt:hover .map__halo, .map__pt:focus .map__halo { opacity: .3; }
+.map__pt:focus { outline: none; }
+.map__pt:focus .map__dot { stroke: var(--ink); stroke-width: 2.5; }
+
+/* On a phone the labels are the first thing to become unreadable: at 390px the
+   map is ~2.5px per SVG unit and the type is competing with the arcs. Only the
+   bases keep a label; everything else is a tap. */
+@media (max-width: 44rem) {
+    .map__pt:not(.is-hub) .map__label { display: none; }
+    .map__arc { stroke-width: 2.4; }
+}
+
+.map-legend {
+    display: flex; flex-wrap: wrap; gap: .6rem 1.6rem;
+    margin-top: 1.2rem; font-size: .84rem; color: var(--muted);
+}
+.map-legend span { display: inline-flex; align-items: center; gap: .5rem; }
+.map-legend i { width: .6rem; height: .6rem; border-radius: 50%; background: var(--am-blue); flex: none; }
+.map-legend i.is-hub { background: var(--am-red); }
+.map-legend i.is-arc { width: 1.4rem; height: 2px; border-radius: 2px; background: var(--am-red); }
+
+/* ============================ TIERS & GROUPS =============================
+   The network is published in five tiers (Operations Plan §6) and the page is
+   grouped by them, so a pilot scanning for "what can I fly today" reads five
+   headings rather than twenty-three rows. */
+.tier-head {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem .9rem;
+    margin: clamp(2rem, 4vw, 3rem) 0 .2rem;
+    padding-bottom: .7rem; border-bottom: 2px solid var(--ink);
+}
+.tier-head:first-child { margin-top: 0; }
+.tier-head h3 { margin: 0; font-size: clamp(1.25rem, 2.4vw, 1.6rem); }
+.tier-head .series {
+    font-family: var(--font-mono); font-size: .8rem; font-weight: 700;
+    color: var(--accent); letter-spacing: .04em;
+}
+.tier-head .count { margin-left: auto; font-size: .82rem; color: var(--muted); }
+.tier-head + p.tier-note { margin: .8rem 0 0; font-size: .9rem; color: var(--muted); max-width: 62ch; }
+
+/* A rank chip: the smallest way to say "you need to be this to file this". */
+.rank-chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); white-space: nowrap;
+}
+.rank-chip::before {
+    content: ""; width: .42rem; height: .42rem; border-radius: 50%;
+    background: currentColor; flex: none;
+}
+.route-card__meta .rank-chip { margin-left: auto; }
+
+/* ============================ RANK LADDER ================================
+   The ranks page. The old ladder was seven rows of name-and-hours, which is
+   what the review called "numerical rather than developmental" — it said what
+   you needed and never what you got. Each rank is now an entry: what it
+   releases, how far it lets you fly, and what is expected of you there. */
+.ladder { display: grid; gap: 0; }
+.ladder__row {
+    display: grid; gap: .4rem 1.6rem;
+    grid-template-columns: 1fr;
+    padding: clamp(1.3rem, 3vw, 1.9rem) 0;
+    border-top: 1px solid var(--line);
+}
+.ladder__row:last-child { border-bottom: 1px solid var(--line); }
+@media (min-width: 48rem) {
+    .ladder__row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
+}
+.ladder__lead { display: grid; gap: .35rem; align-content: start; }
+.ladder__name {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
+    font-size: clamp(1.15rem, 2.2vw, 1.4rem); line-height: 1.15;
+}
+.ladder__hours {
+    font-family: var(--font-mono); font-size: .95rem; font-weight: 600; color: var(--accent);
+}
+.ladder__body { display: grid; gap: .8rem; }
+.ladder__body p { margin: 0; color: var(--muted); }
+.ladder__facts {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.6rem;
+    padding-top: .3rem;
+}
+.ladder__fact { display: grid; gap: .1rem; font-size: .88rem; }
+.ladder__fact i {
+    font-style: normal; color: var(--muted);
+    font-size: .66rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700;
+}
+.ladder__fact b { font-family: var(--font-mono); font-weight: 600; }
+.ladder__row.is-appointed { background: var(--surface-2); padding-inline: clamp(1rem, 3vw, 1.6rem); }
+:root[data-theme="dark"] .ladder__row.is-appointed { background: var(--surface); }
+
+/* The bars are a rank insignia, not a chart: one more bar per rung. */
+.ladder__bars { display: flex; gap: 3px; align-items: flex-end; height: 1.1rem; }
+.ladder__bars i { width: 4px; border-radius: 2px; background: var(--accent); display: block; }
+
+/* ============================ STAFF ======================================
+   Four reviewers asked for this page. A role with nobody in it says so — the
+   Operations Plan gives every director a remit, and a remit with a vacancy
+   against it is more useful to a reader (and more honest) than a filled grid. */
+.staff-grid { display: grid; gap: clamp(1.4rem, 3vw, 2rem); }
+@media (min-width: 40rem) { .staff-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .staff-grid { grid-template-columns: repeat(3, 1fr); } }
+.staff-grid--exec { grid-template-columns: 1fr; }
+@media (min-width: 48rem) { .staff-grid--exec { grid-template-columns: repeat(2, 1fr); } }
+
+.staff {
+    display: grid; gap: .55rem; align-content: start;
+    border-top: 1px solid var(--line); padding-top: 1.3rem;
+}
+.staff__role {
+    font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent);
+}
+.staff__id { display: flex; align-items: center; gap: .9rem; }
+.staff__av {
+    width: 3rem; height: 3rem; border-radius: 50%; flex: none;
+    display: grid; place-items: center;
+    background: var(--surface-2); color: var(--accent);
+    font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
+    border: 1px solid var(--line);
+}
+.staff__av--vacant { color: var(--faint); }
+.staff__name {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
+    font-size: 1.22rem; line-height: 1.2;
+}
+.staff__name a { color: inherit; border-bottom: 1px solid var(--line); }
+.staff__name a:hover { color: var(--accent); border-bottom-color: currentColor; }
+.staff__vacant { color: var(--faint); font-style: italic; font-size: 1.05rem; font-weight: 500; }
+.staff__owns { color: var(--muted); font-size: .94rem; margin: 0; }
+.staff__reports { font-size: .8rem; color: var(--faint); font-family: var(--font-mono); }
+.staff--exec .staff__av { width: 4rem; height: 4rem; font-size: 1.5rem; }
+.staff--exec .staff__name { font-size: clamp(1.4rem, 3vw, 1.75rem); }
+
+/* ============================ TIMELINE ===================================
+   Used twice: the first twelve months on /about, and the run-up to an event on
+   /events. A numbered rail rather than four more boxes in a grid. */
+.timeline { display: grid; gap: 0; }
+.timeline__row {
+    display: grid; gap: .3rem 1.4rem; grid-template-columns: auto 1fr;
+    padding: 1.15rem 0; border-top: 1px solid var(--line);
+}
+.timeline__row:last-child { border-bottom: 1px solid var(--line); }
+.timeline__when {
+    font-family: var(--font-mono); font-weight: 700; font-size: .82rem;
+    color: var(--accent); text-transform: uppercase; letter-spacing: .08em;
+    min-width: 7.5rem; padding-top: .15rem;
+}
+.timeline__what { margin: 0; }
+.timeline__what b { display: block; font-family: var(--font-display); font-weight: 700; margin-bottom: .2rem; }
+.timeline__what span { color: var(--muted); font-size: .92rem; }
+@media (max-width: 34rem) {
+    .timeline__row { grid-template-columns: 1fr; gap: .45rem; }
+}
+
+/* ============================ PULL QUOTE =================================
+   The CEO's message. Set as a statement, not dropped into another card. */
+.quote {
+    display: grid; gap: 1.4rem;
+    border-top: 3px solid var(--am-red); padding-top: clamp(1.6rem, 3vw, 2.2rem);
+}
+.quote p {
+    font-family: var(--font-display); font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    line-height: 1.42; letter-spacing: -.015em; font-variation-settings: 'SOFT' 50, 'WONK' 1;
+    max-width: 46ch; margin: 0; color: var(--ink);
+}
+.quote p + p { font-size: clamp(1.02rem, 1.6vw, 1.14rem); font-family: var(--font-body); color: var(--muted); }
+.quote__by { display: flex; align-items: center; gap: .9rem; }
+.quote__by b { font-family: var(--font-display); font-weight: 800; }
+.quote__by span { font-size: .82rem; color: var(--muted); display: block; font-weight: 500; font-family: var(--font-body); }
+
+/* ============================ FACT ROWS ==================================
+   A definition list set as ruled rows. Used for the identity table on /about
+   and the requirement list on /join, both of which were sets of little boxes. */
+.facts { display: grid; gap: 0; margin: 0; }
+.facts__row {
+    display: grid; gap: .2rem 1.6rem; grid-template-columns: 1fr;
+    padding: 1rem 0; border-top: 1px solid var(--line-soft);
+}
+.facts__row:first-child { border-top: 1px solid var(--line); }
+.facts__row:last-child { border-bottom: 1px solid var(--line); }
+@media (min-width: 40rem) { .facts__row { grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); } }
+.facts dt { font-weight: 700; font-family: var(--font-display); letter-spacing: -.01em; }
+.facts dd { margin: 0; color: var(--muted); }
+.facts dd b { color: var(--ink); font-weight: 600; }
+
+/* ============================ FOOTER COLUMNS =============================
+   The review said the footer is too long on mobile, and it was: four stacked
+   columns ran to most of a phone screen on their own. The three link columns
+   now pair up below the brand instead of queueing. */
+.footer__cols { display: grid; gap: 2rem 1.5rem; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 30rem) { .footer__cols { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 48rem) {
+    .footer__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 2fr); }
+    .footer__cols { gap: 2.5rem; }
+}
+@media (max-width: 47.99rem) {
+    .footer { padding-block: clamp(2.25rem, 6vw, 3rem) 1.5rem; }
+    .footer__grid { gap: 1.9rem; }
+    .footer__brand .mark { width: 3.2rem; margin-bottom: .8rem; }
+    .footer__brand p { font-size: .88rem; }
+    .footer ul { gap: .5rem; font-size: .88rem; }
+    .disclaimer { font-size: .72rem; }
+}
+
+/* ============================ STACKING TABLES ============================
+   A data table inside a horizontally scrolling box is the standard answer on a
+   phone and it is a bad one: the reader has to scrub sideways to find the
+   column that answers their question, and the header scrolls away while they
+   do it. Below 37.5rem a `table.stack` becomes one block per row with each
+   cell carrying its own column name, which is the same information in the
+   shape a narrow screen can actually read.
+
+   Renderers put the column name on each cell as data-th. A cell with no
+   data-th just loses its label, so a table can be converted a column at a
+   time. */
+@media (max-width: 37.5rem) {
+    .table-scroll:has(.stack) { overflow-x: visible; }
+    table.stack { min-width: 0; display: block; }
+    table.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    table.stack tbody, table.stack tr, table.stack td { display: block; width: auto; }
+    table.stack tr {
+        padding: 1rem 0;
+        border-top: 1px solid var(--line);
+    }
+    table.stack tr:last-child { border-bottom: 1px solid var(--line); }
+    table.stack td {
+        border: 0; padding: .2rem 0;
+        display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+        gap: .2rem 1rem; align-items: baseline;
+    }
+    table.stack td::before {
+        content: attr(data-th);
+        font-size: .66rem; font-weight: 700; letter-spacing: .13em;
+        text-transform: uppercase; color: var(--muted);
+    }
+    table.stack td:empty { display: none; }
+    .section--ink table.stack tr { border-top-color: rgba(255, 255, 255, .16); }
+    .section--ink table.stack tr:last-child { border-bottom-color: rgba(255, 255, 255, .16); }
+    .section--ink table.stack td::before { color: #9DB0CE; }
+}

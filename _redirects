@@ -8,6 +8,11 @@
 /join       /join.html      200
 /apply      /join.html      200
 /crew       /crew.html      200
+/ranks      /ranks.html     200
+/about      /about.html     200
+/airline    /about.html     200
+/staff      /staff.html     200
+/team       /staff.html     200
 
 # The crew center proper lives on Inflight. /crew (above) frames it in our own
 # chrome; these send anyone who lands on a deeper crew path straight there.

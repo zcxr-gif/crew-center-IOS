@@ -4,9 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join the crew — Aeromexico Virtual</title>
-<meta name="description" content="Apply to fly for Aeromexico Virtual on Infinite Flight. Grade 3 and up, three minutes to apply, a human answer inside 48 hours.">
-<meta name="theme-color" content="#0A1D3B">
+<meta name="description" content="Apply to fly for Aeromexico Virtual on Infinite Flight. Grade 2 and up to apply, three minutes to send it in, and an answer from the Director of Personnel inside 72 hours.">
+<link rel="canonical" href="https://aeromexicova.org/join">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/join">
+<meta property="og:title" content="Join the crew — Aeromexico Virtual">
+<meta property="og:description" content="Apply to fly for Aeromexico Virtual on Infinite Flight. Grade 2 and up to apply, three minutes to send it in, and an answer from the Director of Personnel inside 72 hours.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
@@ -16,18 +29,13 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css?v=2">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
 <style>
-    .req { display:flex; gap:.9rem; align-items:flex-start; padding:1rem 0; border-bottom:1px solid var(--line-soft); }
-    .req:last-child { border-bottom:0; }
-    /* Just the glyph — the tinted disc behind it was another small block. */
-    .req__tick { flex:none; display:grid; place-items:center; color:var(--accent); padding-top:.2rem; }
-    .req__tick svg { width:1.05rem; height:1.05rem; }
-    .req b { display:block; font-family:var(--font-display); letter-spacing:-.01em; }
-    .req span { font-size:.9rem; color:var(--muted); }
     .apply-frame { min-height:640px; }
+    .step { display:flex; gap:1.1rem; }
 </style>
 <script>
+/* Paint the stored theme before first paint so there's no light flash. */
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 </head>
@@ -35,6 +43,15 @@
 
 <a class="skip" href="#main">Skip to content</a>
 <div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
 
 <main id="main">
 
@@ -46,7 +63,8 @@
                 <div class="rule"></div>
                 <p class="lede" style="margin-top:1.4rem">
                     Three minutes to apply. Your Infinite Flight stats are checked automatically
-                    against our requirements, and a human answers inside 48 hours.
+                    against our requirements, and the Director of Personnel answers inside 72
+                    hours — either way, with a reason.
                 </p>
             </div>
 
@@ -56,28 +74,7 @@
                     <p class="muted" style="margin-bottom:.9rem;font-size:.92rem">
                         Checked live against your IF account when you apply.
                     </p>
-                    <div class="card">
-                        <div class="req">
-                            <span class="req__tick" data-icon="check"></span>
-                            <span><b>Grade 3 or higher</b><span>We fly the Expert Server exclusively.</span></span>
-                        </div>
-                        <div class="req">
-                            <span class="req__tick" data-icon="check"></span>
-                            <span><b>10+ flight hours</b><span>Enough time in the sim to fly a full sector.</span></span>
-                        </div>
-                        <div class="req">
-                            <span class="req__tick" data-icon="check"></span>
-                            <span><b>Under 5 violations</b><span>In the last 12 months. Everyone has a bad day; we look at the pattern.</span></span>
-                        </div>
-                        <div class="req">
-                            <span class="req__tick" data-icon="check"></span>
-                            <span><b>An Infinite Flight Community account</b><span>So we can reach you, and you can reach us.</span></span>
-                        </div>
-                        <div class="req">
-                            <span class="req__tick" data-icon="check"></span>
-                            <span><b>Agreement to the code of conduct</b><span>Fly the callsign properly, follow ATC, be decent to people.</span></span>
-                        </div>
-                    </div>
+                    <dl class="facts" id="requirements"></dl>
                 </div>
 
                 <div>
@@ -85,27 +82,15 @@
                     <p class="muted" style="margin-bottom:.9rem;font-size:.92rem">
                         From application to your first logged sector.
                     </p>
-                    <div class="card" style="display:grid;gap:1.6rem">
-                        <div class="step">
-                            <span class="step__n">1</span>
-                            <span><b style="font-family:var(--font-display)">Apply</b>
-                            <span style="display:block;font-size:.9rem" class="muted">Fill in the form below. Your IF username is verified on the spot.</span></span>
-                        </div>
-                        <div class="step">
-                            <span class="step__n">2</span>
-                            <span><b style="font-family:var(--font-display)">We review</b>
-                            <span style="display:block;font-size:.9rem" class="muted">A staff pilot reads it. Inside 48 hours you get an answer, and a reason either way.</span></span>
-                        </div>
-                        <div class="step">
-                            <span class="step__n">3</span>
-                            <span><b style="font-family:var(--font-display)">Get your callsign</b>
-                            <span style="display:block;font-size:.9rem" class="muted">You're issued an Aeromexico callsign and crew center login.</span></span>
-                        </div>
-                        <div class="step">
-                            <span class="step__n">4</span>
-                            <span><b style="font-family:var(--font-display)">Fly</b>
-                            <span style="display:block;font-size:.9rem" class="muted">Pick a sector, fly it on Expert, and watch the hours land automatically.</span></span>
-                        </div>
+                    <div class="timeline">
+                        <div class="timeline__row"><span class="timeline__when">Apply</span>
+                            <p class="timeline__what"><b>Three minutes</b><span>Fill in the form below. Your IF username is verified on the spot.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">72 hours</span>
+                            <p class="timeline__what"><b>We review</b><span>The Director of Personnel reads it and answers either way, with a reason.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">On acceptance</span>
+                            <p class="timeline__what"><b>Callsign and login</b><span>You join as a Cadet with an Aeromexico callsign and a crew center account.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">Seven days</span>
+                            <p class="timeline__what"><b>Your first sector</b><span>Fly any published route inside the three-hour Cadet limit, and file it. That is the whole induction.</span></p></div>
                     </div>
                 </div>
             </div>
@@ -128,6 +113,7 @@
             <div class="frame-host">
                 <iframe id="applyFrame" class="apply-frame" title="Aeromexico Virtual application"
                         src="https://inflight.info/crew/aeromexico-virtual/join?embed=1"
+                        referrerpolicy="strict-origin-when-cross-origin"
                         loading="lazy" scrolling="no"></iframe>
             </div>
             <noscript>
@@ -139,33 +125,111 @@
         </div>
     </section>
 
+    <!-- ==================== AFTER YOU JOIN ====================
+         The review's finding on this page was that an applicant could read the
+         whole thing and still not know what membership involves past pressing
+         send. This section is that: the induction, what keeps you current, and
+         what happens when life gets in the way. -->
     <section class="section">
         <div class="wrap">
-            <div class="head">
+            <div class="head" data-reveal>
+                <span class="eyebrow">After you join</span>
+                <h2>What being a member actually involves</h2>
+                <p class="lede">
+                    No check-ride and nothing to be signed off for. You join, you fly one sector for
+                    the airline, and you log it — that is the induction. Everything below is the
+                    Operations Plan, in the order you will meet it.
+                </p>
+            </div>
+
+            <div class="grid grid-3">
+                <article class="card" data-reveal>
+                    <div class="card__icon" data-icon="clock"></div>
+                    <h3>Your first seven days</h3>
+                    <p>One logged sector inside seven days of being accepted. Any published route
+                       counts, at Cadet rank and inside the three-hour Cadet limit. It is the flight
+                       <em>report</em> that stops the clock, once staff have validated it.</p>
+                    <p style="margin-top:.7rem">A warning goes out two days before the deadline, so
+                       nobody is closed without notice — and anyone closed this way may apply again
+                       with nothing held against them.</p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="80">
+                    <div class="card__icon" data-icon="gauge"></div>
+                    <h3>Staying current</h3>
+                    <p>One validated flight every 30 days. The crew centre tracks it and acts on it
+                       automatically — it is not a rule somebody has to remember to apply, and a
+                       warning goes out seven days before.</p>
+                    <p style="margin-top:.7rem">Miss it and you move to the inactive roster. Nobody
+                       is removed for it: your hours, rank and flight history are kept, and you are
+                       active again the moment you log a flight.</p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="160">
+                    <div class="card__icon" data-icon="users"></div>
+                    <h3>When life gets busy</h3>
+                    <p>Leave of absence is granted on request for up to 90 days and pauses the
+                       activity clock. Rank and hours are held exactly where you left them.</p>
+                    <p style="margin-top:.7rem">Line Trainers are there for the first few sectors,
+                       for remedial help, and for anyone coming back after a while away.</p>
+                </article>
+                <article class="card" data-reveal>
+                    <div class="card__icon" data-icon="book"></div>
+                    <h3>Filing a flight</h3>
+                    <p>Fly under an Aeromexico callsign on the Expert Server in a fleet aircraft and
+                       the crew centre captures the leg, matches the route and credits it. You can
+                       file by hand if something is missed.</p>
+                    <p style="margin-top:.7rem">Reports are filed within 48 hours of landing and
+                       validated within 72, with the flight number, aircraft, block time and
+                       evidence of the arrival.</p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="80">
+                    <div class="card__icon" data-icon="award"></div>
+                    <h3>Getting promoted</h3>
+                    <p>Automatically, on validated hours. Each rank releases more of the fleet and
+                       raises the longest sector you may file — from three hours at Cadet to no limit
+                       at all at Senior Captain.</p>
+                    <p style="margin-top:.7rem"><a href="/ranks" style="color:var(--accent);font-weight:600">See the full ladder</a></p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="160">
+                    <div class="card__icon" data-icon="shield"></div>
+                    <h3>What is expected</h3>
+                    <p>Expert Server rules and every ATC instruction. Realistic fuel and payload. Fly
+                       the whole sector. And treat other members and the wider Infinite Flight
+                       community with respect — one standard, staff included.</p>
+                    <p style="margin-top:.7rem"><a href="/about" style="color:var(--accent);font-weight:600">The standards in full</a></p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
                 <span class="eyebrow">Questions</span>
                 <h2 style="margin-top:.9rem">Before you ask</h2>
             </div>
             <div class="grid grid-2">
                 <article class="card" data-reveal>
-                    <h3>Do I need to fly a minimum every month?</h3>
-                    <p>One logged sector every 30 days keeps you current. Tell us if life gets busy
-                       and we'll park your account rather than remove it.</p>
+                    <h3>I am Grade 2. Can I still apply?</h3>
+                    <p>Yes — Grade 2 is our bar to apply. Infinite Flight itself requires Grade 3 to
+                       enter the Expert Server, which is where we fly, so you will need to reach it
+                       before your first line sector. Apply now and get there with us.</p>
                 </article>
                 <article class="card" data-reveal data-reveal-delay="80">
                     <h3>Can I keep flying for another VA?</h3>
                     <p>Yes. We don't ask for exclusivity. Just don't fly our callsign for someone
-                       else's operation.</p>
+                       else's operation. Hours transferred in from another VA are recognised up to
+                       50, on evidence, and don't count towards Captain or above.</p>
                 </article>
                 <article class="card" data-reveal>
                     <h3>How do hours get credited?</h3>
                     <p>Automatically. Fly under an Aeromexico callsign on the Expert Server in a
                        fleet aircraft and the crew center captures the leg, matches the route and
-                       credits it. You can file by hand if something is missed.</p>
+                       credits it once a validator has approved the report.</p>
                 </article>
                 <article class="card" data-reveal data-reveal-delay="80">
                     <h3>What if I'm declined?</h3>
-                    <p>You'll be told why, and whether you can reapply. Most declines are hours or
-                       violations — both fixable in a couple of weeks.</p>
+                    <p>You'll be told why, and whether you can reapply. Most declines are grade or
+                       an outstanding violation — both fixable in a couple of weeks.</p>
                 </article>
             </div>
         </div>
@@ -175,9 +239,20 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/site.js?v=2"></script>
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
 <script>
 (function () {
+    const D = window.AMV_DATA, A = window.AMV;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    document.getElementById('requirements').innerHTML = D.requirements.map(r => `
+        <div class="facts__row">
+            <dt>${esc(r.req)}</dt>
+            <dd>${esc(r.why)}</dd>
+        </div>`).join('');
+
     // crew-join.html posts { ifcrewHeight: <px> } whenever its step changes, so
     // the framed form grows instead of scrolling inside a fixed box.
     const frame = document.getElementById('applyFrame');
@@ -187,6 +262,8 @@
         const h = e.data && e.data.ifcrewHeight;
         if (typeof h === 'number' && h > 200 && h < 6000) frame.style.height = h + 'px';
     });
+
+    A.refresh();
 })();
 </script>
 </body>
