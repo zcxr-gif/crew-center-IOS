@@ -1,3 +1,6 @@
 # Screenshots the browser checks drop next to themselves.
 tools/*.png
 node_modules/
+
+__pycache__/
+*.pyc

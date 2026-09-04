@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About the airline — Aeromexico Virtual</title>
+<meta name="description" content="How Aeromexico Virtual is run: the mission, what we hold ourselves to, the flight operations standards every pilot flies to, and the first twelve months.">
+<link rel="canonical" href="https://aeromexicova.org/about">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/about">
+<meta property="og:title" content="About the airline — Aeromexico Virtual">
+<meta property="og:description" content="How Aeromexico Virtual is run: the mission, what we hold ourselves to, the flight operations standards every pilot flies to, and the first twelve months.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
+     load asynchronously: a render-blocking third-party stylesheet also blocks
+     the body scripts that inject the nav and footer, so a slow or unreachable
+     fonts.googleapis.com would leave the page chrome missing, not merely
+     unstyled. display=swap shows text in the fallback and swaps in. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<script>
+/* Paint the stored theme before first paint so there's no light flash. */
+(function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
+
+<main id="main">
+
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+        <div class="wrap">
+            <div class="head">
+                <span class="eyebrow">The airline</span>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">An airline, run like one</h1>
+                <div class="rule"></div>
+                <p class="lede" style="margin-top:1.4rem">
+                    Aeromexico Virtual flies the Aeroméxico network inside Infinite Flight to a
+                    standard our members are proud of: realistic operations, a calendar worth
+                    turning up for, and a route structure that rewards flying rather than waiting.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CEO'S MESSAGE ====================
+         DRAFTED FROM THE OPERATIONS PLAN, NOT DICTATED. Every claim below is
+         the plan's own §1 — the mission sentence and the four things the
+         airline holds itself to. It carries a real person's name, so it is his
+         to approve or rewrite before it stays here. -->
+    <section class="section" style="padding-top:0">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div class="quote" data-reveal>
+                    <p>
+                        Most virtual airlines are a spreadsheet with a logo on it. We wanted the
+                        opposite: an operation you could actually join, fly, and get somewhere in.
+                    </p>
+                    <p>
+                        So everything here is arranged around the flying. Hours credit themselves off
+                        your real Infinite Flight history. Rank is arithmetic, not a favour — cross
+                        the threshold and the promotion is already applied. Every route we publish is
+                        one Aeroméxico flies and one you can load into the sim tonight. And when we
+                        get something wrong, we say so, in plain terms, quickly.
+                    </p>
+                    <p>
+                        If that sounds like the airline you have been looking for, the application
+                        takes about three minutes. I read them.
+                    </p>
+                    <div class="quote__by">
+                        <span class="staff__av" aria-hidden="true" id="ceoInitials">RA</span>
+                        <span>
+                            <b id="ceoName">Randomaviator2</b>
+                            <span>Chief Executive Officer, Aeromexico Virtual</span>
+                        </span>
+                    </div>
+                </div>
+                <div data-reveal data-reveal-delay="80">
+                    <span class="eyebrow">At a glance</span>
+                    <h2 style="margin:.9rem 0 1.4rem;font-size:clamp(1.5rem,3vw,2rem)">The airline on paper</h2>
+                    <dl class="facts" id="identity"></dl>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">What we hold ourselves to</span>
+                <h2>Four things, and we are held to them</h2>
+                <p class="lede">
+                    These are not a values poster. Each one is a rule somebody can point at when the
+                    airline is not keeping to it.
+                </p>
+            </div>
+            <div class="grid grid-2" id="values"></div>
+        </div>
+    </section>
+
+    <!-- ==================== STANDARDS ==================== -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Flight operations</span>
+                <h2>What flying the callsign involves</h2>
+                <p class="lede">
+                    Pilots fly as <b class="mono">AEROMEXICO</b> plus their flight number on the
+                    Expert Server. These are the standards behind the callsign — the same ones
+                    Flight Operations validates reports against.
+                </p>
+            </div>
+            <div class="grid grid-3">
+                <article class="card" data-reveal>
+                    <div class="card__icon" data-icon="book"></div>
+                    <h3>Before the flight</h3>
+                    <p>A full flight plan with a routing appropriate to the sector, SID and STAR
+                       where published. Fuel and payload loaded realistically — no minimum-fuel
+                       long-haul, no empty widebodies. Weather checked, and an alternate planned
+                       for long-haul.</p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="80">
+                    <div class="card__icon" data-icon="radio"></div>
+                    <h3>In flight</h3>
+                    <p>Expert Server rules and every ATC instruction, without exception. 250 knots
+                       below 10,000 feet and standard climb and descent profiles. Fly the whole
+                       sector — timewarp only where Infinite Flight itself allows it, and never on
+                       a group flight.</p>
+                </article>
+                <article class="card" data-reveal data-reveal-delay="160">
+                    <div class="card__icon" data-icon="shield"></div>
+                    <h3>On the network</h3>
+                    <p>A pilot in our colours represents the airline. Arguing with controllers,
+                       deliberate interference with other traffic and breaches of Infinite Flight's
+                       community rules are disciplinary matters wherever they happen.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section--ink">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">Flight reporting</span>
+                    <h2 style="margin:.9rem 0">Hours come from validated reports</h2>
+                    <div class="rule"></div>
+                    <p class="lede" style="margin-top:1.4rem">
+                        A report is filed through the crew centre within 48 hours of landing, and
+                        Flight Operations validates it within 72. A report is rejected where the
+                        evidence does not support it, the routing was not flown, the flight was not
+                        completed, or the aircraft was not the one published for that route — and it
+                        comes back with the reason.
+                    </p>
+                    <p style="margin-top:1.2rem;color:#9DB0CE;font-size:.94rem">
+                        A rejected report may be resubmitted once. A pilot who disagrees with a
+                        rejection may appeal to the COO.
+                    </p>
+                </div>
+                <div data-reveal data-reveal-delay="80">
+                    <h3 style="margin-bottom:1rem">Every report carries</h3>
+                    <ul style="list-style:none;padding:0;display:grid;gap:0">
+                        <li style="padding:.9rem 0;border-top:1px solid rgba(255,255,255,.16)">Flight number, origin and destination</li>
+                        <li style="padding:.9rem 0;border-top:1px solid rgba(255,255,255,.16)">Aircraft type and registration</li>
+                        <li style="padding:.9rem 0;border-top:1px solid rgba(255,255,255,.16)">Block time, and the Infinite Flight session it was flown in</li>
+                        <li style="padding:.9rem 0;border-top:1px solid rgba(255,255,255,.16);border-bottom:1px solid rgba(255,255,255,.16)">Evidence — a screenshot of the arrival, or the Infinite Flight logbook entry</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FIRST YEAR ==================== -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Where this is going</span>
+                <h2>The first twelve months</h2>
+                <p class="lede">
+                    From the Operations Plan, with the measure against each one. Operations are
+                    reviewed against this every quarter by the CEO and COO.
+                </p>
+            </div>
+            <div class="timeline" id="roadmap" data-reveal></div>
+        </div>
+    </section>
+
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
+                <div data-reveal>
+                    <span class="eyebrow">Conduct</span>
+                    <h2 style="margin:.9rem 0">One standard, staff included</h2>
+                    <div class="rule"></div>
+                    <p class="lede" style="margin-top:1.4rem">
+                        Treat other members and the wider Infinite Flight community with respect.
+                        Harassment, discriminatory conduct, deliberate disruption of other pilots and
+                        falsified flight reports are what this exists for.
+                    </p>
+                    <p style="margin-top:1.2rem;font-size:.94rem" class="muted">
+                        Any outcome may be appealed to the CEO within 14 days. Falsifying a flight
+                        report is treated as a serious breach at first instance. Sanctions imposed by
+                        Infinite Flight itself — and by the IFVARB — are honoured by the airline.
+                    </p>
+                </div>
+                <div class="timeline" data-reveal data-reveal-delay="80">
+                    <div class="timeline__row"><span class="timeline__when">Informal word</span>
+                        <p class="timeline__what"><b>First minor lapse</b><span>Noted verbally, nothing recorded.</span></p></div>
+                    <div class="timeline__row"><span class="timeline__when">Written warning</span>
+                        <p class="timeline__what"><b>Repeat, or a first serious lapse</b><span>Recorded on the member's file.</span></p></div>
+                    <div class="timeline__row"><span class="timeline__when">Suspension</span>
+                        <p class="timeline__what"><b>Repeated warnings or a serious breach</b><span>Flying and event access withdrawn, 7–30 days.</span></p></div>
+                    <div class="timeline__row"><span class="timeline__when">Removal</span>
+                        <p class="timeline__what"><b>Severe breach, or conduct after suspension</b><span>Membership ends.</span></p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">The people</span>
+                <h2>Someone is accountable for each of these</h2>
+                <p class="lede">
+                    Six departments, each owning its area day to day. Names, remits and Infinite
+                    Flight Community profiles are on the staff page.
+                </p>
+            </div>
+            <p data-reveal>
+                <a class="btn btn--primary" href="/staff">Meet the staff <span data-icon="arrow"></span></a>
+            </p>
+        </div>
+    </section>
+
+    <section class="band">
+        <div class="band__wash"></div>
+        <div class="wrap band__inner">
+            <h2>Regulated, and glad to be.</h2>
+            <p>Aeromexico Virtual operates in compliance with the IFVARB. Where anything in our plan conflicts with a Board requirement, the Board's requirement wins and our plan is amended to match.</p>
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/ranks">See the rank ladder</a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div data-site-footer></div>
+
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, A = window.AMV;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // The signature is read off the staff list rather than typed under the
+    // message, so a change of CEO does not leave the wrong name on it.
+    const ceo = D.staff.find(s => s.short === 'CEO');
+    if (ceo && ceo.name) {
+        document.getElementById('ceoName').textContent = ceo.name;
+        document.getElementById('ceoInitials').textContent =
+            ceo.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase();
+    }
+
+    const a = D.airline, hubs = D.hubs;
+    const bases = hubs.filter(h => h.role !== 'Primary hub');
+    const hub = hubs.find(h => h.role === 'Primary hub') || hubs[0];
+    document.getElementById('identity').innerHTML = [
+        ['Real-world basis', `${esc(a.basedOn)} — IATA <b>${esc(a.iata)}</b>, ICAO <b>${esc(a.icao)}</b>, callsign <b>${esc(a.callsign)}</b>`],
+        ['Alliance',         `${esc(a.alliance)}, with codeshare flying on partner carriers`],
+        ['Platform',         `${esc(a.platform)} — ${esc(a.server)} only`],
+        ['Primary hub',      `${esc(hub.city)} <b>${esc(hub.icao)}</b>`],
+        ['Bases',            bases.map(h => `${esc(h.city)} <b>${esc(h.icao)}</b>`).join(' · ')],
+        ['Fleet',            `${D.fleet.length} types in service, ${D.fleetPlanned.length} planned`],
+        ['Network',          `${D.routes.length} published sectors across ${D.tiers.length} tiers`],
+        ['Regulation',       'Operated in compliance with the IFVARB'],
+    ].map(([k, v]) => `<div class="facts__row"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+
+    document.getElementById('values').innerHTML = D.values.map((v, i) => `
+        <article class="card card--hover" data-reveal data-reveal-delay="${(i % 2) * 80}">
+            <h3>${esc(v.title)}</h3>
+            <p>${esc(v.note)}</p>
+        </article>`).join('');
+
+    document.getElementById('roadmap').innerHTML = D.roadmap.map(r => `
+        <div class="timeline__row">
+            <span class="timeline__when">${esc(r.q)}</span>
+            <p class="timeline__what"><b>${esc(r.objective)}</b><span>${esc(r.measure)}</span></p>
+        </div>`).join('');
+
+    A.refresh();
+})();
+</script>
+</body>
+</html>

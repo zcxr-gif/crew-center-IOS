@@ -6,7 +6,8 @@
 <title>Crew Center — Aeromexico Virtual</title>
 <meta name="description" content="Sign in to the Aeromexico Virtual crew center: logbook, roster, route network, PIREPs and events.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0A1D3B">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +18,7 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css?v=2">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
 <style>
     /* The crew center fills the viewport under our own nav, so signing in here
        feels like a section of this site rather than a trip to another product. */
@@ -49,12 +50,14 @@
 </head>
 <body>
 
+<a class="skip" href="#main">Skip to content</a>
 <div data-site-nav></div>
 
-<main>
+<main id="main">
     <div class="crew-stage">
         <iframe id="crewFrame" title="Aeromexico Virtual Crew Center"
                 src="https://inflight.info/crew/aeromexico-virtual?embed=1"
+                referrerpolicy="strict-origin-when-cross-origin"
                 allow="clipboard-write"></iframe>
 
         <div class="crew-fallback" id="crewFallback">
@@ -77,7 +80,9 @@
     </div>
 </main>
 
-<script src="/assets/js/site.js?v=2"></script>
+<div data-site-footer></div>
+
+<script src="/assets/js/site.js?v=3"></script>
 <script>
 (function () {
     const frame    = document.getElementById('crewFrame');

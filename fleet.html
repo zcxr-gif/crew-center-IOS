@@ -4,9 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fleet — Aeromexico Virtual</title>
-<meta name="description" content="The Aeromexico Virtual fleet: 787-9, 787-8, 777-200ER, 737 MAX 8, 737-800 and the E190 Connect regional fleet — every type available in Infinite Flight with an Aeroméxico livery.">
-<meta name="theme-color" content="#0A1D3B">
+<meta name="description" content="Six types in service: the E190 Connect regional fleet, the 737-800 and MAX 8, the 787-8 and 787-9 Dreamliners and the 777-200ER — what each one flies, and the rank that releases it.">
+<link rel="canonical" href="https://aeromexicova.org/fleet">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/fleet">
+<meta property="og:title" content="Fleet — Aeromexico Virtual">
+<meta property="og:description" content="Six types in service: the E190 Connect regional fleet, the 737-800 and MAX 8, the 787-8 and 787-9 Dreamliners and the 777-200ER — what each one flies, and the rank that releases it.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
@@ -16,8 +29,9 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css?v=2">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
 <script>
+/* Paint the stored theme before first paint so there's no light flash. */
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 </head>
@@ -25,6 +39,15 @@
 
 <a class="skip" href="#main">Skip to content</a>
 <div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
 
 <main id="main">
 
@@ -32,40 +55,82 @@
         <div class="wrap">
             <div class="head">
                 <span class="eyebrow">The fleet</span>
-                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Six types, one livery</h1>
+                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Six types, and a job for each</h1>
                 <div class="rule"></div>
                 <p class="lede" style="margin-top:1.4rem">
-                    We only operate aircraft that exist in Infinite Flight wearing an Aeroméxico
-                    livery. No paper fleet, no types you can't actually load into the sim.
+                    The fleet is drawn from the real Aeroméxico operation and limited to types
+                    available in Infinite Flight in an Aeroméxico livery. No paper fleet, and no
+                    types you cannot load into the sim tonight.
+                </p>
+                <p style="margin-top:1.1rem;max-width:62ch" class="muted">
+                    Its strength is the spread. Two regional and narrowbody types carry the domestic
+                    trunk and the US transborder network and are what a new pilot flies from day
+                    one; two Dreamliners carry Europe, South America and the Pacific; the 777 is
+                    kept for events. Every type is released at a rank, so the fleet opens up as you
+                    fly rather than sitting there as a catalogue.
                 </p>
             </div>
-            <p class="strip__facts" id="fleetStats" style="margin-bottom:clamp(2.5rem,5vw,4rem)"></p>
+            <p class="strip__facts" id="fleetStats" style="margin-bottom:clamp(2rem,5vw,3rem)"></p>
             <div class="grid grid-3" id="fleetGrid"></div>
         </div>
     </section>
 
+    <!-- ==================== WHAT EACH TYPE DOES ====================
+         The review's finding on this page was that it was about the aeroplanes
+         rather than about the airline flying them. This table is the
+         Operations Plan's own fleet table: what the type is for, where it
+         typically goes, and the rank that releases it. -->
     <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Fleet assignment</span>
+                <h2>What each type is for</h2>
+                <p class="lede">
+                    Straight from the Operations Plan. A route is only offered to a pilot whose rank
+                    permits both the aircraft and the block time, so the rank column is also the
+                    order in which the network opens up to you.
+                </p>
+            </div>
+            <div class="table-scroll" data-reveal>
+                <table id="fleetTable" class="stack">
+                    <thead><tr><th>Infinite Flight type</th><th>Operation</th><th>Typical sector</th><th>Released at</th><th>Seats</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
+                Types are written exactly as Infinite Flight's API names them — the crew centre
+                matches your live flight to our fleet on that string to credit the hours
+                automatically. Fly the right type in the right livery and the logbook takes care of
+                itself.
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== FLEET DEVELOPMENT ====================
+         Types the Operations Plan names and the airline has not put into
+         service. Listed as planned rather than as fleet: the plan's own closing
+         checklist has these liveries down as still to be confirmed against
+         Infinite Flight, and this site does not publish a paper fleet. -->
+    <section class="section">
         <div class="wrap">
             <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
                 <div data-reveal>
-                    <span class="eyebrow">Why the names look like that</span>
-                    <h2 style="margin:.9rem 0">Fleet names are matching keys</h2>
+                    <span class="eyebrow">Fleet development</span>
+                    <h2 style="margin:.9rem 0">What comes next</h2>
                     <div class="rule"></div>
                     <p class="lede" style="margin-top:1.4rem">
-                        Each type below is written exactly as Infinite Flight's API names it —
-                        "Boeing 787-9 Dreamliner", not "789". The Inflight Crew Center matches your
-                        live flight to our fleet on that string to credit the hours automatically.
-                        Fly the right type in the right livery and the logbook takes care of itself.
+                        Types are added only where Aeroméxico operated them in reality and Infinite
+                        Flight carries the livery. These three are in the Operations Plan and are not
+                        in service: each one enters the fleet on the day its livery is confirmed in
+                        the sim, and not before.
                     </p>
-                    <p style="margin-top:1.6rem">
-                        <a class="btn btn--ghost" href="/network">See where they fly <span data-icon="arrow"></span></a>
+                    <p style="margin-top:1.2rem;font-size:.94rem" class="muted">
+                        The network is reviewed each quarter against the real airline's timetable,
+                        and the fleet with it. Routes the real carrier drops are retired.
                     </p>
                 </div>
-                <div class="table-scroll" data-reveal>
-                    <table id="fleetTable">
-                        <thead><tr><th>Infinite Flight type</th><th>Livery</th><th>Seats</th><th>Range</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                <div data-reveal data-reveal-delay="80">
+                    <dl class="facts" id="fleetPlanned"></dl>
                 </div>
             </div>
         </div>
@@ -75,9 +140,10 @@
         <div class="band__wash"></div>
         <div class="wrap band__inner">
             <h2>Pick your type. Fly your first sector.</h2>
-            <p>Cadets start on the E190 and 737-800. Widebodies unlock at 100 hours.</p>
+            <p>Cadets start on the E190 and the 737-800. The Dreamliners open at First Officer.</p>
             <div class="hero__cta">
                 <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/ranks">See the rank ladder</a>
             </div>
         </div>
     </section>
@@ -86,11 +152,11 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js?v=2"></script>
-<script src="/assets/js/site.js?v=2"></script>
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
 <script>
 (function () {
-    const D = window.AMV_DATA;
+    const D = window.AMV_DATA, A = window.AMV;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -98,16 +164,17 @@
     // a made-up number and is gone; how many types it flies is a fact about
     // this file, so it cannot go stale or overstate the airline.
     const wide = D.fleet.filter(a => /787|777/.test(a.type)).length;
+    const seats = D.fleet.map(a => a.seats);
     document.getElementById('fleetStats').innerHTML = [
-        `${D.fleet.length} types operated`,
-        `${wide} widebody`,
-        `${D.fleet.length - wide} narrowbody and regional`,
-        'Every one available in Infinite Flight',
+        `${D.fleet.length} types in service`,
+        `${wide} widebody, ${D.fleet.length - wide} narrowbody and regional`,
+        `${Math.min(...seats)}–${Math.max(...seats)} seats`,
+        `${D.fleetPlanned.length} more planned`,
     ].map(t => `<span>${esc(t)}</span>`).join('');
 
     document.getElementById('fleetGrid').innerHTML = D.fleet.map((a, i) => `
         <article class="card card--hover fleet-card" data-reveal data-reveal-delay="${(i % 3) * 80}">
-            <div class="fleet-card__media">${window.AMV.fleetMedia(a)}</div>
+            <div class="fleet-card__media">${A.fleetMedia(a)}</div>
             <div class="fleet-card__body">
                 <span class="type">${esc(a.short)} · ${esc(a.role)}</span>
                 <h3>${esc(a.type)}</h3>
@@ -117,18 +184,28 @@
                     <span>Range <b>${esc(a.range)}</b></span>
                     <span>Livery <b>${esc(a.livery)}</b></span>
                 </div>
+                <p style="margin-top:.9rem"><span class="rank-chip"
+                   title="The rank that releases this type">Released at ${esc(a.releasedAt)}</span></p>
             </div>
         </article>`).join('');
 
     document.querySelector('#fleetTable tbody').innerHTML = D.fleet.map(a => `
         <tr>
-            <td class="mono">${esc(a.type)}</td>
-            <td>${esc(a.livery)}</td>
-            <td class="mono">${a.seats}</td>
-            <td class="mono">${esc(a.range)}</td>
+            <td class="mono" data-th="Type">${esc(a.type)}</td>
+            <td data-th="Operation">${esc(a.operation)}</td>
+            <td class="mono" data-th="Typical">${(a.typical || []).map(esc).join('<br>')}</td>
+            <td data-th="Released at">${esc(a.releasedAt)}</td>
+            <td class="mono" data-th="Seats">${a.seats}</td>
         </tr>`).join('');
 
-    window.AMV.refresh();
+    document.getElementById('fleetPlanned').innerHTML = D.fleetPlanned.map(a => `
+        <div class="facts__row">
+            <dt>${esc(a.type)}</dt>
+            <dd>${esc(a.operation)}. Releases at <b>${esc(a.releasedAt)}</b>.
+                <span style="display:block;margin-top:.3rem;font-size:.86rem" class="faint">${esc(a.status)}</span></dd>
+        </div>`).join('');
+
+    A.refresh();
 })();
 </script>
 </body>

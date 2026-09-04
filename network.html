@@ -4,9 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Route network — Aeromexico Virtual</title>
-<meta name="description" content="23 destinations across North America, Europe, Asia Pacific, South America and Mexico, flown from our hubs at Mexico City, Guadalajara and Monterrey.">
-<meta name="theme-color" content="#0A1D3B">
+<meta name="description" content="The Aeromexico Virtual route map: 23 published sectors in five tiers, from Mexico City and our bases at Monterrey, Guadalajara and Cancún out to Europe, South America and the Pacific.">
+<link rel="canonical" href="https://aeromexicova.org/network">
+<!-- The bar matches the page, so a phone browser stops painting a navy strip
+     over a white site. Two values, one per scheme. -->
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#071426" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/mark.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aeromexico Virtual">
+<meta property="og:url" content="https://aeromexicova.org/network">
+<meta property="og:title" content="Route network — Aeromexico Virtual">
+<meta property="og:description" content="The Aeromexico Virtual route map: 23 published sectors in five tiers, from Mexico City and our bases at Monterrey, Guadalajara and Cancún out to Europe, South America and the Pacific.">
+<!-- Absolute, because a share card is fetched by a crawler that has no page to
+     resolve a root-relative path against. -->
+<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fraunces (display) + Karla (text) + JetBrains Mono (flight data). Fonts
@@ -16,7 +29,7 @@
      unstyled. display=swap shows text in the fallback and swaps in. -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=swap"></noscript>
-<link rel="stylesheet" href="/assets/brand.css?v=2">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
 <style>
     .filters { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.6rem; }
     .filter {
@@ -27,8 +40,15 @@
     }
     .filter:hover { color:var(--ink); border-color:var(--ink); }
     .filter[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+    /* The filter row scrolls rather than wrapping to three lines on a phone. */
+    @media (max-width: 34rem) {
+        .filters { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin-inline:calc(clamp(1.15rem,4vw,2rem) * -1); padding-inline:clamp(1.15rem,4vw,2rem); }
+        .filters::-webkit-scrollbar { display:none; }
+        .filter { flex:none; }
+    }
 </style>
 <script>
+/* Paint the stored theme before first paint so there's no light flash. */
 (function(){try{var t=localStorage.getItem('amv:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 </head>
@@ -36,47 +56,79 @@
 
 <a class="skip" href="#main">Skip to content</a>
 <div data-site-nav></div>
+<!-- The nav is injected by site.js so one change lands on every page. With
+     scripting off nothing would be injected at all, so every page carries the
+     site map in plain HTML too. -->
+<noscript>
+    <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
+    <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
+    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
+</noscript>
 
 <main id="main">
 
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+    <!-- ==================== THE MAP ====================
+         The network, drawn. Every reviewer asked for this, and the page it
+         replaces opened with twenty-three sectors listed one under another —
+         which is a table of airports, not a network. The list is still here,
+         below, grouped by tier; it is no longer the first thing you meet. -->
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4rem)">
         <div class="wrap">
-            <div class="head">
+            <div class="head" style="margin-bottom:1.6rem">
                 <span class="eyebrow">The network</span>
                 <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Out of the Valley of Mexico</h1>
                 <div class="rule"></div>
                 <p class="lede" style="margin-top:1.4rem">
-                    Every route below is a real Aeroméxico sector, flyable end to end in Infinite
-                    Flight. File it in the crew center, fly it on the Expert Server, and the hours
-                    land in your logbook.
+                    Every sector below is a real Aeroméxico route, flyable end to end in Infinite
+                    Flight. Published in five tiers, each with its own flight-number series, and
+                    each open to a pilot once their rank permits both the aircraft and the block
+                    time.
                 </p>
             </div>
-            <div class="grid grid-3" id="hubs"></div>
+
+            <div class="filters" id="filters" role="group" aria-label="Filter the network by tier"></div>
+            <div class="map-host" id="mapHost" data-reveal>
+                <p class="muted" style="padding:3rem 0;text-align:center">Drawing the network…</p>
+            </div>
+            <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
+            <p class="map-legend">
+                <span><i class="is-hub"></i> Hub and bases</span>
+                <span><i></i> Destination</span>
+                <span><i class="is-arc"></i> Longest sector in its region</span>
+                <span id="mapNote"></span>
+            </p>
+            <p class="mono muted" id="mapPick" style="margin-top:.4rem;font-size:.86rem;min-height:1.3em"
+               role="status" aria-live="polite">Tap or focus a dot to name it.</p>
         </div>
     </section>
 
+    <!-- ==================== THE SECTORS, BY TIER ==================== -->
     <section class="section section--alt">
         <div class="wrap">
-            <div class="head" style="margin-bottom:1.6rem">
+            <div class="head" style="margin-bottom:1.2rem">
                 <span class="eyebrow">All routes</span>
                 <h2 style="margin-top:.9rem"><span id="routeCount">23</span> sectors</h2>
+                <p class="lede">
+                    Grouped the way the airline publishes them. The rank against each sector is the
+                    higher of what the aircraft needs and what the block time needs — the same test
+                    the crew centre applies when you book.
+                </p>
             </div>
-            <div class="filters" id="filters" role="group" aria-label="Filter routes by region"></div>
-            <!-- Each sector is a card rather than a table row: the pair of
-                 airport codes is the thing a pilot is scanning for, and at
-                 table-cell size it was the smallest text on the page. -->
             <div id="routes"></div>
             <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
                 Distances are great-circle nautical miles. Block times are scheduled and will vary
-                with routing, winds and the day's traffic.
+                with routing, winds and the day's traffic. Flight numbers are issued in the crew
+                centre against the series shown.
             </p>
         </div>
     </section>
 
+    <!-- ==================== LIVE ==================== -->
     <section class="section">
         <div class="wrap">
             <div class="head" data-reveal>
-                <span class="chip chip--live"><i class="dot-live"></i> Live now</span>
+                <span class="chip chip--live"><i class="dot-live" aria-hidden="true"></i> Live now</span>
                 <h2 style="margin-top:.9rem">Who's flying the network</h2>
                 <p class="lede">Aeromexico Virtual pilots airborne on the Expert Server this minute.</p>
             </div>
@@ -86,13 +138,31 @@
         </div>
     </section>
 
+    <!-- ==================== BASES ====================
+         Moved to the foot of the page. They were the first thing on it, which
+         put three cards of airport metadata ahead of the network itself. -->
+    <section class="section section--ink">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Where we fly from</span>
+                <h2>One hub, three bases</h2>
+                <p class="lede">
+                    Mexico City is the hub. Monterrey, Guadalajara and Cancún are bases — the
+                    airline's own count of sectors touching each is below.
+                </p>
+            </div>
+            <div class="grid grid-4" id="hubs"></div>
+        </div>
+    </section>
+
     <section class="band">
         <div class="band__wash"></div>
         <div class="wrap band__inner">
             <h2>Twenty-three destinations. Pick one.</h2>
-            <p>Route access opens up as you rank. Cadets start domestic; captains take the 787 to Narita.</p>
+            <p>Route access opens up as you rank. Cadets start domestic; Senior Captains take the 787 to Narita.</p>
             <div class="hero__cta">
                 <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/ranks">How ranks work</a>
             </div>
         </div>
     </section>
@@ -101,63 +171,84 @@
 
 <div data-site-footer></div>
 
-<script src="/assets/js/data.js?v=2"></script>
-<script src="/assets/js/site.js?v=2"></script>
-<script src="/assets/js/crew.js?v=2"></script>
-<script src="/assets/js/live.js?v=2"></script>
+<script src="/assets/js/data.js?v=3"></script>
+<script src="/assets/js/world.js?v=3"></script>
+<script src="/assets/js/site.js?v=3"></script>
+<script src="/assets/js/map.js?v=3"></script>
+<script src="/assets/js/crew.js?v=3"></script>
+<script src="/assets/js/live.js?v=3"></script>
 <script>
 (function () {
-    const D = window.AMV_DATA, icon = window.AMV.icon;
+    const D = window.AMV_DATA, A = window.AMV, icon = A.icon;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-    // ---- Hubs ----
-    // The sector count per hub is counted off whichever list is current, so it
-    // cannot end up saying 23 while the list below it shows 3.
-    function renderHubs() {
-    document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
-        const legs = ROUTES.filter(r => r.from === h.icao || r.to === h.icao).length;
-        return `
-        <article class="card card--hover" data-reveal data-reveal-delay="${i * 80}">
-            <div class="card__icon">${icon('pin')}</div>
-            <span class="tag tag--hub">${esc(h.role)}</span>
-            <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
-            <p>${esc(h.name)}</p>
-            <div class="fleet-card__specs" style="padding-top:1.1rem">
-                <span>ICAO <b>${esc(h.icao)}</b></span>
-                <span>IATA <b>${esc(h.iata)}</b></span>
-                <span>Sectors <b>${legs}</b></span>
-            </div>
-        </article>`;
-    }).join('');
-    }
-
-    // ---- Region filter ----
-    let active = 'All';
-
-    function renderFilters() {
-        const regions = ['All', ...Array.from(new Set(ROUTES.map(r => r.region)))];
-        if (!regions.includes(active)) active = 'All';
-        document.getElementById('filters').innerHTML = regions.map(r =>
-            `<button class="filter" type="button" data-region="${esc(r)}"
-                     aria-pressed="${r === active}">${esc(r)}</button>`).join('');
-    }
-
-    const list = document.getElementById('routes');
-    const count = document.getElementById('routeCount');
 
     // The sectors this page shows. Starts as the copy in data.js so the page is
     // complete on first paint, and is replaced by the crew center's own list if
     // that answers — see the live-routes block at the bottom.
     let ROUTES = D.routes;
+    let active = 'All';
+
+    const list    = document.getElementById('routes');
+    const count   = document.getElementById('routeCount');
+    const mapHost = document.getElementById('mapHost');
+    const mapNote = document.getElementById('mapNote');
 
     // Lookups off the same arrays, so nothing here is a second copy of a fact.
-    // The origin is always one of our own hubs, which is where its airport name
-    // and city come from; a destination only has the city data.js gives it, so
-    // the card shows that and does not invent an airport name for it.
     const hubBy  = Object.fromEntries(D.hubs.map(h => [h.icao, h]));
     const typeBy = Object.fromEntries(D.fleet.map(a => [a.short, a.type]));
+    const tierBy = Object.fromEntries(D.tiers.map(t => [t.name, t]));
 
+    const shown = () => active === 'All' ? ROUTES : ROUTES.filter(r => r.tier === active);
+
+    // ---- Bases --------------------------------------------------------------
+    // The sector count per base is counted off whichever list is current, so it
+    // cannot end up saying 23 while the list below it shows 3.
+    function renderHubs() {
+        document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
+            const legs = ROUTES.filter(r => r.from === h.icao || r.to === h.icao).length;
+            return `
+            <article class="card card--hover" data-reveal data-reveal-delay="${i * 70}">
+                <div class="card__icon">${icon('pin')}</div>
+                <span class="tag tag--hub">${esc(h.role)}</span>
+                <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
+                <p>${esc(h.name)}</p>
+                <div class="fleet-card__specs" style="padding-top:1.1rem">
+                    <span>ICAO <b>${esc(h.icao)}</b></span>
+                    <span>IATA <b>${esc(h.iata)}</b></span>
+                    <span>Sectors <b>${legs}</b></span>
+                </div>
+            </article>`;
+        }).join('');
+    }
+
+    // ---- Tier filter --------------------------------------------------------
+    function renderFilters() {
+        const live = D.tiers.map(t => t.name).filter(n => ROUTES.some(r => r.tier === n));
+        // A sector from the crew centre with no tier of ours still has to be
+        // reachable, so its bucket is offered rather than hidden.
+        const extra = [...new Set(ROUTES.map(r => r.tier).filter(t => t && !live.includes(t)))];
+        const all = ['All', ...live, ...extra];
+        if (!all.includes(active)) active = 'All';
+        document.getElementById('filters').innerHTML = all.map(t =>
+            `<button class="filter" type="button" data-tier="${esc(t)}"
+                     aria-pressed="${t === active}">${esc(t)}</button>`).join('');
+    }
+
+    // ---- The map ------------------------------------------------------------
+    function renderMap() {
+        if (!window.AMV_MAP) return;
+        const rows = shown();
+        const drawn = window.AMV_MAP.draw(mapHost, rows, { hubs: D.hubs, airports: D.airports });
+        // Say plainly when a sector could not be placed rather than quietly
+        // drawing a smaller network than the one listed underneath.
+        const off = rows.length - drawn;
+        mapNote.textContent = off > 0
+            ? `${off} sector${off === 1 ? '' : 's'} not mapped — no published coordinates`
+            : '';
+    }
+
+    // ---- The sector list ----------------------------------------------------
     // Every line below the code is optional. A sector that came from the crew
     // center and has no twin in data.js has no city and no region to show, and
     // an empty line reserved for one is worse than not drawing it.
@@ -172,45 +263,91 @@
             </div>`;
     }
 
-    function render() {
-        const rows = active === 'All' ? ROUTES : ROUTES.filter(r => r.region === active);
-        count.textContent = rows.length;
-        list.innerHTML = rows.map((r, i) => {
-            const h = hubBy[r.from] || {};
-            return `
-            <article class="route-card" data-reveal data-reveal-delay="${Math.min(i, 6) * 40}">
-                <div class="route-card__ends">
-                    ${end(r.from, h.city || '', h.name || '', true, 'from')}
-                    <span class="route-card__arrow" aria-hidden="true">${icon('arrow')}</span>
-                    <span class="sr-only">to</span>
-                    ${end(r.to, r.city, r.region, r.region === 'Domestic', 'to')}
-                </div>
-                <div class="route-card__meta">
-                    ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
-                    ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
-                    ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
-                    ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
-                </div>
-            </article>`;
-        }).join('');
-        // The cards are injected, so their [data-reveal] has to be wired each
-        // time — without this a filtered-in card sits at opacity 0 forever.
-        window.AMV.refresh(list);
+    function card(r, i) {
+        const h = hubBy[r.from] || {};
+        const rank = A.minRankFor(r, D.ranks, D.fleet);
+        return `
+        <article class="route-card" data-reveal data-reveal-delay="${Math.min(i, 6) * 40}">
+            <div class="route-card__ends">
+                ${end(r.from, h.city || '', '', true, 'from')}
+                <span class="route-card__arrow" aria-hidden="true">${icon('arrow')}</span>
+                <span class="sr-only">to</span>
+                ${end(r.to, r.city, '', r.region === 'Domestic', 'to')}
+            </div>
+            <div class="route-card__meta">
+                ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
+                ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
+                ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
+                ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
+                ${rank ? `<span class="rank-chip" title="Minimum rank to file this sector">${esc(rank.name)}</span>` : ''}
+            </div>
+        </article>`;
     }
 
+    function render() {
+        const rows = shown();
+        count.textContent = rows.length;
+
+        // Grouped under its tier when you are looking at the whole network;
+        // flat when you have already picked one, because the heading would then
+        // just repeat the filter you pressed.
+        let html;
+        if (active === 'All') {
+            const order = [...D.tiers.map(t => t.name),
+                           ...new Set(rows.map(r => r.tier).filter(t => !tierBy[t]))];
+            html = order.map(name => {
+                const inTier = rows.filter(r => r.tier === name);
+                if (!inTier.length) return '';
+                const t = tierBy[name] || {};
+                // One panel per tier: the sectors are a table, and a table is
+                // the one thing on this site that gets a box (see .panel).
+                return `
+                <section class="panel" data-reveal aria-label="${esc(name)} routes">
+                    <div class="tier-head">
+                        <h3>${esc(name)}</h3>
+                        ${t.series ? `<span class="series">${esc(t.series)}</span>` : ''}
+                        <span class="count">${inTier.length} sector${inTier.length === 1 ? '' : 's'}</span>
+                    </div>
+                    ${t.note ? `<p class="tier-note">${esc(t.note)}</p>` : ''}
+                    <div style="margin-top:1.1rem">${inTier.map(card).join('')}</div>
+                </section>`;
+            }).join('');
+        } else {
+            html = `<section class="panel" data-reveal>${rows.map(card).join('')}</section>`;
+        }
+
+        list.innerHTML = html || '<p class="lede">No sectors in this tier yet.</p>';
+        // The cards are injected, so their [data-reveal] has to be wired each
+        // time — without this a filtered-in card sits at opacity 0 forever.
+        A.refresh(list);
+    }
+
+    // Only the bases keep a permanent label on a narrow screen, so the rest are
+    // named on tap. Delegated, because the map is redrawn on every filter.
+    const pick = document.getElementById('mapPick');
+    const namePoint = (e) => {
+        const pt = e.target.closest && e.target.closest('.map__pt');
+        if (pt) pick.textContent = pt.dataset.place || '';
+    };
+    mapHost.addEventListener('click', namePoint);
+    mapHost.addEventListener('focusin', namePoint);
+    mapHost.addEventListener('mouseover', namePoint);
+
     document.getElementById('filters').addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-region]');
+        const btn = e.target.closest('[data-tier]');
         if (!btn) return;
-        active = btn.dataset.region;
+        active = btn.dataset.tier;
         document.querySelectorAll('#filters .filter').forEach(b =>
-            b.setAttribute('aria-pressed', String(b.dataset.region === active)));
+            b.setAttribute('aria-pressed', String(b.dataset.tier === active)));
         render();
+        renderMap();
     });
 
     renderHubs();
     renderFilters();
     render();
-    window.AMV.refresh();
+    renderMap();
+    A.refresh();
 
     // ---- Live routes from the crew center -----------------------------------
     // The crew center is where sectors are actually added, so it — not this
@@ -219,11 +356,11 @@
     //
     // The two records are not the same shape. The crew center knows the sector
     // and the aircraft; data.js knows the things a reader wants and an ops tool
-    // has no reason to store — the destination's city, which region it belongs
-    // to, the scheduled block time. So a live sector is matched to its data.js
-    // twin on the airport pair and takes those labels from it. Anything with no
-    // twin is still shown, with the fields we genuinely have: no city invented
-    // for it, no block time guessed at.
+    // has no reason to store — the destination's city, which tier and region it
+    // belongs to, the scheduled block time. So a live sector is matched to its
+    // data.js twin on the airport pair and takes those labels from it. Anything
+    // with no twin is still shown, with the fields we genuinely have: no city
+    // invented for it, no block time guessed at, and no tier assumed.
     (function liveRoutes() {
         if (!window.AMV_CREW) return;
         const key = r => `${r.from}-${r.to}`;
@@ -237,6 +374,7 @@
                     from: r.from, to: r.to,
                     city:   m.city   || '',
                     region: m.region || 'Network',   // honest bucket, not a guess
+                    tier:   m.tier   || 'Network',
                     ac:     r.ac     || m.ac || '',
                     dist:   r.dist   || m.dist || 0,
                     block:  m.block  || '',
@@ -246,7 +384,8 @@
             renderHubs();
             renderFilters();
             render();
-            window.AMV.refresh();
+            renderMap();
+            A.refresh();
         });
     })();
 })();

@@ -704,7 +704,19 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     display: block; padding: .85rem 0; border-bottom: 1px solid var(--line-soft);
     font-size: 1rem; font-weight: 600;
 }
-.nav__menu .btn { width: 100%; margin-top: 1.15rem; }
+/* `.nav__menu a` is a class AND a type, so it outranks `.btn` and was winning:
+   the Crew Center button in the open menu became display:block with zero side
+   padding, which put its icon hard against the left edge of the pill and
+   wrapped the label onto a second line. That is the "crew center and its icon
+   at the extreme edge of the rectangle" the mobile review reported. Restated
+   here at equal weight rather than by reordering the file, so a future edit to
+   either rule cannot quietly bring it back. */
+.nav__menu a.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; margin-top: 1.15rem;
+    padding: .95rem 1.7rem; border-bottom: 0;
+    font-size: .95rem; font-weight: 700;
+}
 
 @media (min-width: 62rem) {
     .nav__links  { display: flex; }
@@ -713,105 +725,25 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================ HERO =======================================
-   Two columns of content over a full-bleed aircraft.
+   The home page hero is the poster — see "POSTER HERO" further down, where the
+   whole of it lives. What is left here is the shell it shares with nothing
+   else, kept because `.hero--poster` and `.hero__cta` are built on it.
 
-   The previous version was a left-aligned block of copy with the entire right
-   half of the viewport left white, and the artwork as a separate slab beneath
-   it. That is the stock landing-page hero, and no amount of adjusting the
-   padding fixes it — the composition was the problem. So:
-
-     · the copy keeps the left, but the right carries the airline in four
-       counted figures, which is real information rather than filler;
-     · the artwork is genuinely full-bleed and slightly overscanned, so it runs
-       off both edges and reads as a crop of something larger rather than an
-       object floating in a box with margins.
-   ========================================================================= */
+   The previous hero was a two-column arrangement: copy left, four counted
+   figures right, the aircraft full-bleed underneath, all on white. It was a
+   perfectly good landing-page header and that turned out to be the problem —
+   the VA's reading was that it was not memorable, and it was not. Every rule
+   that composed it (.hero__inner, .hero__art, .hero__copy, and the ruled
+   .hero__facts column) went with it rather than being left behind to rot; one
+   of them was already leaking a light hairline into the dark facts band. If a
+   second hero is ever needed, write it, do not resurrect this one from git. */
 .hero { position: relative; background: var(--bg); color: var(--ink); overflow: hidden; }
-.hero__inner {
-    display: grid; gap: clamp(1.75rem, 4vw, 3.5rem);
-    padding-block: clamp(2.25rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
-}
-/* Two columns only once there is genuinely room; below that the figures stack
-   under the copy rather than squeezing it. `end` alignment sits the last rule
-   of the figures on the same baseline as the buttons. */
-@media (min-width: 62rem) {
-    .hero__inner {
-        grid-template-columns: minmax(0, 1.3fr) minmax(16rem, .7fr);
-        align-items: end;
-    }
-}
-.hero h1 { margin-block: 1rem; max-width: 15ch; text-wrap: balance; }
-.hero .lede { max-width: 46ch; }
+.hero h1 { margin-block: 1rem; text-wrap: balance; }
 .hero .eyebrow { margin-bottom: .3rem; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
-
-/* --- The four figures --- */
-.hero__facts { margin: 0; display: grid; }
-.hero__facts > div {
-    display: flex; align-items: baseline; gap: clamp(.9rem, 2vw, 1.4rem);
-    padding: .8rem 0; border-top: 1px solid var(--line);
-}
-.hero__facts > div:last-child { border-bottom: 1px solid var(--line); }
-.hero__facts dt {
-    font-family: var(--font-display); font-weight: 800;
-    font-variation-settings: 'SOFT' 60, 'WONK' 0;
-    font-size: 1.9rem; line-height: 1; letter-spacing: -.03em;
-    font-variant-numeric: tabular-nums;
-    min-width: 2.4ch; text-align: right; color: var(--accent);
-}
-.hero__facts dd { margin: 0; display: grid; }
-.hero__facts dd b { font-size: .95rem; font-weight: 700; letter-spacing: -.005em; }
-.hero__facts dd span { font-size: .84rem; color: var(--muted); }
-
-/* --- The aircraft --- */
-/* Full-bleed and overscanned. `width: 108%` on a centred flex child inside an
-   overflow-hidden figure bleeds it off both edges at every viewport width. */
-.hero__art {
-    margin: 0; width: 100%; padding: 0;
-    display: flex; justify-content: center; overflow: hidden;
-}
-.hero__art img {
-    flex: none; width: 108%; max-width: none; height: auto;
-    aspect-ratio: 1394 / 372;
-}
-
-/* The artwork is drawn on white, so in the dark theme it needs its own band
-   rather than a glaring slab with nothing holding it. Full width, no radius —
-   an overscanned image cannot have rounded corners, they are off-screen. */
-:root[data-theme="dark"] .hero__art img { background: #fff; padding-block: 1rem; }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero__art img { background: #fff; padding-block: 1rem; }
-}
-
-/* Below this the aircraft stops fitting and is sized by height instead: fitted
-   whole to a phone it is ~100px tall and illegible, which was the single worst
-   thing on the page. ~1.35x the viewport keeps the airframe complete while the
-   illustration bleeds off. */
 @media (max-width: 48rem) {
-    .hero__art img {
-        width: auto; height: clamp(9rem, 36vw, 13rem);
-    }
-    .hero__inner { padding-block: 1.75rem 1.5rem; }
-    .hero h1 { margin-block: .8rem; }
     .hero__cta { margin-top: 1.6rem; gap: .6rem; }
     .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
-
-    /* Two up. Stacked one per row these four figures run to ~600px and push
-       the aircraft off the bottom of the screen entirely, which is the thing
-       the hero is here to show. */
-    .hero__facts { grid-template-columns: 1fr 1fr; column-gap: clamp(1rem, 4vw, 1.6rem); }
-    .hero__facts > div:nth-last-child(2) { border-bottom: 1px solid var(--line); }
-    .hero__facts dt { font-size: 1.6rem; }
-    .hero__facts dd b { font-size: .9rem; }
-    .hero__facts dd span { font-size: .78rem; }
-}
-
-/* On a phone the sub-notes wrap to three lines each and cost ~160px, which is
-   the difference between the aircraft being on the first screen and not. The
-   figure and its label carry the meaning on their own at this size. */
-@media (max-width: 34rem) {
-    .hero__facts dd span { display: none; }
-    .hero__facts > div { padding: .7rem 0; }
 }
 
 /* A single line of counted facts. The hero used to use this; it now runs its
@@ -1114,13 +1046,29 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .route-meta b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
 
-/* Stacked, the arrow points down — an arrow still pointing right between two
-   panels that are now one above the other reads as the wrong diagram. */
+/* On a phone the two panels used to stack, which doubled the height of every
+   sector and turned twenty-three of them into a very long scroll — which is
+   what the mobile review said about this page. They stay side by side instead:
+   a pair of four-letter codes and two city names fit across 390px comfortably
+   once the panel chrome comes off and the codes come down a size. */
 @media (max-width: 44rem) {
-    .route-card__ends { grid-template-columns: 1fr; }
-    .route-end--to { text-align: left; }
-    .route-end--to .route-end__place { justify-content: flex-start; }
-    .route-card__arrow { transform: rotate(90deg); justify-self: center; }
+    .route-card { padding-block: .8rem; gap: .55rem; }
+    .route-card__ends { gap: .35rem; align-items: center; }
+    .route-end {
+        background: none; border: 0; padding: 0;
+        border-radius: 0;
+    }
+    .route-end__code { font-size: clamp(1.15rem, 6.5vw, 1.55rem); }
+    .route-end__place { font-size: .78rem; gap: .3rem; }
+    .route-end__name { display: none; }
+    .route-card__arrow { width: 1.5rem; height: 1.5rem; }
+    .route-card__arrow svg { width: .8rem; height: .8rem; }
+    .route-card__meta { gap: .3rem .9rem; }
+    .route-meta { font-size: .76rem; }
+    .route-meta i { font-size: .6rem; letter-spacing: .1em; }
+    .rank-chip { font-size: .62rem; }
+    /* The chip has nowhere to sit on a narrow row, so it leads instead. */
+    .route-card__meta .rank-chip { margin-left: 0; order: -1; flex-basis: 100%; }
 }
 
 /* Visible to a screen reader, gone from the page: the arrow between the two
@@ -1137,3 +1085,504 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     padding: .7rem 1.15rem; border-radius: 0 0 var(--radius-sm) 0; z-index: 100;
 }
 .skip:focus { left: 0; }
+
+/* ============================ ROUTE MAP ==================================
+   The network drawn as a network. Land comes from assets/js/world.js (Natural
+   Earth, reprojected by tools/make-worldmap.py); the arcs are real great
+   circles computed in assets/js/map.js. Everything below is colour and weight.
+
+   The map is the one place on this site that gets a filled shape rather than a
+   hairline, and it earns it: a coastline IS a filled shape. */
+/* The map is sized by HEIGHT and allowed to be wider than the page, inside a
+   scroller. Fitted to the container's width instead, a network running from Los
+   Angeles to Tokyo is 258 degrees of longitude squeezed into one column — about
+   130px tall on a phone, which is a diagram of a map rather than a map. Given a
+   real height it overflows sideways and you pan it, which is what an airline
+   route map is for.
+
+   No overflow on the SVG itself: the viewBox is the crop, and letting it paint
+   outside puts Antarctica and half the Pacific back on the page. */
+.map-host {
+    position: relative;
+    margin-inline: calc(clamp(1.15rem, 4vw, 2rem) * -1);   /* full-bleed of .wrap */
+}
+.map-scroll {
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;      /* panning the map must not swipe the page */
+    scrollbar-width: thin;
+    cursor: grab;
+}
+.map-scroll.is-dragging { cursor: grabbing; user-select: none; }
+.map-scroll::-webkit-scrollbar { height: 6px; }
+.map-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.map {
+    display: block;
+    height: clamp(20rem, 52vh, 38rem);
+    width: auto; max-width: none;
+}
+/* Room to spare? Then it is not scrolling and should simply centre. */
+.map-scroll.is-whole { cursor: default; overflow-x: hidden; }
+.map-scroll.is-whole .map { margin-inline: auto; }
+
+.map-hint {
+    display: none; align-items: center; gap: .45rem;
+    margin-top: .7rem; font-size: .76rem; color: var(--faint);
+    text-transform: uppercase; letter-spacing: .1em; font-weight: 700;
+}
+.map-hint svg { width: 1rem; height: 1rem; }
+/* Shown only when there is real distance to pan — map.js sets .has-pan. A
+   browser without :has() simply never shows the hint, which is the safe way
+   round: the map scrolls perfectly well without being told to. */
+.map-host:has(.has-pan) + .map-hint { display: flex; }
+
+.map__land {
+    fill: #E7ECF4;
+    stroke: #CFD8E6;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+}
+:root[data-theme="dark"] .map__land { fill: #0E2542; stroke: #1E3556; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__land { fill: #0E2542; stroke: #1E3556; }
+}
+
+.map__arc {
+    fill: none;
+    stroke: var(--am-blue);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: .34;
+    vector-effect: non-scaling-stroke;
+    transition: opacity .25s var(--ease), stroke .25s var(--ease);
+}
+.map__arc.is-flagship { stroke: var(--am-red); opacity: .72; stroke-width: 2.6; }
+/* The dark override is more specific than `.map__arc.is-flagship`, so the
+   flagship rule has to be restated inside it or the red sectors come out blue
+   like everything else. */
+:root[data-theme="dark"] .map__arc { stroke: var(--am-blue-300); opacity: .42; }
+:root[data-theme="dark"] .map__arc.is-flagship { stroke: #FF7C90; opacity: .85; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__arc { stroke: var(--am-blue-300); opacity: .42; }
+    :root:not([data-theme="light"]) .map__arc.is-flagship { stroke: #FF7C90; opacity: .85; }
+}
+
+.map__leader { stroke: var(--am-red); stroke-width: 1.4; opacity: .55; vector-effect: non-scaling-stroke; }
+.map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue); opacity: .4; }
+:root[data-theme="dark"] .map__leader { stroke: #FF7C90; }
+:root[data-theme="dark"] .map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue-300); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__leader { stroke: #FF7C90; }
+    :root:not([data-theme="light"]) .map__pt:not(.is-hub) .map__leader { stroke: var(--am-blue-300); }
+}
+.map__dot  { fill: var(--am-blue); }
+.map__halo { fill: var(--am-blue); opacity: 0; transition: opacity .2s var(--ease); }
+.map__pt.is-hub .map__dot  { fill: var(--am-red); }
+.map__pt.is-hub .map__halo { fill: var(--am-red); opacity: .16; }
+:root[data-theme="dark"] .map__dot { fill: var(--am-blue-300); }
+:root[data-theme="dark"] .map__pt.is-hub .map__dot  { fill: #FF7C90; }
+:root[data-theme="dark"] .map__pt.is-hub .map__halo { fill: #FF7C90; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__dot { fill: var(--am-blue-300); }
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__dot  { fill: #FF7C90; }
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__halo { fill: #FF7C90; }
+}
+
+.map__label {
+    font-family: var(--font-body); font-weight: 700;
+    fill: var(--ink); paint-order: stroke; stroke: var(--bg);
+    stroke-linejoin: round; pointer-events: none;
+}
+.map__pt.is-hub .map__label { fill: var(--am-red); }
+:root[data-theme="dark"] .map__pt.is-hub .map__label { fill: #FF7C90; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .map__pt.is-hub .map__label { fill: #FF7C90; }
+}
+
+/* Hover and keyboard focus name the airport without needing a permanent label
+   on all twenty-three. `outline: none` is safe here only because the halo IS
+   the focus indicator and it is far more visible than a browser ring on a dot. */
+.map__pt { cursor: default; }
+.map__pt:hover .map__halo, .map__pt:focus .map__halo { opacity: .3; }
+.map__pt:focus { outline: none; }
+.map__pt:focus .map__dot { stroke: var(--ink); stroke-width: 2.5; }
+
+/* On a phone the labels are the first thing to become unreadable: at 390px the
+   map is ~2.5px per SVG unit and the type is competing with the arcs. Only the
+   bases keep a label; everything else is a tap. */
+@media (max-width: 44rem) {
+    .map__pt:not(.is-hub) .map__label { display: none; }
+    .map__arc { stroke-width: 2.4; }
+}
+
+.map-legend {
+    display: flex; flex-wrap: wrap; gap: .6rem 1.6rem;
+    margin-top: 1.2rem; font-size: .84rem; color: var(--muted);
+}
+.map-legend span { display: inline-flex; align-items: center; gap: .5rem; }
+.map-legend i { width: .6rem; height: .6rem; border-radius: 50%; background: var(--am-blue); flex: none; }
+.map-legend i.is-hub { background: var(--am-red); }
+.map-legend i.is-arc { width: 1.4rem; height: 2px; border-radius: 2px; background: var(--am-red); }
+
+/* ============================ TIERS & GROUPS =============================
+   The network is published in five tiers (Operations Plan §6) and the page is
+   grouped by them, so a pilot scanning for "what can I fly today" reads five
+   headings rather than twenty-three rows. */
+.tier-head {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem .9rem;
+    margin: clamp(2rem, 4vw, 3rem) 0 .2rem;
+    padding-bottom: .7rem; border-bottom: 2px solid var(--ink);
+}
+.tier-head:first-child { margin-top: 0; }
+.tier-head h3 { margin: 0; font-size: clamp(1.25rem, 2.4vw, 1.6rem); }
+.tier-head .series {
+    font-family: var(--font-mono); font-size: .8rem; font-weight: 700;
+    color: var(--accent); letter-spacing: .04em;
+}
+.tier-head .count { margin-left: auto; font-size: .82rem; color: var(--muted); }
+.tier-head + p.tier-note { margin: .8rem 0 0; font-size: .9rem; color: var(--muted); max-width: 62ch; }
+
+/* A rank chip: the smallest way to say "you need to be this to file this". */
+.rank-chip {
+    display: inline-flex; align-items: center; gap: .4rem;
+    font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); white-space: nowrap;
+}
+.rank-chip::before {
+    content: ""; width: .42rem; height: .42rem; border-radius: 50%;
+    background: currentColor; flex: none;
+}
+.route-card__meta .rank-chip { margin-left: auto; }
+
+/* ============================ RANK LADDER ================================
+   The ranks page. The old ladder was seven rows of name-and-hours, which is
+   what the review called "numerical rather than developmental" — it said what
+   you needed and never what you got. Each rank is now an entry: what it
+   releases, how far it lets you fly, and what is expected of you there. */
+.ladder { display: grid; gap: 0; }
+.ladder__row {
+    display: grid; gap: .4rem 1.6rem;
+    grid-template-columns: 1fr;
+    padding: clamp(1.3rem, 3vw, 1.9rem) 0;
+    border-top: 1px solid var(--line);
+}
+.ladder__row:last-child { border-bottom: 1px solid var(--line); }
+@media (min-width: 48rem) {
+    .ladder__row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
+}
+.ladder__lead { display: grid; gap: .35rem; align-content: start; }
+.ladder__name {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
+    font-size: clamp(1.15rem, 2.2vw, 1.4rem); line-height: 1.15;
+}
+.ladder__hours {
+    font-family: var(--font-mono); font-size: .95rem; font-weight: 600; color: var(--accent);
+}
+.ladder__body { display: grid; gap: .8rem; }
+.ladder__body p { margin: 0; color: var(--muted); }
+.ladder__facts {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.6rem;
+    padding-top: .3rem;
+}
+.ladder__fact { display: grid; gap: .1rem; font-size: .88rem; }
+.ladder__fact i {
+    font-style: normal; color: var(--muted);
+    font-size: .66rem; text-transform: uppercase; letter-spacing: .13em; font-weight: 700;
+}
+.ladder__fact b { font-family: var(--font-mono); font-weight: 600; }
+.ladder__row.is-appointed { background: var(--surface-2); padding-inline: clamp(1rem, 3vw, 1.6rem); }
+:root[data-theme="dark"] .ladder__row.is-appointed { background: var(--surface); }
+
+/* The bars are a rank insignia, not a chart: one more bar per rung. */
+.ladder__bars { display: flex; gap: 3px; align-items: flex-end; height: 1.1rem; }
+.ladder__bars i { width: 4px; border-radius: 2px; background: var(--accent); display: block; }
+
+/* ============================ STAFF ======================================
+   Four reviewers asked for this page. A role with nobody in it says so — the
+   Operations Plan gives every director a remit, and a remit with a vacancy
+   against it is more useful to a reader (and more honest) than a filled grid. */
+.staff-grid { display: grid; gap: clamp(1.4rem, 3vw, 2rem); }
+@media (min-width: 40rem) { .staff-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .staff-grid { grid-template-columns: repeat(3, 1fr); } }
+.staff-grid--exec { grid-template-columns: 1fr; }
+@media (min-width: 48rem) { .staff-grid--exec { grid-template-columns: repeat(2, 1fr); } }
+
+.staff {
+    display: grid; gap: .55rem; align-content: start;
+    border-top: 1px solid var(--line); padding-top: 1.3rem;
+}
+.staff__role {
+    font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent);
+}
+.staff__id { display: flex; align-items: center; gap: .9rem; }
+.staff__av {
+    width: 3rem; height: 3rem; border-radius: 50%; flex: none;
+    display: grid; place-items: center;
+    background: var(--surface-2); color: var(--accent);
+    font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
+    border: 1px solid var(--line);
+}
+.staff__av--vacant { color: var(--faint); }
+.staff__name {
+    font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
+    font-size: 1.22rem; line-height: 1.2;
+}
+.staff__name a { color: inherit; border-bottom: 1px solid var(--line); }
+.staff__name a:hover { color: var(--accent); border-bottom-color: currentColor; }
+.staff__vacant { color: var(--faint); font-style: italic; font-size: 1.05rem; font-weight: 500; }
+.staff__owns { color: var(--muted); font-size: .94rem; margin: 0; }
+.staff__reports { font-size: .8rem; color: var(--faint); font-family: var(--font-mono); }
+.staff--exec .staff__av { width: 4rem; height: 4rem; font-size: 1.5rem; }
+.staff--exec .staff__name { font-size: clamp(1.4rem, 3vw, 1.75rem); }
+
+/* ============================ TIMELINE ===================================
+   Used twice: the first twelve months on /about, and the run-up to an event on
+   /events. A numbered rail rather than four more boxes in a grid. */
+.timeline { display: grid; gap: 0; }
+.timeline__row {
+    display: grid; gap: .3rem 1.4rem; grid-template-columns: auto 1fr;
+    padding: 1.15rem 0; border-top: 1px solid var(--line);
+}
+.timeline__row:last-child { border-bottom: 1px solid var(--line); }
+.timeline__when {
+    font-family: var(--font-mono); font-weight: 700; font-size: .82rem;
+    color: var(--accent); text-transform: uppercase; letter-spacing: .08em;
+    min-width: 7.5rem; padding-top: .15rem;
+}
+.timeline__what { margin: 0; }
+.timeline__what b { display: block; font-family: var(--font-display); font-weight: 700; margin-bottom: .2rem; }
+.timeline__what span { color: var(--muted); font-size: .92rem; }
+@media (max-width: 34rem) {
+    .timeline__row { grid-template-columns: 1fr; gap: .45rem; }
+}
+
+/* ============================ PULL QUOTE =================================
+   The CEO's message. Set as a statement, not dropped into another card. */
+.quote {
+    display: grid; gap: 1.4rem;
+    border-top: 3px solid var(--am-red); padding-top: clamp(1.6rem, 3vw, 2.2rem);
+}
+.quote p {
+    font-family: var(--font-display); font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    line-height: 1.42; letter-spacing: -.015em; font-variation-settings: 'SOFT' 50, 'WONK' 1;
+    max-width: 46ch; margin: 0; color: var(--ink);
+}
+.quote p + p { font-size: clamp(1.02rem, 1.6vw, 1.14rem); font-family: var(--font-body); color: var(--muted); }
+.quote__by { display: flex; align-items: center; gap: .9rem; }
+.quote__by b { font-family: var(--font-display); font-weight: 800; }
+.quote__by span { font-size: .82rem; color: var(--muted); display: block; font-weight: 500; font-family: var(--font-body); }
+
+/* ============================ FACT ROWS ==================================
+   A definition list set as ruled rows. Used for the identity table on /about
+   and the requirement list on /join, both of which were sets of little boxes. */
+.facts { display: grid; gap: 0; margin: 0; }
+.facts__row {
+    display: grid; gap: .2rem 1.6rem; grid-template-columns: 1fr;
+    padding: 1rem 0; border-top: 1px solid var(--line-soft);
+}
+.facts__row:first-child { border-top: 1px solid var(--line); }
+.facts__row:last-child { border-bottom: 1px solid var(--line); }
+@media (min-width: 40rem) { .facts__row { grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); } }
+.facts dt { font-weight: 700; font-family: var(--font-display); letter-spacing: -.01em; }
+.facts dd { margin: 0; color: var(--muted); }
+.facts dd b { color: var(--ink); font-weight: 600; }
+
+/* ============================ FOOTER COLUMNS =============================
+   The review said the footer is too long on mobile, and it was: four stacked
+   columns ran to most of a phone screen on their own. The three link columns
+   now pair up below the brand instead of queueing. */
+.footer__cols { display: grid; gap: 2rem 1.5rem; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 30rem) { .footer__cols { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 48rem) {
+    .footer__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 2fr); }
+    .footer__cols { gap: 2.5rem; }
+}
+@media (max-width: 47.99rem) {
+    .footer { padding-block: clamp(2.25rem, 6vw, 3rem) 1.5rem; }
+    .footer__grid { gap: 1.9rem; }
+    .footer__brand .mark { width: 3.2rem; margin-bottom: .8rem; }
+    .footer__brand p { font-size: .88rem; }
+    .footer ul { gap: .5rem; font-size: .88rem; }
+    .disclaimer { font-size: .72rem; }
+}
+
+/* ============================ STACKING TABLES ============================
+   A data table inside a horizontally scrolling box is the standard answer on a
+   phone and it is a bad one: the reader has to scrub sideways to find the
+   column that answers their question, and the header scrolls away while they
+   do it. Below 37.5rem a `table.stack` becomes one block per row with each
+   cell carrying its own column name, which is the same information in the
+   shape a narrow screen can actually read.
+
+   Renderers put the column name on each cell as data-th. A cell with no
+   data-th just loses its label, so a table can be converted a column at a
+   time. */
+@media (max-width: 37.5rem) {
+    .table-scroll:has(.stack) { overflow-x: visible; }
+    table.stack { min-width: 0; display: block; }
+    table.stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    table.stack tbody, table.stack tr, table.stack td { display: block; width: auto; }
+    table.stack tr {
+        padding: 1rem 0;
+        border-top: 1px solid var(--line);
+    }
+    table.stack tr:last-child { border-bottom: 1px solid var(--line); }
+    table.stack td {
+        border: 0; padding: .2rem 0;
+        display: grid; grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+        gap: .2rem 1rem; align-items: baseline;
+    }
+    table.stack td::before {
+        content: attr(data-th);
+        font-size: .66rem; font-weight: 700; letter-spacing: .13em;
+        text-transform: uppercase; color: var(--muted);
+    }
+    table.stack td:empty { display: none; }
+    .section--ink table.stack tr { border-top-color: rgba(255, 255, 255, .16); }
+    .section--ink table.stack tr:last-child { border-bottom-color: rgba(255, 255, 255, .16); }
+    .section--ink table.stack td::before { color: #9DB0CE; }
+}
+
+/* ============================ PANELS =====================================
+   The one thing on this site that gets a box.
+
+   The rule at the top of the components section still stands — prose is opened
+   by a hairline, not wrapped in a card. But a table of sectors is not prose,
+   and floated straight onto the greca field it read as loose rows on a
+   patterned background with nothing holding them together. That rule always
+   allowed a box around "something that is genuinely a surface (a table, a
+   framed embed)". A route list is a table. This is that box, and it is the only
+   one: do not put a paragraph in it. */
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(1rem, 2.5vw, 1.6rem) clamp(1rem, 3vw, 1.9rem);
+    box-shadow: var(--shadow);
+}
+.panel + .panel { margin-top: clamp(1.2rem, 3vw, 1.8rem); }
+
+/* The panel's own edge is the list's edge, so the first and last rules inside
+   it would double it up. */
+.panel > .route-card:first-child,
+.panel > div > .route-card:first-child { border-top: 0; padding-top: 0; }
+.panel > .route-card:last-child,
+.panel > div > .route-card:last-child  { border-bottom: 0; padding-bottom: 0; }
+.panel > .tier-head:first-child  { margin-top: 0; }
+/* Inside a panel the sector panels need to sit a step off IT, not off the page. */
+.panel .route-end { background: var(--surface-2); }
+
+/* A table is the other genuine surface, and it was floating too. */
+.table-scroll {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: clamp(.4rem, 2vw, 1.1rem) clamp(1rem, 3vw, 1.9rem);
+    box-shadow: var(--shadow);
+}
+/* On the navy sections the panel would be a second dark box on a dark ground;
+   there the rules alone carry it, which is what the existing override does. */
+.section--ink .table-scroll { background: none; border: 0; box-shadow: none; padding: 0; }
+/* Stacked, the table is a list of rows and the panel padding is all it needs. */
+@media (max-width: 37.5rem) {
+    .table-scroll { padding-block: .2rem; }
+}
+
+/* ============================ POSTER HERO ================================
+   The home page opens on the airline's own poster rather than on a layout.
+
+   The composition — aircraft, folk art, wordmark — was made as one piece on its
+   own tiled navy, so it is used whole and nothing is set on top of it. The
+   section takes that same navy, the artwork's edges are masked into it, and the
+   copy sits underneath where it has room to be read.
+
+   This is a fixed dark card in both themes on purpose: it is a title card, not
+   a surface, and a light version of it would mean recolouring artwork we did
+   not draw. */
+.hero--poster {
+    --poster-navy: #142238;
+    background: var(--poster-navy);
+    color: #EEF2F8;
+    overflow: hidden;
+    padding-bottom: clamp(2rem, 5vw, 3.25rem);
+    text-align: center;
+}
+.hero--poster .lede    { color: #A9BBD6; margin-inline: auto; max-width: 54ch; }
+.hero--poster .eyebrow { color: #8FA6C8; }
+.hero--poster .eyebrow::before { box-shadow: none; }
+.hero--poster h1 {
+    margin: .5rem auto .9rem;
+    max-width: 16ch;
+    font-size: clamp(2.3rem, 7.5vw, 4.4rem);
+}
+.hero--poster .grad-text { color: var(--am-marigold); }
+.hero--poster .hero__cta { justify-content: center; margin-top: 1.9rem; }
+
+.hero__poster { padding-top: clamp(.5rem, 2vw, 1.75rem); }
+.hero__poster-frame { position: relative; max-width: 58rem; margin-inline: auto; }
+.hero__poster img { display: block; width: 100%; height: auto; }
+
+/* The artwork's ground is a tiled navy, so its edge lands as a pasted
+   rectangle on the flat navy behind it. This paints the section's own colour
+   back over the outer tenth from each side, which dissolves the join.
+
+   Done as an overlay rather than a mask on purpose: a mask needs two gradients
+   composited to fade four straight edges, and `mask-composite` is the one part
+   of this that browsers still disagree about. The section colour is flat and
+   known, so painting it is exact and works everywhere. The stops use the navy
+   at zero alpha rather than `transparent` so nothing greys out mid-ramp. */
+.hero__poster-frame::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+        linear-gradient(90deg,
+            var(--poster-navy) 0, rgba(20, 34, 56, 0) 10%,
+            rgba(20, 34, 56, 0) 90%, var(--poster-navy) 100%),
+        linear-gradient(180deg,
+            var(--poster-navy) 0, rgba(20, 34, 56, 0) 14%,
+            rgba(20, 34, 56, 0) 82%, var(--poster-navy) 100%);
+}
+@media (max-width: 39.99rem) {
+    /* The cropped art is all aircraft and bleeds the full width, so only the
+       top and bottom need dissolving. */
+    .hero__poster { padding-top: 0; margin-inline: calc(clamp(1.15rem, 4vw, 2rem) * -1); }
+    .hero__poster-frame::after {
+        background: linear-gradient(180deg,
+            var(--poster-navy) 0, rgba(20, 34, 56, 0) 16%,
+            rgba(20, 34, 56, 0) 84%, var(--poster-navy) 100%);
+    }
+}
+
+.hero__poster-copy { padding-top: clamp(.25rem, 1.5vw, 1rem); }
+
+/* The four figures as one ruled band under the copy, rather than the column
+   they were in beside it. */
+.hero__facts--band {
+    display: grid; gap: 0 clamp(1rem, 4vw, 2.5rem);
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: clamp(2rem, 4.5vw, 3rem);
+    text-align: left;
+}
+@media (min-width: 52rem) { .hero__facts--band { grid-template-columns: repeat(4, 1fr); } }
+/* The base .hero__facts rules rule each row off along the bottom, which in four
+   columns draws a broken line. Each figure takes its own rule along the TOP
+   instead — including :last-child, which the base sheet also rules. */
+.hero__facts--band > div,
+.hero__facts--band > div:last-child {
+    border-top: 1px solid rgba(255, 255, 255, .18);
+    border-bottom: 0;
+    padding: 1.05rem 0 .3rem;
+    display: grid; grid-template-columns: auto 1fr; gap: .1rem .7rem; align-items: baseline;
+}
+.hero__facts--band dt {
+    font-family: var(--font-mono); font-weight: 700; letter-spacing: -.02em;
+    font-size: clamp(1.5rem, 3.4vw, 2.1rem); color: var(--am-marigold);
+    grid-row: span 2;
+}
+.hero__facts--band dd { margin: 0; display: grid; align-content: center; }
+.hero__facts--band dd b { font-size: .92rem; font-weight: 700; color: #EEF2F8; }
+.hero__facts--band dd span { font-size: .78rem; color: #8FA6C8; line-height: 1.35; }
+@media (max-width: 34rem) {
+    .hero__facts--band dd span { display: none; }
+    .hero__facts--band > div { padding: .85rem 0; }
+}

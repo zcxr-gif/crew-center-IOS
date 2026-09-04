@@ -52,10 +52,11 @@
 
     // ---- Site map -----------------------------------------------------------
     const LINKS = [
-        { href: '/',          label: 'Home' },
         { href: '/fleet',     label: 'Fleet' },
         { href: '/network',   label: 'Network' },
+        { href: '/ranks',     label: 'Ranks' },
         { href: '/events',    label: 'Events' },
+        { href: '/about',     label: 'Airline' },
         { href: '/join',      label: 'Join' },
     ];
     // /crew is our own page, which frames the Inflight crew center in this
@@ -130,6 +131,11 @@
     }
 
     // ---- Footer -------------------------------------------------------------
+    // Four columns on a desktop; the three link columns pair up on a phone
+    // rather than stacking into a fifth screen of scrolling. The reviewer note
+    // was that this footer is too long on mobile, and it was: four stacked
+    // columns, a four-line blurb and a five-line disclaimer ran to most of a
+    // viewport on its own.
     function renderFooter(host) {
         host.innerHTML = `
         <footer class="footer">
@@ -137,42 +143,46 @@
                 <div class="footer__grid">
                     <div class="footer__brand">
                         ${MARK}
-                        <p>An Infinite Flight virtual airline flying the Aeroméxico network — from
-                           Mexico City across the Americas, Europe and the Pacific.</p>
+                        <p>An Infinite Flight virtual airline flying the Aeroméxico network from
+                           Mexico City.</p>
                         <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>
                     </div>
-                    <div>
-                        <h4>Airline</h4>
-                        <ul>
-                            <li><a href="/fleet">Fleet</a></li>
-                            <li><a href="/network">Route network</a></li>
-                            <li><a href="/events">Events</a></li>
-                            <li><a href="/join">Join the crew</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Crew</h4>
-                        <ul>
-                            <li><a href="${CREW_URL}">Crew Center</a></li>
-                            <li><a href="${CREW_DIRECT}/status">Application status</a></li>
-                            <li><a href="https://inflight.info">Live map</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Community</h4>
-                        <ul>
-                            <li><a href="https://discord.gg/" rel="noopener">Discord</a></li>
-                            <li><a href="https://community.infiniteflight.com/" rel="noopener">IFC thread</a></li>
-                            <li><a href="mailto:crew@aeromexicova.org">Contact</a></li>
-                        </ul>
+                    <div class="footer__cols">
+                        <div>
+                            <h4>Airline</h4>
+                            <ul>
+                                <li><a href="/about">About us</a></li>
+                                <li><a href="/staff">Staff</a></li>
+                                <li><a href="/fleet">Fleet</a></li>
+                                <li><a href="/network">Route network</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Pilots</h4>
+                            <ul>
+                                <li><a href="/ranks">Ranks &amp; progression</a></li>
+                                <li><a href="/events">Events</a></li>
+                                <li><a href="/join">Join the crew</a></li>
+                                <li><a href="${CREW_DIRECT}/status">Application status</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Crew</h4>
+                            <ul>
+                                <li><a href="${CREW_URL}">Crew Center</a></li>
+                                <li><a href="https://inflight.info" rel="noopener">Live map</a></li>
+                                <li><a href="https://community.infiniteflight.com/" rel="noopener">Infinite Flight Community</a></li>
+                                <li><a href="mailto:crew@aeromexicova.org">Contact</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="footer__base">
                     <p class="disclaimer">
                         Aeromexico Virtual is a non-commercial virtual airline operating inside the
-                        flight simulator Infinite Flight. It is not affiliated with, endorsed by, or
-                        connected to Aerovías de México, S.A. de C.V. (Aeroméxico) or any real-world
-                        airline. No real tickets, flights or services are sold.
+                        flight simulator Infinite Flight, in compliance with the IFVARB. It is not
+                        affiliated with, endorsed by, or connected to Aerovías de México, S.A. de
+                        C.V. (Aeroméxico). No real tickets, flights or services are sold.
                     </p>
                     <p>&copy; <span data-year></span> Aeromexico Virtual · Powered by
                        <a href="https://inflight.info" rel="noopener">Inflight</a></p>
@@ -293,6 +303,48 @@
                `<span class="fleet-badge" aria-hidden="true"><span class="mark"></span></span>`;
     }
 
+    // ---- Rank ladder arithmetic ---------------------------------------------
+    // The Operations Plan says a route is offered to a pilot whose rank permits
+    // BOTH the aircraft and the block time, and that the crew centre enforces
+    // that at booking. So the minimum rank for a sector is not a fact anyone
+    // types in — it is the higher of those two, computed off the ladder. Change
+    // a threshold in data.js and every route re-ranks itself; nothing goes
+    // stale, and the network page cannot contradict the ranks page.
+
+    // "10h 05m" -> 10.083. Also copes with "45m" and "3h".
+    function blockHours(block) {
+        if (typeof block === 'number') return block;
+        const m = String(block || '').match(/(?:(\d+)\s*h)?\s*(?:(\d+)\s*m)?/);
+        if (!m) return 0;
+        return (+m[1] || 0) + (+m[2] || 0) / 60;
+    }
+
+    // Ranks reached by flying, in ladder order. Aeroméxico Airman is awarded
+    // rather than earned, so it can never be the ANSWER to "what do I need".
+    function earnedRanks(ranks) {
+        return (ranks || []).filter(r => !r.appointed);
+    }
+
+    function minRankFor(route, ranks, fleet) {
+        const ladder = earnedRanks(ranks);
+        if (!ladder.length) return null;
+
+        const ac = (fleet || []).find(a => a.short === route.ac || a.type === route.ac);
+        const byAircraft = ac ? ladder.findIndex(r => r.name === ac.releasedAt) : -1;
+
+        const hours = blockHours(route.block);
+        // An uncapped rank (sectorHours null) clears any sector; a rank with a
+        // cap clears a sector only if the filed block fits inside it.
+        let byBlock = ladder.findIndex(r => r.sectorHours == null || hours <= r.sectorHours + 1e-9);
+        if (byBlock < 0) byBlock = ladder.length - 1;
+
+        // A route with no block time only has the aircraft to go on, and a
+        // route flown by a type we do not list only has the block time. Either
+        // is a partial answer and is better than none; neither is invented.
+        const i = Math.max(byAircraft, hours ? byBlock : -1);
+        return i < 0 ? null : ladder[i];
+    }
+
     // ---- Boot ---------------------------------------------------------------
     // refresh() is the same pass boot() runs, minus the chrome. Page scripts that
     // inject markup call AMV.refresh() afterwards so their [data-reveal] /
@@ -316,5 +368,6 @@
     else boot();
 
     // Exported for live.js and page-level scripts.
-    window.AMV = { MARK, icon, refresh, fleetMedia, CREW_URL, CREW_DIRECT, THEME_KEY, currentTheme };
+    window.AMV = { MARK, icon, refresh, fleetMedia, blockHours, earnedRanks, minRankFor,
+                   CREW_URL, CREW_DIRECT, THEME_KEY, currentTheme };
 })();
