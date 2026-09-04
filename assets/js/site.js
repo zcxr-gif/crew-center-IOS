@@ -219,29 +219,102 @@
     }
 
     // ---- Scroll reveal ------------------------------------------------------
+    //
+    //   <div data-reveal>                     rises into place
+    //   <div data-reveal="fade">              fades on the spot (maps, imagery)
+    //   <div data-reveal="lift">              a longer arrival (a section head)
+    //   <div data-reveal data-reveal-delay="80">        …80ms behind
+    //   <div class="grid" data-reveal-group>  each CHILD in turn
+    //
+    // The last one is the point. A grid used to be a single [data-reveal], so
+    // six cards appeared as one slab; where a page did stagger them by hand it
+    // typed the delays in, and on the home page that meant 0/80/160 on the
+    // first row and 0/80/160 AGAIN on the second — the cascade restarting
+    // halfway down, which is the thing that read as broken. A group works the
+    // count out from the child's position, so a grid of any size cascades once
+    // and a row added later needs nothing typed in.
+    //
+    // A group is observed as a whole and shows its children together, rather
+    // than each child waiting to cross the line on its own: a card that is
+    // third in the run should arrive third, not whenever the scroll happens to
+    // reach it.
+    //
+    // Delays are CSS variables, never setTimeout — see the REVEAL block in
+    // brand.css for why.
+    //
     // Elements are marked once wired, so refresh() can safely re-scan after a
     // page script injects more markup without double-observing what's already in.
     let revealIO = null;
 
+    const REVEAL_STEP = 70;   // ms between one child and the next
+    const REVEAL_CAP  = 8;    // …stops counting here, so a long list never
+                              //    takes two seconds to finish arriving
+
+    function show(el) {
+        el.classList.add('is-in');
+        if (el.hasAttribute('data-reveal-group')) {
+            el.querySelectorAll('[data-reveal]').forEach(c => c.classList.add('is-in'));
+        }
+    }
+
     function wireReveal() {
-        const items = document.querySelectorAll('[data-reveal]:not([data-reveal-wired])');
+        // 1. Groups: give every child its place in the run and wire it to the
+        //    group, not to the observer.
+        document.querySelectorAll('[data-reveal-group]:not([data-reveal-staged])').forEach(g => {
+            g.dataset.revealStaged = '1';
+            const step = +(g.dataset.revealStep || REVEAL_STEP);
+            const base = +(g.dataset.revealDelay || 0);
+            const kind = g.getAttribute('data-reveal-group') || '';
+            Array.from(g.children).forEach((child, i) => {
+                child.setAttribute('data-reveal', kind);
+                // A delay typed onto the child wins: a group is a default, not
+                // a rule, and a page that meant something by a specific number
+                // should keep it.
+                if (!child.hasAttribute('data-reveal-delay')) {
+                    child.style.setProperty('--reveal-delay', (base + Math.min(i, REVEAL_CAP) * step) + 'ms');
+                }
+                child.dataset.revealWired = '1';     // the group shows it
+            });
+        });
+
+        // 2. A hand-set delay becomes the same variable, so both routes end up
+        //    scheduled by the browser rather than by a timer.
+        document.querySelectorAll('[data-reveal][data-reveal-delay]:not([data-reveal-timed])').forEach(el => {
+            el.dataset.revealTimed = '1';
+            el.style.setProperty('--reveal-delay', (+el.dataset.revealDelay || 0) + 'ms');
+        });
+
+        const items = document.querySelectorAll(
+            '[data-reveal]:not([data-reveal-wired]), [data-reveal-group]:not([data-reveal-wired])');
         if (!items.length) return;
 
         if (!('IntersectionObserver' in window)) {
-            items.forEach(el => { el.dataset.revealWired = '1'; el.classList.add('is-in'); });
+            items.forEach(el => { el.dataset.revealWired = '1'; show(el); });
             return;
         }
         if (!revealIO) {
+            // threshold 0 with the viewport's foot pulled up: an element starts
+            // arriving as its top crosses 88% of the way down the screen,
+            // whatever its height. The old rule wanted 12% of the element
+            // visible, so a tall block had to be a couple of hundred pixels in
+            // before it began — you were already reading it when it appeared.
             revealIO = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     if (!e.isIntersecting) return;
-                    const delay = +(e.target.dataset.revealDelay || 0);
-                    setTimeout(() => e.target.classList.add('is-in'), delay);
+                    show(e.target);
                     revealIO.unobserve(e.target);
                 });
-            }, { rootMargin: '0px 0px -8% 0px', threshold: .12 });
+            }, { rootMargin: '0px 0px -12% 0px', threshold: 0 });
         }
-        items.forEach(el => { el.dataset.revealWired = '1'; revealIO.observe(el); });
+
+        items.forEach(el => {
+            el.dataset.revealWired = '1';
+            // Anything already scrolled PAST is shown outright. An observer
+            // only ever fires on the way in, so landing on a #hash and
+            // scrolling back up used to leave everything above it at opacity 0.
+            if (el.getBoundingClientRect().bottom < 0) show(el);
+            else revealIO.observe(el);
+        });
     }
 
     // ---- Count-up -----------------------------------------------------------

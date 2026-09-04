@@ -101,7 +101,7 @@
         <!-- The airline in four counted figures, every one derived from data.js
              so none of them can drift from what the site lists. -->
         <div class="wrap">
-            <dl class="hero__facts hero__facts--band" id="heroFacts"></dl>
+            <dl class="hero__facts hero__facts--band" id="heroFacts" data-reveal-group data-reveal-step="60"></dl>
         </div>
     </section>
 
@@ -126,7 +126,7 @@
                 </p>
             </div>
 
-            <div class="ops__grid" data-reveal>
+            <div class="ops__grid" data-reveal-group data-reveal-delay="90">
                 <div class="stat" data-va-figure>
                     <span class="stat__num" data-va-stat="pilots" data-count="0">0</span>
                     <span class="stat__label">Pilots on the roster</span>
@@ -171,43 +171,43 @@
                     network and events. You fly; the paperwork files itself.
                 </p>
             </div>
-            <div class="grid grid-3">
-                <article class="card card--hover" data-reveal>
+            <div class="grid grid-3" data-reveal-group data-reveal-delay="90">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="radio"></div>
                     <h3>Flights log themselves</h3>
                     <p>Fly under an Aeromexico callsign on the Expert Server and the crew center
                        captures the leg, matches it to the fleet and route network, and credits the
                        hours. No forms unless something needs fixing.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="route"></div>
                     <h3>A network worth flying</h3>
                     <p>The real Aeroméxico map, published in five tiers — regional Connect hops on
                        the E190, transborder sectors on the MAX, and 787 flagship runs to Europe
                        and the Pacific.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="award"></div>
                     <h3>Rank that means something</h3>
                     <p>Each rank releases more of the fleet <em>and</em> raises the longest sector
                        you may file — three hours at Cadet, no limit at Senior Captain. Promotions
                        come off validated hours, not vibes.</p>
                 </article>
-                <article class="card card--hover" data-reveal>
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="calendar"></div>
                     <h3>Events with ATC</h3>
                     <p>At least two a month, published a fortnight ahead, run with staffed
                        controllers, published slots and a proper briefing — not a Discord message
                        and a hope.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="users"></div>
                     <h3>Staffed by people who fly</h3>
                     <p>Our staff are line pilots first, and every one of them is named on the staff
                        page. Applications get a human answer inside 72 hours, and every decision is
                        explained.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="shield"></div>
                     <h3>Run to a written plan</h3>
                     <p>How the airline is governed, what is expected of a pilot and how flights are
@@ -232,7 +232,7 @@
                     One hub, three bases, and the whole thing flown on the Expert Server.
                 </p>
             </div>
-            <div class="map-host" id="mapHost" data-reveal></div>
+            <div class="map-host" id="mapHost" data-reveal="fade"></div>
             <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
             <p style="margin-top:1.6rem" data-reveal>
                 <a class="btn btn--ghost" href="/network">Every sector, by tier <span data-icon="arrow"></span></a>
@@ -262,8 +262,9 @@
     <!-- ==================== FROM THE CEO ==================== -->
     <section class="section">
         <div class="wrap">
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center">
-                <div class="quote" data-reveal>
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center"
+                 data-reveal-group data-reveal-step="90">
+                <div class="quote">
                     <p>
                         Most virtual airlines are a spreadsheet with a logo on it. We wanted the
                         opposite: an operation you could actually join, fly, and get somewhere in.
@@ -276,7 +277,7 @@
                         </span>
                     </div>
                 </div>
-                <div data-reveal data-reveal-delay="80">
+                <div>
                     <p class="lede">
                         Aeromexico Virtual is run by an executive team of two and five departmental
                         directors, to a written Operations Plan that is reviewed every quarter.
