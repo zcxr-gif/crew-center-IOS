@@ -46,13 +46,19 @@
 
     /* ---- Routes -------------------------------------------------------------
        GET /api/crew/<slug>/routes → { routes: [{ flightNumber, origin,
-       destination, aircraft, distanceNm, notes, active }] }
+       destination, aircraft, distanceNm, notes, active, kind, partnerName,
+       minRank }] }
 
        Drafts come back too — the endpoint returns everything so managers see
        their unpublished work in the crew center. A public website is not the
        place for a draft sector, so anything not explicitly active is dropped.
        `active` is only filtered when the field is actually present, so a route
-       saved before that field existed is published rather than silently lost. */
+       saved before that field existed is published rather than silently lost.
+
+       `codeshare` and `partner` come through because a partner sector is not
+       ours: the plan publishes codeshares as their own tier (AM 7000, flown in
+       partner colours), and a network page that prints someone else's metal
+       identically to our own overstates the airline. */
     async function routes() {
         const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/routes`);
         if (!data || !Array.isArray(data.routes)) return null;
@@ -66,11 +72,47 @@
                 dist:   Number(r.distanceNm) || 0,
                 flight: (r.flightNumber || '').trim(),
                 notes:  (r.notes || '').trim(),
+                codeshare: r.kind === 'codeshare',
+                partner: (r.partnerName || '').trim(),
+                // The crew centre may gate a sector to a rank. It is the one
+                // that actually enforces it at booking, so when it states one
+                // we show that rather than the ladder-derived guess.
+                minRank: (r.minRank || '').trim(),
             }));
         // An empty list is a real answer, but it is not one worth showing: a VA
         // that has not filled in its crew center yet would get a blank network
         // page instead of the sectors this repo already knows about.
         return live.length ? live : null;
+    }
+
+    /* ---- Where those routes go ----------------------------------------------
+       GET /api/crew/<slug>/route-map → { routes: [...], airports: [{ icao, lat,
+       lon, dep, arr }], stats: { unmapped } }
+
+       The same sectors, already joined to aerodrome reference points.
+
+       The map draws from AMV_DATA.airports, which is this repo's own table of
+       positions. That was fine while the network was this repo's, and stopped
+       being fine the moment the crew centre became the source: staff open a
+       destination we have never heard of, the sector arrives in `routes()`
+       above, and the map silently leaves it off because nothing here knows
+       where it is. This is how it finds out.
+
+       Only real coordinates ever come back — a guessed position is a wrong
+       position, and a dot in the wrong ocean is worse than no dot. Resolves to
+       null on any failure, and the map falls back to the repo's table. */
+    async function airports() {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/route-map`);
+        if (!data || !Array.isArray(data.airports)) return null;
+        const out = {};
+        data.airports.forEach((a) => {
+            if (!a || a.lat == null || a.lon == null) return;
+            const icao = String(a.icao || '').trim().toUpperCase();
+            const lat = Number(a.lat), lon = Number(a.lon);
+            if (!icao || !Number.isFinite(lat) || !Number.isFinite(lon)) return;
+            out[icao] = [lat, lon];
+        });
+        return Object.keys(out).length ? out : null;
     }
 
     /* ---- Events -------------------------------------------------------------
@@ -287,5 +329,5 @@
         return stats().then((figures) => { paint(figures, root); return figures; });
     }
 
-    window.AMV_CREW = { get, routes, events, pastEvents, stats, paint, mountStats, BACKEND, SLUG };
+    window.AMV_CREW = { get, routes, airports, events, pastEvents, stats, paint, mountStats, BACKEND, SLUG };
 })();

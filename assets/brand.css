@@ -132,6 +132,17 @@
     --radius-sm: 11px;
     --radius-lg: 28px;
     --ease:      cubic-bezier(.2, .8, .2, 1);
+    /* The reveal curve. `--ease` is a hover curve — it spends its time in the
+       middle, which is right for a 250ms nudge and wrong for something
+       arriving from off the page: at 600ms it reads as floating. This one
+       spends almost all of its distance in the first third and then settles,
+       so a card arrives and stops rather than drifting into place. */
+    --ease-rise: cubic-bezier(.16, 1, .3, 1);
+
+    /* How far a pale section takes to arrive.
+       See SECTION SEAMS, below. Kept inside the section's own padding so the
+       ramp never runs under the copy. */
+    --seam:      clamp(1.75rem, 4.5vw, 4rem);
     --shadow:    0 1px 2px rgba(15, 27, 46, .05), 0 10px 30px -14px rgba(15, 27, 46, .16);
     --shadow-lg: 0 28px 70px -24px rgba(15, 27, 46, .26);
 
@@ -330,14 +341,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
    `background` and follows the theme. */
 .section--alt::before {
     content: ""; position: absolute; inset: 0;
-    background: var(--am-blue); opacity: .05;
+    --greca-ink: var(--am-blue);
+    /* The texture fades on the same ramp as the tint under it — see SECTION
+       SEAMS. The gradient is the pseudo-element's BACKGROUND, not a second
+       mask layer, so the greca mask stays a single layer and needs no
+       mask-composite. */
+    background: linear-gradient(180deg,
+        transparent 0,
+        var(--greca-ink) var(--seam-top),
+        var(--greca-ink) calc(100% - var(--seam-bot)),
+        transparent 100%);
+    opacity: .05;
     -webkit-mask: url('/assets/img/greca-tile.svg') repeat left top / var(--greca-tile);
             mask: url('/assets/img/greca-tile.svg') repeat left top / var(--greca-tile);
     z-index: -1; pointer-events: none;
 }
-:root[data-theme="dark"] .section--alt::before { background: var(--am-blue-300); opacity: .05; }
+:root[data-theme="dark"] .section--alt::before { --greca-ink: var(--am-blue-300); opacity: .05; }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .section--alt::before { background: var(--am-blue-300); opacity: .05; }
+    :root:not([data-theme="light"]) .section--alt::before { --greca-ink: var(--am-blue-300); opacity: .05; }
 }
 
 /* The band closing the page. It sits ON the footer's top edge, half above and
@@ -463,7 +484,53 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .wrap    { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: clamp(1.15rem, 4vw, 2rem); }
 .section { padding-block: clamp(3.5rem, 8vw, 7rem); }
 .section--tight { padding-block: clamp(2.5rem, 5vw, 4rem); }
-.section--alt   { position: relative; isolation: isolate; background: var(--bg-alt); }
+
+/* ---- SECTION SEAMS -------------------------------------------------------
+   A page here alternates white and the pale tint, three or four times over.
+   Each of those changeovers used to be a knife edge — one row of pixels where
+   #FFFFFF became #F7F8FA and the greca field started mid-pattern — and the
+   result read as a stack of boxes somebody had shuffled together rather than
+   one page. The colours are four percent apart; the SEAM is what you saw, not
+   the tint.
+
+   So the tint now ramps in and out over `--seam`, and the texture ramps with
+   it (the pseudo-element's own background is the gradient, painted through the
+   greca mask, so one mask layer still does the masking). Inside the section's
+   own padding, so no copy ever sits in the ramp.
+
+   Where the neighbour is DARK, the hard edge is the right answer and is kept:
+   navy against white is the airline's own device, and the band and the footer
+   already meet it with a marigold greca crown. A soft ramp there would put a
+   4rem sliver of white above that crown and read as a gap. Same for two pale
+   sections in a row, which must not develop a white stripe between them.
+
+   `:has()` is what identifies those neighbours. Without it (a browser older
+   than 2023) every edge simply ramps, which is loose rather than broken. */
+.section--alt {
+    position: relative; isolation: isolate;
+    --seam-top: var(--seam);
+    --seam-bot: var(--seam);
+    background: linear-gradient(180deg,
+        var(--bg) 0,
+        var(--bg-alt) var(--seam-top),
+        var(--bg-alt) calc(100% - var(--seam-bot)),
+        var(--bg) 100%);
+}
+.section--ink + .section--alt,
+.band + .section--alt,
+.hero:has(.hero__facts--band) + .section--alt,   /* the home hero ends navy */
+.section--alt + .section--alt { --seam-top: 0px; }
+
+.section--alt:has(+ .section--ink),
+.section--alt:has(+ .band),
+.section--alt:has(+ .footer),
+.section--alt:has(+ [data-site-footer]),
+.section--alt:has(+ .frame-host),
+.section--alt:last-child { --seam-bot: 0px; }
+
+/* A tight section has less padding than the ramp wants, so it gets a shorter
+   one rather than a ramp running under its first line of type. */
+.section--alt.section--tight { --seam: clamp(1.25rem, 3vw, 2.25rem); }
 .section--ink   { position: relative; isolation: isolate; background: var(--am-navy); color: #EEF2F8; }
 .section--ink .muted   { color: #9DB0CE; }
 .section--ink .eyebrow { color: #9DB0CE; }
@@ -967,10 +1034,47 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* The disclaimer is not decoration — keep it legible. */
 .disclaimer { font-size: .78rem; line-height: 1.6; color: #8698B6; max-width: 68ch; }
 
-/* ============================ REVEAL ===================================== */
-[data-reveal] { opacity: 0; transform: translateY(14px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+/* ============================ REVEAL =====================================
+   What was here: everything on every page rose 14px over 700ms on `--ease`,
+   and the stagger between siblings was a setTimeout. Three things were wrong
+   with that, and together they are why the page read as a slideshow.
+
+   700ms on a hover curve is a long time to spend covering 14px. The eye
+   registers the motion, not the arrival — it floats. The distance is now a
+   little longer, the fade is shorter than the move, and the curve puts most
+   of the distance in the first third, so a card arrives and stops.
+
+   The delay is a CSS variable rather than a setTimeout. A timer runs on the
+   main thread and the transition runs on the compositor, so under load the
+   two came apart: a stagger meant to be 80ms behind arrived 300ms behind, or
+   out of order. As `transition-delay` the browser schedules the whole run at
+   once and it cannot drift.
+
+   And a whole grid was ONE reveal, so six cards appeared as one slab. Grids
+   are staggered per child now (see [data-reveal-group] in site.js), which is
+   the difference between a section appearing and a section arriving. */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(var(--reveal-rise, 1.25rem));
+    transition: opacity .42s var(--ease-rise) var(--reveal-delay, 0ms),
+                transform .62s var(--ease-rise) var(--reveal-delay, 0ms);
+}
 [data-reveal].is-in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; } }
+/* No will-change here on purpose. A long page carries forty of these, and
+   promoting all forty to their own layer before any of them has moved costs
+   more than the first frame it would buy. Opacity and transform are promoted
+   by the browser when the transition actually starts, which is when it is
+   worth paying for. */
+
+/* Variants. A wide figure sliding up reads as a slide deck, so the map and the
+   imagery fade on the spot; a section heading is worth a longer arrival than
+   the cards under it. */
+[data-reveal="fade"] { --reveal-rise: 0px; }
+[data-reveal="lift"] { --reveal-rise: 2.25rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
 
 /* ============================ EMBED FRAMES =============================== */
 .frame-host { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }

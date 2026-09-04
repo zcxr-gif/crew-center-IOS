@@ -101,7 +101,7 @@
         <!-- The airline in four counted figures, every one derived from data.js
              so none of them can drift from what the site lists. -->
         <div class="wrap">
-            <dl class="hero__facts hero__facts--band" id="heroFacts"></dl>
+            <dl class="hero__facts hero__facts--band" id="heroFacts" data-reveal-group data-reveal-step="60"></dl>
         </div>
     </section>
 
@@ -126,7 +126,7 @@
                 </p>
             </div>
 
-            <div class="ops__grid" data-reveal>
+            <div class="ops__grid" data-reveal-group data-reveal-delay="90">
                 <div class="stat" data-va-figure>
                     <span class="stat__num" data-va-stat="pilots" data-count="0">0</span>
                     <span class="stat__label">Pilots on the roster</span>
@@ -171,43 +171,43 @@
                     network and events. You fly; the paperwork files itself.
                 </p>
             </div>
-            <div class="grid grid-3">
-                <article class="card card--hover" data-reveal>
+            <div class="grid grid-3" data-reveal-group data-reveal-delay="90">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="radio"></div>
                     <h3>Flights log themselves</h3>
                     <p>Fly under an Aeromexico callsign on the Expert Server and the crew center
                        captures the leg, matches it to the fleet and route network, and credits the
                        hours. No forms unless something needs fixing.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="route"></div>
                     <h3>A network worth flying</h3>
                     <p>The real Aeroméxico map, published in five tiers — regional Connect hops on
                        the E190, transborder sectors on the MAX, and 787 flagship runs to Europe
                        and the Pacific.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="award"></div>
                     <h3>Rank that means something</h3>
                     <p>Each rank releases more of the fleet <em>and</em> raises the longest sector
                        you may file — three hours at Cadet, no limit at Senior Captain. Promotions
                        come off validated hours, not vibes.</p>
                 </article>
-                <article class="card card--hover" data-reveal>
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="calendar"></div>
                     <h3>Events with ATC</h3>
                     <p>At least two a month, published a fortnight ahead, run with staffed
                        controllers, published slots and a proper briefing — not a Discord message
                        and a hope.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="80">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="users"></div>
                     <h3>Staffed by people who fly</h3>
                     <p>Our staff are line pilots first, and every one of them is named on the staff
                        page. Applications get a human answer inside 72 hours, and every decision is
                        explained.</p>
                 </article>
-                <article class="card card--hover" data-reveal data-reveal-delay="160">
+                <article class="card card--hover">
                     <div class="card__icon" data-icon="shield"></div>
                     <h3>Run to a written plan</h3>
                     <p>How the airline is governed, what is expected of a pilot and how flights are
@@ -232,7 +232,7 @@
                     One hub, three bases, and the whole thing flown on the Expert Server.
                 </p>
             </div>
-            <div class="map-host" id="mapHost" data-reveal></div>
+            <div class="map-host" id="mapHost" data-reveal="fade"></div>
             <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
             <p style="margin-top:1.6rem" data-reveal>
                 <a class="btn btn--ghost" href="/network">Every sector, by tier <span data-icon="arrow"></span></a>
@@ -262,8 +262,9 @@
     <!-- ==================== FROM THE CEO ==================== -->
     <section class="section">
         <div class="wrap">
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center">
-                <div class="quote" data-reveal>
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center"
+                 data-reveal-group data-reveal-step="90">
+                <div class="quote">
                     <p>
                         Most virtual airlines are a spreadsheet with a logo on it. We wanted the
                         opposite: an operation you could actually join, fly, and get somewhere in.
@@ -276,7 +277,7 @@
                         </span>
                     </div>
                 </div>
-                <div data-reveal data-reveal-delay="80">
+                <div>
                     <p class="lede">
                         Aeromexico Virtual is run by an executive team of two and five departmental
                         directors, to a written Operations Plan that is reviewed every quarter.
@@ -359,14 +360,62 @@
     }
 
     // ---- The network, at a glance ----
+    //
+    // Painted from data.js so the section is complete on first paint, then
+    // repainted from the crew centre — which is where sectors are actually
+    // added, and therefore what the airline's network IS. The network page has
+    // worked this way for a while; the home page did not, so the two could sit
+    // one click apart quoting different sizes of the same airline.
     const hub = D.hubs.find(h => h.role === 'Primary hub') || D.hubs[0];
-    document.getElementById('networkLede').textContent =
-        `${D.routes.length} published sectors from ${hub.city} and our bases, in `
-        + `${D.tiers.filter(t => D.routes.some(r => r.tier === t.name)).length} tiers — `
-        + `the shortest is an hour on the E190, the longest is fourteen to Seoul.`;
-    if (window.AMV_MAP) {
-        window.AMV_MAP.draw(document.getElementById('mapHost'), D.routes,
-                            { hubs: D.hubs, airports: D.airports });
+
+    // The city a destination is in, where this repo knows it. Only ever used to
+    // name an airport more readably than its ICAO — never to claim a sector.
+    const cityOf = Object.fromEntries(D.routes.filter(r => r.city).map(r => [r.to, r.city]));
+
+    function paintNetwork(rows, coords) {
+        const tiers = new Set(rows.map(r => r.tier).filter(Boolean));
+        // The shortest and longest are READ OFF the list rather than written
+        // down. The sentence used to end "an hour on the E190, fourteen to
+        // Seoul", which was true of the network in this repo and would have
+        // gone on being said about whatever network the crew centre held.
+        const byDist = rows.filter(r => r.dist > 0).sort((a, b) => a.dist - b.dist);
+        const name = (r) => cityOf[r.to] || r.to;
+        const spread = byDist.length >= 2
+            ? ` — the shortest is ${byDist[0].dist.toLocaleString()} nm to ${name(byDist[0])}, `
+              + `the longest ${byDist[byDist.length - 1].dist.toLocaleString()} nm to ${name(byDist[byDist.length - 1])}.`
+            : '.';
+
+        document.getElementById('networkLede').textContent =
+            `${rows.length} published sector${rows.length === 1 ? '' : 's'} from ${hub.city} `
+            + `and our bases, in ${tiers.size} tier${tiers.size === 1 ? '' : 's'}${spread}`;
+        if (window.AMV_MAP) {
+            window.AMV_MAP.draw(document.getElementById('mapHost'), rows,
+                                { hubs: D.hubs, airports: coords });
+        }
+    }
+
+    paintNetwork(D.routes, D.airports);
+
+    if (window.AMV_CREW) {
+        const key = r => `${r.from}-${r.to}`;
+        const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
+        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()]).then(([live, pos]) => {
+            if (!live) return;              // backend quiet — keep what data.js said
+            // Tier comes from the sector's twin in data.js, or from the plan's
+            // own Codeshare tier when the crew centre says it is one. A sector
+            // we have never seen still counts towards the total; it just has no
+            // tier of ours to be counted under.
+            const rows = live.map(r => {
+                const m = local[key(r)] || {};
+                return {
+                    from: r.from, to: r.to, ac: r.ac || m.ac || '', dist: r.dist || m.dist || 0,
+                    tier: r.codeshare ? 'Codeshare' : (m.tier || 'Network'),
+                };  // city is looked up by ICAO, so a sector we have never seen still reads
+            });
+            // The repo's coordinates win on a clash — those are checked — and
+            // the crew centre fills in the destinations it has that we do not.
+            paintNetwork(rows, pos ? Object.assign({}, pos, D.airports) : D.airports);
+        });
     }
 
     // ---- Next event (the soonest one still ahead of us) ----

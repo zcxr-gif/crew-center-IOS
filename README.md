@@ -9,7 +9,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 ```
 index.html         Home — hero, live figures, why, the route map, next event
 fleet.html         The six operated types, what each one flies, and what is planned
-network.html       The route map, then all 23 sectors grouped by publication tier
+network.html       The route map, then every published sector grouped by tier
 ranks.html         The ladder: hours, aircraft released, sector limits
 events.html        The calendar, the programme, and what has been flown
 about.html         Mission, the CEO's message, standards, the first twelve months
@@ -252,8 +252,11 @@ nothing to keep out of git — writes are gated, reads are not.
 
 | helper | endpoint | used for |
 |---|---|---|
-| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` |
+| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` and the network band on `/` |
+| `AMV_CREW.airports()` | `GET /api/crew/<slug>/route-map` | where those sectors go — coordinates for the map |
 | `AMV_CREW.stats()` | `GET /api/crew/<slug>/stats` | the operating figures |
+| `AMV_CREW.events()` | `GET /api/crew/<slug>/events` | the calendar on `/events` and the next-event card |
+| `AMV_CREW.pastEvents()` | the same feed, read backwards | what the airline has actually flown |
 | `AMV_CREW.mountStats()` | — | fetches once, fills every figure slot on the page |
 | `AMV_CREW.get(path)` | anything else public | adding a feed |
 
@@ -275,9 +278,25 @@ region it belongs to, the scheduled block time. A live sector is matched to its
 `data.js` twin on the airport pair and takes those labels from it. **A sector
 with no twin is still shown, with only the fields we genuinely have** — no city
 invented for it, no block time guessed at, and its region falls into a plain
-`Network` bucket rather than being assigned one. Everything counted off the
-list — the sector count, the per-hub sector counts — is counted off whichever
-list is current, so the page cannot say 23 above a list of 3.
+`Network` bucket rather than being assigned one. The one exception is a sector
+the crew centre has marked a **codeshare**: the plan already publishes those as
+their own tier, so that is the tier it goes in, and the partner's name is on the
+card rather than the sector passing as our own metal.
+
+Everything counted off the list — the sector count, the per-hub sector counts,
+the "N destinations" band on `/network`, the network sentence and the map on the
+home page — is counted off whichever list is current, so the page cannot say 23
+above a list of 3.
+
+**Where a sector goes** comes from the crew centre too. `AMV_CREW.airports()`
+reads `/route-map`, which is the same sectors already joined to aerodrome
+reference points, and those positions are merged *under* `data.js`'s own table
+(the repo's coordinates are checked, so they win a clash). Without it, a
+destination staff opened that this repo has never heard of would be listed and
+then silently left off the map — the map draws only what it can place, which is
+right, and until this feed existed there was no way for it to learn. When a
+sector still cannot be placed the map says how many, rather than quietly drawing
+a smaller network than the one listed under it.
 
 Adding a feed is `AMV_CREW.get('/api/…')`, a `null` check, and a re-render.
 The backend is in `connect-src` in `_headers`; a feed from a *new* origin needs
@@ -402,6 +421,18 @@ Clean URLs (`/fleet` rather than `/fleet.html`) come from `_redirects`, which
 only applies on Netlify. Locally, use the `.html` paths — `site.js` normalises
 both forms when it highlights the active nav item, so nav looks right either way.
 
+### The checks
+
+Browser tests, run against a throwaway server on a spare port with the crew
+centre faked. They need `playwright-core` and a Chromium (`npm i playwright-core`;
+the path is `$PLAYWRIGHT_CHROMIUM`, or `/opt/pw-browsers/chromium`).
+
+```bash
+node tools/test-events-page.js     # the calendar, and what must not reach it
+node tools/test-network-sync.js    # the network, counted off the crew centre
+node tools/test-motion.js          # nothing stranded invisible; the seams
+```
+
 ## Deploying
 
 Netlify, publish directory `.`, no build command. `_redirects` and `_headers`
@@ -487,6 +518,47 @@ rule always allowed a box around "something that is genuinely a surface (a
 table, a framed embed)", and the sector list floated onto the greca field read
 as loose rows on a pattern. Each tier is a panel now, and so is every
 `.table-scroll`. Do not put a paragraph in one.
+
+**Motion is one system, and it lives in two places.** `[data-reveal]` in
+`brand.css` says what the movement is; `wireReveal` in `site.js` says when it
+starts. Three rules hold it together:
+
+- *Stagger with a group, not with numbers.* Put `data-reveal-group` on a grid
+  and every child gets its place in the run worked out from its position —
+  `data-reveal-step` changes the gap, `data-reveal-delay` on the container
+  offsets the whole run. The home page's six cards used to carry hand-typed
+  delays of 0/80/160 on each row, so the cascade visibly restarted halfway
+  down; a group cannot do that, and a card added later needs nothing typed in.
+  A delay written onto a child still wins, for the cases that mean something
+  specific.
+- *A delay is CSS, never a timer.* It is set as `--reveal-delay` and consumed by
+  `transition-delay`, so the browser schedules the whole run at once. The
+  `setTimeout` this replaced ran on the main thread while the transition ran on
+  the compositor, and under load the two came apart — a stagger meant to be 80ms
+  behind arrived 300ms behind, or out of order.
+- *Variants, not new rules.* `data-reveal="fade"` for anything wide (the map, a
+  banner) — a full-width figure sliding up reads as a slide deck.
+  `data-reveal="lift"` for a longer arrival.
+
+Nothing may be left at opacity 0. An observer only fires on the way in, so
+anything injected after the first pass needs `AMV.refresh()`, and anything the
+observer will never reach has to be shown outright — landing on a `#hash` and
+scrolling back up is the case that catches this. `tools/test-motion.js` walks
+every page with the crew centre both down and answering and fails if a single
+element is stranded.
+
+**A pale section arrives; a dark one cuts.** The page alternates white and the
+tint three or four times, and those changeovers used to be knife edges — one row
+of pixels where `#FFFFFF` became `#F7F8FA` and the greca field started
+mid-pattern. Four percent of tint is not what you saw; the seam was. The tint
+and its texture now ramp in and out over `--seam`, inside the section's own
+padding so no copy sits in the ramp.
+
+The edge against a **dark** block is deliberate and stays hard: navy against
+white is the airline's own device, and the band and the footer already meet it
+with a marigold greca crown — a soft ramp there puts a 4rem sliver of white
+above that crown and reads as a gap. `:has()` is what spots those neighbours, so
+add any new dark block to the `--seam-bot: 0px` list in `brand.css`.
 
 **The route map is generated, not drawn.** `assets/js/world.js` is Natural
 Earth's public-domain 1:110m land, reprojected Robinson and simplified by
