@@ -274,6 +274,7 @@
 
 <script src="/assets/js/data.js?v=3"></script>
 <script src="/assets/js/site.js?v=3"></script>
+<script src="/assets/js/crew.js?v=3"></script>
 <script>
 (function () {
     const D = window.AMV_DATA, A = window.AMV;
@@ -292,16 +293,42 @@
     const a = D.airline, hubs = D.hubs;
     const bases = hubs.filter(h => h.role !== 'Primary hub');
     const hub = hubs.find(h => h.role === 'Primary hub') || hubs[0];
-    document.getElementById('identity').innerHTML = [
-        ['Real-world basis', `${esc(a.basedOn)} — IATA <b>${esc(a.iata)}</b>, ICAO <b>${esc(a.icao)}</b>, callsign <b>${esc(a.callsign)}</b>`],
-        ['Alliance',         `${esc(a.alliance)}, with codeshare flying on partner carriers`],
-        ['Platform',         `${esc(a.platform)} — ${esc(a.server)} only`],
-        ['Primary hub',      `${esc(hub.city)} <b>${esc(hub.icao)}</b>`],
-        ['Bases',            bases.map(h => `${esc(h.city)} <b>${esc(h.icao)}</b>`).join(' · ')],
-        ['Fleet',            `${D.fleet.length} types in service, ${D.fleetPlanned.length} planned`],
-        ['Network',          `${D.routes.length} published sectors across ${D.tiers.length} tiers`],
-        ['Regulation',       'Operated in compliance with the IFVARB'],
-    ].map(([k, v]) => `<div class="facts__row"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+
+    // The network line is a count, and a count belongs to whichever list is
+    // current — this repo's until the crew centre answers, the crew centre's
+    // after that. Painted once from data.js so the row is right on first paint.
+    function networkLine(rows) {
+        const tiers = new Set(rows.map(r => r.tier).filter(Boolean)).size || D.tiers.length;
+        return `${rows.length} published sector${rows.length === 1 ? '' : 's'} across `
+             + `${tiers} tier${tiers === 1 ? '' : 's'}`;
+    }
+
+    function paintIdentity(rows) {
+        document.getElementById('identity').innerHTML = [
+            ['Real-world basis', `${esc(a.basedOn)} — IATA <b>${esc(a.iata)}</b>, ICAO <b>${esc(a.icao)}</b>, callsign <b>${esc(a.callsign)}</b>`],
+            ['Alliance',         `${esc(a.alliance)}, with codeshare flying on partner carriers`],
+            ['Platform',         `${esc(a.platform)} — ${esc(a.server)} only`],
+            ['Primary hub',      `${esc(hub.city)} <b>${esc(hub.icao)}</b>`],
+            ['Bases',            bases.map(h => `${esc(h.city)} <b>${esc(h.icao)}</b>`).join(' · ')],
+            ['Fleet',            `${D.fleet.length} types in service, ${D.fleetPlanned.length} planned`],
+            // Tiers are the ones actually flown, not the five the plan defines:
+            // a tier with nothing in it is a heading, not a piece of network.
+            ['Network',          esc(networkLine(rows))],
+            ['Regulation',       'Operated in compliance with the IFVARB'],
+        ].map(([k, v]) => `<div class="facts__row"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    }
+
+    paintIdentity(D.routes);
+    if (window.AMV_CREW) {
+        const local = Object.fromEntries(D.routes.map(r => [`${r.from}-${r.to}`, r]));
+        window.AMV_CREW.routes().then(live => {
+            if (!live) return;              // backend quiet — keep what data.js said
+            paintIdentity(live.map(r => ({
+                tier: r.codeshare ? 'Codeshare' : ((local[`${r.from}-${r.to}`] || {}).tier || 'Network'),
+            })));
+            A.refresh();
+        });
+    }
 
     document.getElementById('values').innerHTML = D.values.map((v, i) => `
         <article class="card card--hover" data-reveal data-reveal-delay="${(i % 2) * 80}">

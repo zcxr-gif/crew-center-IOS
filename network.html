@@ -158,7 +158,11 @@
     <section class="band">
         <div class="band__wash"></div>
         <div class="wrap band__inner">
-            <h2>Twenty-three destinations. Pick one.</h2>
+            <!-- Counted off the list on this page rather than typed in. It said
+                 "Twenty-three" for as long as the network happened to be
+                 twenty-three sectors long, and would have gone on saying it
+                 through every route staff added in the crew centre. -->
+            <h2 id="destLine">Pick a destination.</h2>
             <p>Route access opens up as you rank. Cadets start domestic; Senior Captains take the 787 to Narita.</p>
             <div class="hero__cta">
                 <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
@@ -222,6 +226,17 @@
         }).join('');
     }
 
+    // ---- "N destinations" ---------------------------------------------------
+    // Counted off the whole network, not the filtered view: the band is a
+    // statement about the airline, and it should not drop to three because
+    // somebody pressed Domestic.
+    function renderDestLine() {
+        const el = document.getElementById('destLine');
+        if (!el) return;
+        const n = new Set(ROUTES.map(r => r.to).filter(Boolean)).size;
+        el.textContent = n ? `${n} destination${n === 1 ? '' : 's'}. Pick one.` : 'Pick a destination.';
+    }
+
     // ---- Tier filter --------------------------------------------------------
     function renderFilters() {
         const live = D.tiers.map(t => t.name).filter(n => ROUTES.some(r => r.tier === n));
@@ -236,10 +251,14 @@
     }
 
     // ---- The map ------------------------------------------------------------
+    // Positions start as this repo's table and grow as the crew centre tells us
+    // where its own destinations are — see AMV_CREW.airports.
+    let COORDS = D.airports;
+
     function renderMap() {
         if (!window.AMV_MAP) return;
         const rows = shown();
-        const drawn = window.AMV_MAP.draw(mapHost, rows, { hubs: D.hubs, airports: D.airports });
+        const drawn = window.AMV_MAP.draw(mapHost, rows, { hubs: D.hubs, airports: COORDS });
         // Say plainly when a sector could not be placed rather than quietly
         // drawing a smaller network than the one listed underneath.
         const off = rows.length - drawn;
@@ -265,7 +284,11 @@
 
     function card(r, i) {
         const h = hubBy[r.from] || {};
-        const rank = A.minRankFor(r, D.ranks, D.fleet);
+        // The crew centre enforces the gate at booking, so when it states one
+        // that is the true answer; the ladder-derived rank is what we work out
+        // for a sector it has not gated itself.
+        const derived = A.minRankFor(r, D.ranks, D.fleet);
+        const rankName = r.minRank || (derived && derived.name) || '';
         return `
         <article class="route-card" data-reveal data-reveal-delay="${Math.min(i, 6) * 40}">
             <div class="route-card__ends">
@@ -279,7 +302,8 @@
                 ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
                 ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
                 ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
-                ${rank ? `<span class="rank-chip" title="Minimum rank to file this sector">${esc(rank.name)}</span>` : ''}
+                ${r.codeshare ? `<span class="route-meta"><i>Codeshare</i><b>${esc(r.partner || 'Partner airline')}</b></span>` : ''}
+                ${rankName ? `<span class="rank-chip" title="Minimum rank to file this sector">${esc(rankName)}</span>` : ''}
             </div>
         </article>`;
     }
@@ -317,6 +341,7 @@
         }
 
         list.innerHTML = html || '<p class="lede">No sectors in this tier yet.</p>';
+        renderDestLine();
         // The cards are injected, so their [data-reveal] has to be wired each
         // time — without this a filtered-in card sits at opacity 0 forever.
         A.refresh(list);
@@ -366,19 +391,34 @@
         const key = r => `${r.from}-${r.to}`;
         const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
 
-        window.AMV_CREW.routes().then(live => {
-            if (!live) return;                       // backend quiet — keep data.js
+        // Both feeds at once. The coordinates matter most for exactly the
+        // sectors data.js has never seen, so waiting for them costs nothing and
+        // saves the map a second redraw. Either may be null on its own.
+        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()]).then(([live, pos]) => {
+            // A destination the crew centre knows and this repo does not now
+            // lands on the map instead of being silently left off it. The
+            // repo's own table wins on a clash: those are checked, and this
+            // page's hub markers are placed from them.
+            if (pos) COORDS = Object.assign({}, pos, D.airports);
+            if (!live) { if (pos) renderMap(); return; }   // backend quiet — keep data.js
+
             ROUTES = live.map(r => {
                 const m = local[key(r)] || {};
                 return {
                     from: r.from, to: r.to,
                     city:   m.city   || '',
-                    region: m.region || 'Network',   // honest bucket, not a guess
-                    tier:   m.tier   || 'Network',
+                    // An honest bucket, not a guess — except for a codeshare,
+                    // which the plan already publishes as its own tier, and
+                    // which the crew centre has told us this sector is.
+                    region: m.region || 'Network',
+                    tier:   r.codeshare ? 'Codeshare' : (m.tier || 'Network'),
                     ac:     r.ac     || m.ac || '',
                     dist:   r.dist   || m.dist || 0,
                     block:  m.block  || '',
                     flight: r.flight,
+                    codeshare: r.codeshare,
+                    partner: r.partner,
+                    minRank: r.minRank,
                 };
             });
             renderHubs();

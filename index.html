@@ -359,14 +359,62 @@
     }
 
     // ---- The network, at a glance ----
+    //
+    // Painted from data.js so the section is complete on first paint, then
+    // repainted from the crew centre — which is where sectors are actually
+    // added, and therefore what the airline's network IS. The network page has
+    // worked this way for a while; the home page did not, so the two could sit
+    // one click apart quoting different sizes of the same airline.
     const hub = D.hubs.find(h => h.role === 'Primary hub') || D.hubs[0];
-    document.getElementById('networkLede').textContent =
-        `${D.routes.length} published sectors from ${hub.city} and our bases, in `
-        + `${D.tiers.filter(t => D.routes.some(r => r.tier === t.name)).length} tiers — `
-        + `the shortest is an hour on the E190, the longest is fourteen to Seoul.`;
-    if (window.AMV_MAP) {
-        window.AMV_MAP.draw(document.getElementById('mapHost'), D.routes,
-                            { hubs: D.hubs, airports: D.airports });
+
+    // The city a destination is in, where this repo knows it. Only ever used to
+    // name an airport more readably than its ICAO — never to claim a sector.
+    const cityOf = Object.fromEntries(D.routes.filter(r => r.city).map(r => [r.to, r.city]));
+
+    function paintNetwork(rows, coords) {
+        const tiers = new Set(rows.map(r => r.tier).filter(Boolean));
+        // The shortest and longest are READ OFF the list rather than written
+        // down. The sentence used to end "an hour on the E190, fourteen to
+        // Seoul", which was true of the network in this repo and would have
+        // gone on being said about whatever network the crew centre held.
+        const byDist = rows.filter(r => r.dist > 0).sort((a, b) => a.dist - b.dist);
+        const name = (r) => cityOf[r.to] || r.to;
+        const spread = byDist.length >= 2
+            ? ` — the shortest is ${byDist[0].dist.toLocaleString()} nm to ${name(byDist[0])}, `
+              + `the longest ${byDist[byDist.length - 1].dist.toLocaleString()} nm to ${name(byDist[byDist.length - 1])}.`
+            : '.';
+
+        document.getElementById('networkLede').textContent =
+            `${rows.length} published sector${rows.length === 1 ? '' : 's'} from ${hub.city} `
+            + `and our bases, in ${tiers.size} tier${tiers.size === 1 ? '' : 's'}${spread}`;
+        if (window.AMV_MAP) {
+            window.AMV_MAP.draw(document.getElementById('mapHost'), rows,
+                                { hubs: D.hubs, airports: coords });
+        }
+    }
+
+    paintNetwork(D.routes, D.airports);
+
+    if (window.AMV_CREW) {
+        const key = r => `${r.from}-${r.to}`;
+        const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
+        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()]).then(([live, pos]) => {
+            if (!live) return;              // backend quiet — keep what data.js said
+            // Tier comes from the sector's twin in data.js, or from the plan's
+            // own Codeshare tier when the crew centre says it is one. A sector
+            // we have never seen still counts towards the total; it just has no
+            // tier of ours to be counted under.
+            const rows = live.map(r => {
+                const m = local[key(r)] || {};
+                return {
+                    from: r.from, to: r.to, ac: r.ac || m.ac || '', dist: r.dist || m.dist || 0,
+                    tier: r.codeshare ? 'Codeshare' : (m.tier || 'Network'),
+                };  // city is looked up by ICAO, so a sector we have never seen still reads
+            });
+            // The repo's coordinates win on a clash — those are checked — and
+            // the crew centre fills in the destinations it has that we do not.
+            paintNetwork(rows, pos ? Object.assign({}, pos, D.airports) : D.airports);
+        });
     }
 
     // ---- Next event (the soonest one still ahead of us) ----

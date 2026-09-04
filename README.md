@@ -9,7 +9,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 ```
 index.html         Home — hero, live figures, why, the route map, next event
 fleet.html         The six operated types, what each one flies, and what is planned
-network.html       The route map, then all 23 sectors grouped by publication tier
+network.html       The route map, then every published sector grouped by tier
 ranks.html         The ladder: hours, aircraft released, sector limits
 events.html        The calendar, the programme, and what has been flown
 about.html         Mission, the CEO's message, standards, the first twelve months
@@ -252,8 +252,11 @@ nothing to keep out of git — writes are gated, reads are not.
 
 | helper | endpoint | used for |
 |---|---|---|
-| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` |
+| `AMV_CREW.routes()` | `GET /api/crew/<slug>/routes` | the sector list on `/network` and the network band on `/` |
+| `AMV_CREW.airports()` | `GET /api/crew/<slug>/route-map` | where those sectors go — coordinates for the map |
 | `AMV_CREW.stats()` | `GET /api/crew/<slug>/stats` | the operating figures |
+| `AMV_CREW.events()` | `GET /api/crew/<slug>/events` | the calendar on `/events` and the next-event card |
+| `AMV_CREW.pastEvents()` | the same feed, read backwards | what the airline has actually flown |
 | `AMV_CREW.mountStats()` | — | fetches once, fills every figure slot on the page |
 | `AMV_CREW.get(path)` | anything else public | adding a feed |
 
@@ -275,9 +278,25 @@ region it belongs to, the scheduled block time. A live sector is matched to its
 `data.js` twin on the airport pair and takes those labels from it. **A sector
 with no twin is still shown, with only the fields we genuinely have** — no city
 invented for it, no block time guessed at, and its region falls into a plain
-`Network` bucket rather than being assigned one. Everything counted off the
-list — the sector count, the per-hub sector counts — is counted off whichever
-list is current, so the page cannot say 23 above a list of 3.
+`Network` bucket rather than being assigned one. The one exception is a sector
+the crew centre has marked a **codeshare**: the plan already publishes those as
+their own tier, so that is the tier it goes in, and the partner's name is on the
+card rather than the sector passing as our own metal.
+
+Everything counted off the list — the sector count, the per-hub sector counts,
+the "N destinations" band on `/network`, the network sentence and the map on the
+home page — is counted off whichever list is current, so the page cannot say 23
+above a list of 3.
+
+**Where a sector goes** comes from the crew centre too. `AMV_CREW.airports()`
+reads `/route-map`, which is the same sectors already joined to aerodrome
+reference points, and those positions are merged *under* `data.js`'s own table
+(the repo's coordinates are checked, so they win a clash). Without it, a
+destination staff opened that this repo has never heard of would be listed and
+then silently left off the map — the map draws only what it can place, which is
+right, and until this feed existed there was no way for it to learn. When a
+sector still cannot be placed the map says how many, rather than quietly drawing
+a smaller network than the one listed under it.
 
 Adding a feed is `AMV_CREW.get('/api/…')`, a `null` check, and a re-render.
 The backend is in `connect-src` in `_headers`; a feed from a *new* origin needs
