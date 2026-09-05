@@ -528,11 +528,35 @@ Four things about the stage are deliberate:
 - **Photographs load as they are needed.** Only the first slide carries a `src`
   on first paint; each one loads as the slide before it comes up. Five 1920px
   photographs fetched to show one is the whole of an opening screen's budget.
-- **Airport photography would slot straight in.** There is none in this repo,
-  and a stock shot of Benito Juárez is not the airline's material, so hubs are
-  named rather than pictured. When the VA has its own, `AMV_DATA.heroStills`
-  takes `{ src, w, h, alt, title, reg, note, route }` entries and they lead the
-  rotation with no change to `hero.js`.
+- **Nothing is cropped, on either screen.** `object-fit` is `contain`, not the
+  `cover` a full-bleed hero normally reaches for: these are 1920x886 photographs
+  of whole aeroplanes, and under `cover` a tall frame ate the tail off one side
+  and the nose off the other. Two geometries carry it. Wide (>= 48rem) the hero
+  is at least 50vw tall — taller than a 2.167 ratio needs at that width — so
+  `contain` fits by width and the slack lands as navy inside the veil, where it
+  is invisible. Narrow (< 48rem) the stage leaves the absolute layer, takes the
+  photograph's own `aspect-ratio`, and the plate stacks underneath it on navy;
+  that is the only arrangement in which this ratio fits a 390px screen whole
+  and still leaves the type somewhere legible. The one case `contain` gets
+  wrong is a viewport *wider* than the photograph, where fitting by width would
+  pillarbox it — an `(min-aspect-ratio: 19/10)` query falls back to `cover`
+  there, because a few percent off the sides beats two navy columns.
+- **The drift is `object-position`, not `transform: scale()`.** A Ken Burns
+  scale grows the image past its box and the box clips it, which is a crop —
+  the one thing this stage does not do. Percentage `object-position` on a
+  *contained* image is defined against the letterbox slack, so a 28% -> 72%
+  pan moves only through navy and cannot reach the picture's edges at any
+  viewport. On the phone band there is no slack, so the drift comes off there
+  and the cross-fade carries it.
+- **Hub photography slots in through `AMV_DATA.heroStills`.** Entries there
+  lead the rotation, ahead of the fleet, and the plate renders an ICAO in the
+  marigold slot where an airframe puts its tail number — so a hub still reads
+  "Benito Juárez Intl · MMMX · Primary hub · Mexico City" with no special
+  casing. The array ships **empty**, and the comment in `data.js` says why: a
+  stock picture of Terminal 2 is the "invented artwork standing in for a real
+  airline" that the header of `brand.css` exists to keep out, with a licensing
+  problem on top. The fleet shots clear that bar because they are the VA's own,
+  taken in the sim. Hub shots should clear the same one.
 
 **The one box on this site is `.panel`.** The rule in `brand.css` is that prose
 is opened by a hairline, never wrapped in a card, and that still holds. But that

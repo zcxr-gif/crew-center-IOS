@@ -1745,14 +1745,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     background: var(--hero-navy); color: #EEF2F8;
     display: grid; align-content: end;
     row-gap: clamp(1.1rem, 2.6vw, 1.7rem);
-    /* Taller than the version with copy in it, because the paragraph that used
-       to fill this is gone and the photograph deserves the room. Still capped,
-       so it never becomes a full-screen splash you have to scroll past to reach
-       the airline. svh rather than vh: on a phone vh is the address bar's
-       promise, not the viewport, and the facts band ends up under the browser
-       chrome. */
-    min-height: 34rem;
-    min-height: min(50rem, max(33rem, 84svh));
+    /* The height is set at the wide breakpoint, off the photograph's ratio
+       rather than off the viewport's — see "The stage" below, where the whole
+       geometry lives. This is the floor for a hero with no photographs at all.
+       svh rather than vh throughout: on a phone vh is the address bar's
+       promise, not the viewport, and the last row ends up under the chrome. */
+    min-height: 28rem;
     padding-block: clamp(3rem, 12vw, 7rem) clamp(1.4rem, 3vw, 2.2rem);
 }
 /* The facts band carries its own generous margin for the hero it was drawn
@@ -1801,6 +1799,30 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ---- The stage -----------------------------------------------------------
+   NOTHING IS CROPPED. This is the rule the stage is built around, and it is
+   why `object-fit` here is `contain` rather than the `cover` a full-bleed hero
+   normally reaches for. These are 1920x886 photographs of whole aeroplanes:
+   under `cover` a tall frame ate the tail off one side and the nose off the
+   other, and on a phone it ate everything but a fuselage. An aircraft with its
+   wingtips outside the frame is not a photograph of that aircraft.
+
+   Two geometries, because a phone and a monitor are not the same problem:
+
+     WIDE (>= 48rem)   full bleed. The hero is at least 50vw tall, which is
+                       taller than the photograph needs at that width (a 2.167
+                       ratio needs 46.2vw), so `contain` fits it by WIDTH and
+                       the slack lands as navy above and below — inside the
+                       veil, which is navy there anyway, so it is invisible.
+     NARROW (< 48rem)  a band. The stage leaves the absolute layer, takes the
+                       photograph's own aspect ratio, and the plate, buttons,
+                       sectors and figures stack underneath it on navy. Full
+                       width, nothing cropped, and no screen of empty sky.
+
+   The one case `contain` gets wrong is a viewport WIDER than the photograph —
+   an ultrawide monitor — where fitting by width would pillarbox it in navy.
+   There, and only there, it falls back to `cover`: a few percent off the sides
+   beats two navy columns.
+
    The wash underneath is the band's own gradient, so a hero whose photographs
    never arrive is still the airline's navy rather than a flat grey hole. */
 .hero__stage { position: absolute; inset: 0; z-index: -2; background: var(--am-wash); }
@@ -1810,51 +1832,55 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .hero__slide.is-on { opacity: 1; }
 .hero__slide img {
-    width: 100%; height: 100%; object-fit: cover;
+    width: 100%; height: 100%;
+    object-fit: contain;
     /* Aircraft sit above the middle of these shots more often than not. */
     object-position: 50% 42%;
-    transform: scale(1.06);
-    will-change: transform;
 }
-/* The drift. Slow, and in alternating directions so consecutive slides do not
-   all pan the same way — 15s against a 7s dwell means it is still moving when
-   the next one takes over, which is the point: it never arrives and stops. */
-.hero__slide.is-on img { animation: heroDrift 15s var(--ease) forwards; }
+@media (min-aspect-ratio: 19/10) {
+    /* Wider than the photograph: crop rather than pillarbox. */
+    .hero__slide img { object-fit: cover; }
+}
+
+/* The drift, and the reason it is written in `object-position` rather than the
+   `transform: scale()` a Ken Burns pan is usually built from. A scale grows the
+   image past its box and the box clips it — which is a crop, which is the one
+   thing this stage does not do. Percentage `object-position` on a CONTAINED
+   image is defined against the slack: 0% pins the top edge of the photograph to
+   the top of the box, 100% pins its bottom to the bottom. So a 30% -> 70% pan
+   moves only through the navy letterbox and cannot reach the picture's edges,
+   whatever size the slack happens to be at that viewport.
+
+   Slow, and alternating so consecutive slides do not all pan the same way. 16s
+   against a 7s dwell means it is still moving when the next one takes over,
+   which is the point: it never arrives and stops. */
+.hero__slide.is-on img { animation: heroDrift 16s var(--ease) forwards; }
 .hero__slide:nth-child(even).is-on img { animation-name: heroDriftAlt; }
 @keyframes heroDrift {
-    from { transform: scale(1.06) translate3d(0, 0, 0); }
-    to   { transform: scale(1.17) translate3d(-1.6%, -1.2%, 0); }
+    from { object-position: 50% 28%; }
+    to   { object-position: 50% 72%; }
 }
 @keyframes heroDriftAlt {
-    from { transform: scale(1.17) translate3d(1.4%, .6%, 0); }
-    to   { transform: scale(1.06) translate3d(0, -.6%, 0); }
+    from { object-position: 50% 70%; }
+    to   { object-position: 50% 30%; }
 }
 
 /* The veil. Lighter than it was, because there is no paragraph to keep legible
    over the middle of the picture any more — only the plate and the buttons, and
    both sit low. One gradient down, which grounds those and lands the section on
    flat navy; on a wide screen a second one across, weighting the left where the
-   plate is and leaving the right open for the aeroplane.
-
-   The across one is a wide-screen rule only. On a phone the plate IS the full
-   width, so a left-weighted wash is just the photograph turned off — the
-   vertical one already carries the legibility there. */
+   plate is and leaving the right open for the aeroplane. */
 .hero__stage::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(180deg,
-        rgba(10, 29, 59, .56) 0, rgba(10, 29, 59, .16) 24%,
-        rgba(10, 29, 59, .46) 50%, rgba(10, 29, 59, .88) 72%,
+        rgba(10, 29, 59, .5) 0, rgba(10, 29, 59, .1) 24%,
+        rgba(10, 29, 59, .34) 48%, rgba(10, 29, 59, .84) 70%,
         var(--hero-navy) 88%, var(--hero-navy) 100%);
 }
-/* A phone frame is tall and narrow and these shots are 1920x886, so `cover`
-   crops hard on the sides and the aircraft drifts out of the top of the frame.
-   Shorter here, and the crop pulled DOWN the image, puts the airframe behind
-   the plate instead of a screen of empty sky above it. */
-@media (max-width: 47.99rem) {
-    .hero--live { min-height: min(42rem, max(29rem, 72svh)); }
-    .hero__slide img { object-position: 50% 56%; }
-}
 @media (min-width: 48rem) {
+    /* Tall enough that `contain` fits the photograph by width and letterboxes
+       it, rather than pillarboxing it — see the geometry note above. */
+    .hero--live { min-height: clamp(32rem, 50vw, 92svh); }
     .hero__stage::after {
         background:
             linear-gradient(180deg,
@@ -1865,6 +1891,46 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
                 rgba(10, 29, 59, .74) 0, rgba(10, 29, 59, .34) 34%,
                 rgba(10, 29, 59, .08) 66%, rgba(10, 29, 59, 0) 100%);
     }
+}
+
+/* ---- The phone: a band, not a backdrop -----------------------------------
+   The stage stops being an absolute layer and becomes the hero's first row, at
+   the photograph's own aspect ratio. That is the only arrangement in which a
+   2.167 ratio picture fits a 390px-wide phone uncropped AND still leaves the
+   plate somewhere legible: laid over it, the type would either sit on the
+   aeroplane or push it out of frame.
+
+   `cover` rather than `contain` here on purpose — the box IS the photograph's
+   ratio, so the two are identical and `cover` guarantees no hairline of
+   background down an edge from a rounding error. The drift comes off for the
+   same reason: with no slack to pan through, motion could only be a crop. */
+@media (max-width: 47.99rem) {
+    .hero--live {
+        min-height: 0;
+        align-content: start;
+        padding-top: 0;
+        row-gap: clamp(1rem, 3.5vw, 1.5rem);
+    }
+    .hero__stage {
+        /* `relative`, not `static`: the slides inside are absolutely
+           positioned, and a static stage stops being their containing block —
+           they escape to .hero--live and go full bleed over the whole section,
+           which is the layout this breakpoint exists to replace. */
+        position: relative; inset: auto; z-index: auto;
+        aspect-ratio: 1920 / 886;
+        margin-bottom: clamp(.4rem, 2vw, 1rem);
+        background: none;
+    }
+    .hero__slide img { object-fit: cover; object-position: 50% 50%; animation: none; }
+    /* Only the bottom edge needs dissolving now: the band meets the navy the
+       plate sits on, and everything above it is the picture. */
+    .hero__stage::after {
+        background: linear-gradient(180deg,
+            rgba(10, 29, 59, 0) 62%, rgba(10, 29, 59, .3) 84%, var(--hero-navy) 100%);
+    }
+    /* Nothing is laid over the photograph any more, so the type does not need
+       to be lifted off it. */
+    .hero__plate b, .hero__plate .mono, .hero__plate-sub { text-shadow: none; }
 }
 
 /* ---- Handing over to the next section ------------------------------------
@@ -1947,7 +2013,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 @media (prefers-reduced-motion: reduce) {
     .hero__slide { transition: none; }
     .hero__slide.is-on img,
-    .hero__slide:nth-child(even).is-on img { animation: none; transform: scale(1.02); }
+    .hero__slide:nth-child(even).is-on img { animation: none; object-position: 50% 42%; }
     .hero__legs { transition: none; }
 }
 
