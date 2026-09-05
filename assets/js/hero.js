@@ -16,18 +16,26 @@
 
      the stage    AMV_DATA.fleet[].photo — the VA's own sim shots, flagship
                   first, cross-faded with a slow drift.
-     the caption  what is on screen: type, registration, role, and the sector
+     the plate    what is on screen, and the page's display type now that the
+                  headline is gone: type, registration, role, and the sector
                   that type is flown on, named in cities where we know them.
      the log      AMV_CREW.pireps() — approved flights off the crew centre,
                   sampled at random. Real pilots, real sectors, filed by the
                   people on the roster.
 
-   NOTHING HERE INVENTS ANYTHING. The slide list is whatever data.js holds
-   photographs for; the flight strip renders only what the crew centre returns
-   and stays hidden when it returns nothing. A photograph that fails to load
-   drops out of the rotation rather than showing a broken frame, and with the
-   backend quiet or scripting off the hero is still the copy, the buttons and
-   the four counted facts on navy — which is what it was before this file.
+   THE HERO HAS NO COPY LEFT TO FALL BACK ON. The tagline and the paragraph
+   that used to sit over the photograph are gone — they covered up the subject,
+   and unlike everything else on this site they were written once and would
+   have gone on being said. So the plate IS the headline, and it is read off
+   the fleet.
+
+   Which raises the stakes on the contract, and nothing here bends it: the
+   slide list is whatever data.js holds photographs for; the flight strip
+   renders only what the crew centre returns and hides itself when that is
+   nothing; a photograph that fails to load drops out of the rotation rather
+   than fading to a broken frame. With no photographs, a quiet backend or
+   scripting off, the hero is the airline's navy, the two buttons and the four
+   counted facts — smaller than it should be, and never wrong.
 
    ADDING AIRPORT PHOTOGRAPHY. There are no hub shots in this repo, and a stock
    photograph of Benito Juárez is not the airline's material. When the VA has
@@ -98,7 +106,9 @@
     }
 
     const slides = buildSlides();
-    if (!slides.length) return;     // no material — the copy carries the hero
+    // No photographs at all: leave the navy wash, the buttons and the counted
+    // facts standing. There is no copy to fall back to and none is invented.
+    if (!slides.length) return;
 
     /* ---- The stage ----------------------------------------------------------
        One <img> per slide, stacked and cross-faded. Only the first carries a
@@ -128,7 +138,11 @@
         if (img && !img.getAttribute('src')) img.setAttribute('src', slides[i].src);
     }
 
-    /* ---- The caption and the dots ------------------------------------------ */
+    /* ---- The plate and the dots --------------------------------------------
+       The plate is what the headline used to be: the aircraft on screen naming
+       itself. There is no static copy in this hero to fall back to, which is
+       why every field below is guarded — a slide with nothing to say prints
+       nothing and the stage carries it. */
     const caption = root.querySelector('[data-hero-caption]');
     const dots = root.querySelector('[data-hero-dots]');
 
@@ -157,12 +171,17 @@
             d.setAttribute('aria-current', j === i ? 'true' : 'false');
         });
 
+        // The plate is the page's display type — see LIVE HERO in brand.css.
+        // Nothing here has a fallback string: a slide with no registration
+        // prints no registration rather than an em dash.
         const s = slides[i];
         const line = [s.note, sector(s.route)].filter(Boolean).join(' · ');
         caption.innerHTML =
-            `<b>${esc(s.title || '')}</b>` +
-            (s.reg ? `<span class="mono">${esc(s.reg)}</span>` : '') +
-            (line ? `<span>${esc(line)}</span>` : '');
+            `<span class="hero__plate-name">
+                <b>${esc(s.title || '')}</b>
+                ${s.reg ? `<span class="mono">${esc(s.reg)}</span>` : ''}
+             </span>` +
+            (line ? `<span class="hero__plate-sub">${esc(line)}</span>` : '');
         at = i;
     }
 

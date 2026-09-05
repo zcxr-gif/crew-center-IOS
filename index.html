@@ -16,9 +16,12 @@
 <meta property="og:url" content="https://aeromexicova.org/">
 <meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
 <meta property="og:description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
-<!-- Absolute, because a share card is fetched by a crawler that has no page to
-     resolve a root-relative path against. -->
-<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<!-- The share card is the airline's own photograph of XA-ADD, off the same
+     community gallery the fleet page and the hero draw from — not the folk-art
+     poster that used to be here, which went with the hero it was drawn for.
+     Absolute because a crawler has no page to resolve a relative path against;
+     off-site because that is where the VA's photographs live. -->
+<meta property="og:image" content="https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAADD-1775817369312.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,47 +55,47 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         The airline as it is running, not a picture of one.
+         The aeroplane, and what the airline did with it. No headline.
 
-         What was here was a poster: one flat illustration of the 787-9 ringed
-         by folk art, over the wordmark, on navy. A title card is a picture of
-         an airline, and the drawn eagle and the pasted aeroplane were reading
-         as exactly that next to the real photographs the fleet page already
-         carries of these same airframes.
+         Two things have been thrown out of this section now. The poster — the
+         787-9 drawn in its special livery, ringed by folk art, over the
+         wordmark — because it was a drawing sitting one click from photographs
+         of the same airframe. And then the copy that replaced it, because a
+         tagline and a paragraph laid over a photograph is the same move every
+         airline's homepage makes, and it was covering the picture up.
 
-         So the opening screen is those photographs — the VA's own sim shots,
-         flagship first, cross-faded behind the copy — captioned with what is on
-         screen and what that type flies, and with a handful of the crew's own
-         approved sectors underneath, sampled at random off the crew centre.
+         What is left says more than the paragraph did, and none of it is
+         written here. The aircraft names ITSELF: hero.js captions each slide off
+         AMV_DATA.fleet — type, registration, what that type is for, and a sector
+         it actually flies, in cities where the site already names them. Under
+         it, sectors the crew have flown, sampled at random off the crew centre's
+         public flight log. Then the airline in four counted figures.
 
-         Everything below the copy is built by hero.js and everything it builds
-         is optional: no photographs, a quiet backend or scripting off and this
-         is the tagline, the buttons and the four counted facts on navy, which
-         is what the hero was before any of it. -->
+         Every layer is optional and none of it is decoration: no photographs, a
+         quiet backend or scripting off, and this is the airline's navy, the two
+         buttons and the counted facts. Nothing here renders a placeholder. -->
     <section class="hero hero--live" data-hero>
         <!-- The stage. Empty in the markup on purpose: the slides are the fleet
              photographs in data.js, so a type gained or lost changes the hero
              with nothing typed in here. -->
         <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
 
-        <div class="wrap hero__body">
-            <span class="eyebrow">Infinite Flight · Expert Server</span>
-            <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
-            <p class="lede">
-                We fly the Aeroméxico network inside Infinite Flight — Mexico City out to
-                New York, Madrid, Tokyo and Buenos Aires. Real routes, a rank ladder that
-                actually opens things up, and every hour logged for you.
-            </p>
-            <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                <a class="btn btn--onink" href="/network">See the route map</a>
-            </div>
+        <!-- The page still has to be NAMED — for a screen reader arriving at it
+             and for a crawler indexing it. It is simply not set in 70px type
+             over the aircraft any more. -->
+        <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual airline
+            flying the Aeroméxico network from Mexico City.</h1>
 
-            <!-- What is on the stage, and the controls for it. Buttons rather
-                 than dots-in-name-only: this is the one way to steer the hero
-                 from a keyboard. -->
-            <div class="hero__stagebar">
-                <p class="hero__caption" data-hero-caption aria-live="polite"></p>
+        <div class="wrap hero__marque">
+            <!-- Filled by hero.js with whatever is on the stage. The dots are
+                 real buttons: this is the only way to steer the hero from a
+                 keyboard. -->
+            <div class="hero__plate" data-hero-caption aria-live="polite"></div>
+            <div class="hero__controls">
+                <div class="hero__cta">
+                    <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                    <a class="btn btn--onink" href="/network">Route map</a>
+                </div>
                 <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
             </div>
         </div>

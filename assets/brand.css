@@ -23,11 +23,14 @@
    actually owns:
 
      Aeromexico-Symbol.webp  the Caballero Águila, traced to mark.svg
-     plane-logo.webp         the 787-9 special livery and its folk-art artwork
+     the fleet photographs   the VA's own sim shots of its own airframes, off
+                             the community gallery (AMV_DATA.fleet[].photo)
      the tricolour           hard stops, real flag colours
 
-   The hero is that aircraft on white. It is the most Mexican thing available
-   and it required no drawing.
+   The hero is those photographs, full bleed, one at a time. The folk-art
+   artwork that used to open the page (plane-logo.webp and the plane-hero.webp
+   crop of it) is gone with the two heroes that used it: a drawing of a 787-9
+   was sitting one click from photographs of the same airframe.
 
    Where the dark sections went next, still inside that rule: the ruled device
    now runs down BOTH edges and the eagle sits faded behind them. Both are the
@@ -907,7 +910,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .hero h1 { margin-block: 1rem; text-wrap: balance; }
 .hero .eyebrow { margin-bottom: .3rem; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
-.hero--live .hero__cta { margin-top: clamp(1.3rem, 3vw, 1.9rem); }
+.hero--live .hero__cta { margin-top: .1rem; }
 @media (max-width: 48rem) {
     .hero__cta { margin-top: 1.6rem; gap: .6rem; }
     .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
@@ -1694,36 +1697,42 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================== LIVE HERO ================================
-   The home page opens on the airline flying rather than on a picture of it.
+   The home page opens on the aeroplane. Not on words about the aeroplane.
 
-   WHAT WAS HERE. A poster: the 787-9 drawn in its special livery, ringed by
-   folk-art illustration, over the wordmark, on a flat navy. It was one
-   immovable image, and next to the photographs the fleet page carries of these
-   same airframes it read as a drawing of an airline. The VA's words were that
-   the eagle and the aeroplane looked terrible; the honest diagnosis is that
-   the material underneath them was better than the composition on top.
+   TWO HEROES DIED HERE, and the second one is the interesting note. First the
+   poster: the 787-9 drawn in its special livery, ringed by folk-art
+   illustration, over the wordmark, on flat navy — one immovable drawing,
+   sitting one click from photographs of the same airframe on the fleet page.
+   It was replaced by those photographs plus the usual furniture: eyebrow, 70px
+   tagline, a paragraph of positioning copy, then the buttons.
 
-   WHAT IT IS NOW. Three layers, in this order back to front:
+   That furniture came off too. A headline and a lede laid over a photograph is
+   the move every airline homepage makes, it covered up the thing worth looking
+   at, and — the part that decided it — none of it was true the way the rest of
+   this site is true. It was written once and would have gone on being said.
 
-     .hero__stage   the fleet photographs, one at a time, cross-faded with a
-                    slow drift. Built by hero.js off AMV_DATA.fleet[].photo, so
-                    the hero is whatever the airline actually operates.
-     the veil       a gradient over the stage. Weak across the top, where the
-                    aircraft is, and heavy at the bottom, where the copy is —
-                    the picture is the subject up there and the ground down
-                    here, and it ends on flat navy so the counted facts and the
-                    section below it sit on a solid colour.
-     the copy       tagline, buttons, what is on screen, and the crew's own
-                    approved sectors off the flight log.
+   WHAT SAYS IT INSTEAD, every word read off data rather than typed here:
 
-   Dark in both themes, like the poster before it: a photograph does not have a
-   light mode, and the copy over it needs one ground to be legible against.
+     .hero__stage    the fleet photographs, one at a time, cross-faded with a
+                     slow drift. hero.js builds them off AMV_DATA.fleet[].photo,
+                     so the hero is whatever the airline actually operates.
+     .hero__plate    the aircraft naming ITSELF — type, registration, what the
+                     type is for, and a sector it flies, in cities where the
+                     site already names them. This is the display type now.
+     .hero__log      sectors the crew have flown, sampled off the crew centre.
+     .hero__facts    the airline in four counted figures.
 
-   EVERYTHING BELOW THE COPY IS OPTIONAL. No photographs, a quiet backend or
-   scripting off and the stage stays the navy wash, the caption row collapses
-   and the flight strip never appears — leaving the tagline, the buttons and the
-   four counted facts, which is a working hero. Nothing here renders a skeleton
-   or a placeholder leg. */
+   The page is still NAMED, by an .sr-only <h1> in the markup: a page with no
+   heading is broken for a screen reader and invisible to a crawler. It is
+   simply not set in 70px over the aircraft.
+
+   Dark in both themes, like the poster before it: a photograph has no light
+   mode, and what sits over it needs one ground to be legible against.
+
+   EVERY LAYER IS OPTIONAL. No photographs, a quiet backend or scripting off,
+   and the stage stays the airline's navy wash, the plate collapses and the
+   flight strip never appears — leaving the buttons and the counted facts, which
+   is a working hero. Nothing here renders a skeleton or a placeholder leg. */
 .hero--live {
     --hero-navy: var(--am-navy);
     /* The colour the hero hands over to whatever follows, and how long it
@@ -1735,36 +1744,61 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     position: relative; isolation: isolate; overflow: hidden;
     background: var(--hero-navy); color: #EEF2F8;
     display: grid; align-content: end;
-    /* Tight on purpose. Five things stack in here — tagline, buttons, caption,
-       the crew's sectors and the four counted facts — and on a 900px laptop the
-       first draft pushed the facts under the fold. A hero you have to scroll to
-       finish reading is a hero that has said nothing. */
-    row-gap: clamp(1rem, 2.4vw, 1.5rem);
-    /* Tall enough for a photograph to be one, capped so it never becomes a
-       full-screen splash you have to scroll past to reach the airline. svh
-       rather than vh: on a phone vh is the address bar's promise, not the
-       viewport, and the facts band ends up under the browser chrome. */
-    min-height: 32rem;
-    min-height: min(44rem, max(31rem, 74svh));
-    padding-block: clamp(2rem, 5vw, 3.25rem) clamp(1.4rem, 3vw, 2.2rem);
+    row-gap: clamp(1.1rem, 2.6vw, 1.7rem);
+    /* Taller than the version with copy in it, because the paragraph that used
+       to fill this is gone and the photograph deserves the room. Still capped,
+       so it never becomes a full-screen splash you have to scroll past to reach
+       the airline. svh rather than vh: on a phone vh is the address bar's
+       promise, not the viewport, and the facts band ends up under the browser
+       chrome. */
+    min-height: 34rem;
+    min-height: min(50rem, max(33rem, 84svh));
+    padding-block: clamp(3rem, 12vw, 7rem) clamp(1.4rem, 3vw, 2.2rem);
 }
-.hero--live .eyebrow { color: #8FA6C8; }
-.hero--live .eyebrow::before { box-shadow: none; }
-.hero--live h1 {
-    margin: .4rem 0 .9rem;
-    max-width: 15ch;
-    font-size: clamp(2.2rem, 5.6vw, 3.9rem);
-    /* The type sits on a photograph, not on a colour. A shadow this soft is
-       invisible over the veil's dark end and is what keeps the headline legible
-       if a bright frame comes up behind it. */
-    text-shadow: 0 2px 24px rgba(7, 20, 38, .55);
-}
-.hero--live .grad-text { color: var(--am-marigold); }
-.hero--live .lede { color: #B7C6DE; max-width: 46ch; }
 /* The facts band carries its own generous margin for the hero it was drawn
    for; in here the row-gap above is already doing that job. */
 .hero--live .hero__facts--band { margin-top: .4rem; }
-.hero__body { position: relative; }
+
+/* ---- The plate -----------------------------------------------------------
+   What the headline used to be, and set as display type because it IS the
+   headline now. The difference is that every word of it is read off the fleet
+   and changes when the stage does — an aircraft introducing itself, rather
+   than a sentence about aircraft in general.
+
+   Three parts, each of which degrades to nothing rather than to a placeholder:
+   the type, in the display face; the registration, in mono and marigold,
+   because a tail number is flight data and is set here like flight data; and
+   the line under them naming what the type is for and one sector it flies. */
+.hero__marque { position: relative; display: grid; justify-items: stretch; gap: 1.15rem; }
+/* The buttons and the dots share a line: the dots are the stage's controls and
+   they belong with the other controls, not stranded under the plate where they
+   read as an underline of it. Pushed to the far edge so the two groups are
+   obviously separate things. */
+.hero__controls {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: .9rem 1.4rem;
+}
+.hero__controls .hero__dots { margin-left: auto; }
+@media (max-width: 40rem) { .hero__controls .hero__dots { margin-left: 0; } }
+.hero__plate  { display: grid; gap: .3rem; margin: 0; }
+.hero__plate:empty { display: none; }
+.hero__plate-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .9rem; }
+.hero__plate b {
+    font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em;
+    font-size: clamp(1.75rem, 4.6vw, 3.1rem); line-height: 1.05; color: #fff;
+    /* The type sits on a photograph, not on a colour. A shadow this soft is
+       invisible over the veil's dark end, and is what keeps the name legible
+       when a bright frame comes up behind it. */
+    text-shadow: 0 2px 26px rgba(7, 20, 38, .62);
+}
+.hero__plate .mono {
+    font-size: clamp(.85rem, 1.5vw, 1rem); font-weight: 700; letter-spacing: .06em;
+    color: var(--am-marigold); text-shadow: 0 2px 18px rgba(7, 20, 38, .7);
+}
+.hero__plate-sub {
+    font-size: clamp(.9rem, 1.7vw, 1.05rem); color: #C7D4E8;
+    text-shadow: 0 1px 16px rgba(7, 20, 38, .72);
+}
 
 /* ---- The stage -----------------------------------------------------------
    The wash underneath is the band's own gradient, so a hero whose photographs
@@ -1796,30 +1830,40 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     to   { transform: scale(1.06) translate3d(0, -.6%, 0); }
 }
 
-/* The veil. One gradient down, which is what makes the copy legible and lands
-   the section on flat navy; on a wide screen a second one across, weighting the
-   left where the copy is and leaving the right open for the aeroplane.
+/* The veil. Lighter than it was, because there is no paragraph to keep legible
+   over the middle of the picture any more — only the plate and the buttons, and
+   both sit low. One gradient down, which grounds those and lands the section on
+   flat navy; on a wide screen a second one across, weighting the left where the
+   plate is and leaving the right open for the aeroplane.
 
-   The across one is a wide-screen rule only. On a phone the copy IS the full
+   The across one is a wide-screen rule only. On a phone the plate IS the full
    width, so a left-weighted wash is just the photograph turned off — the
    vertical one already carries the legibility there. */
 .hero__stage::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
     background: linear-gradient(180deg,
-        rgba(10, 29, 59, .66) 0, rgba(10, 29, 59, .3) 24%,
-        rgba(10, 29, 59, .56) 56%, rgba(10, 29, 59, .89) 80%,
-        var(--hero-navy) 100%);
+        rgba(10, 29, 59, .56) 0, rgba(10, 29, 59, .16) 24%,
+        rgba(10, 29, 59, .46) 50%, rgba(10, 29, 59, .88) 72%,
+        var(--hero-navy) 88%, var(--hero-navy) 100%);
+}
+/* A phone frame is tall and narrow and these shots are 1920x886, so `cover`
+   crops hard on the sides and the aircraft drifts out of the top of the frame.
+   Shorter here, and the crop pulled DOWN the image, puts the airframe behind
+   the plate instead of a screen of empty sky above it. */
+@media (max-width: 47.99rem) {
+    .hero--live { min-height: min(42rem, max(29rem, 72svh)); }
+    .hero__slide img { object-position: 50% 56%; }
 }
 @media (min-width: 48rem) {
     .hero__stage::after {
         background:
             linear-gradient(180deg,
-                rgba(10, 29, 59, .58) 0, rgba(10, 29, 59, .2) 24%,
-                rgba(10, 29, 59, .46) 56%, rgba(10, 29, 59, .86) 80%,
-                var(--hero-navy) 100%),
+                rgba(10, 29, 59, .5) 0, rgba(10, 29, 59, .1) 24%,
+                rgba(10, 29, 59, .34) 48%, rgba(10, 29, 59, .84) 70%,
+                var(--hero-navy) 88%, var(--hero-navy) 100%),
             linear-gradient(90deg,
-                rgba(10, 29, 59, .86) 0, rgba(10, 29, 59, .52) 30%,
-                rgba(10, 29, 59, .16) 62%, rgba(10, 29, 59, .02) 100%);
+                rgba(10, 29, 59, .74) 0, rgba(10, 29, 59, .34) 34%,
+                rgba(10, 29, 59, .08) 66%, rgba(10, 29, 59, 0) 100%);
     }
 }
 
@@ -1845,20 +1889,9 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .hero--live:has(+ .section:not(.section--alt):not(.section--ink))
     { --hero-tail: var(--bg); --hero-tail-h: var(--ink-seam); }
 
-/* ---- What is on the stage ------------------------------------------------
-   The caption names the aircraft in shot and the sector its type is flown on;
-   the dots are the only way to steer the stage from a keyboard, so they are
-   buttons with labels rather than decorated spans. */
-.hero__stagebar {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: .7rem 1.4rem; margin-top: clamp(1.2rem, 2.8vw, 1.8rem);
-}
-.hero__caption {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .7rem;
-    margin: 0; font-size: .88rem; color: #A9BBD6;
-}
-.hero__caption b { color: #EEF2F8; font-size: .95rem; letter-spacing: -.01em; }
-.hero__caption .mono { color: var(--am-marigold); font-size: .8rem; }
+/* ---- Steering the stage --------------------------------------------------
+   Buttons with real labels rather than decorated spans: this is the only way
+   to change the aircraft from a keyboard. */
 .hero__dots { display: flex; gap: .4rem; }
 .hero__dot {
     width: 1.5rem; height: 3px; padding: 0; border: 0; border-radius: 999px;

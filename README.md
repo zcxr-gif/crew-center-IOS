@@ -25,7 +25,7 @@ assets/js/map.js   Draws the route map: great circles, dots, label placement
 assets/js/world.js GENERATED coastlines — see tools/make-worldmap.py
 assets/js/live.js  Mounts the live-traffic embed
 assets/js/crew.js  Read-only client for the crew center's public feeds
-tools/             Regenerate mark.svg, plane-hero.webp and world.js from source
+tools/             Regenerate mark.svg, the ruled device and world.js from source
 assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
 
@@ -104,7 +104,6 @@ motifs sharing a section, not that device.
 | file | what it is | where it runs |
 |---|---|---|
 | `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries, and faded behind dark sections |
-| `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
@@ -134,7 +133,6 @@ untouched:
 
 ```bash
 python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
-python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
 python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg + stripes-mirror.svg
 python3 tools/make-greca.py   # (parameters only)      -> greca.svg + greca-tile.svg
 python3 tools/make-serpent.py # (parameters only)      -> serpent.svg
@@ -146,12 +144,6 @@ single `currentColor` group, and the white channels between the feathers are
 real **holes**, not white-filled shapes. `brand.css` paints it through a CSS
 mask, so one file serves every placement and recolours per theme — and a
 white-filled version would paint solid navy over the page instead.
-
-`crop-hero.py` finds the artwork band in the supplied image and crops to it,
-dropping the second AeroMexico lockup underneath (the nav already carries the
-mark) and the surrounding white, which was pushing the aircraft below the fold.
-It detects the band rather than hard-coding it, so a re-exported source still
-works.
 
 `make-stripes.py` produces the ruled columns that run down **both** edges of the
 dark sections — bars flush to the outside with the ragged edge facing in, the
@@ -493,40 +485,54 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**The home page opens on the fleet, rotating.** `assets/js/hero.js` builds the
-stage out of `AMV_DATA.fleet[].photo` — the VA's own sim shots of these exact
-airframes, the same ones the fleet page carries — flagship first, cross-faded
-with a slow drift, captioned with the type, its registration and the sector that
-type flies. Underneath it, a handful of approved sectors sampled at random off
-the crew centre's public flight log (`AMV_CREW.pireps()`): real pilots, real
-routes, filed by flying them.
+**The home page opens on the aeroplane, and says nothing over it.**
+`assets/js/hero.js` builds the stage out of `AMV_DATA.fleet[].photo` — the VA's
+own sim shots of these exact airframes, the same ones the fleet page carries —
+flagship first, cross-faded with a slow drift, full bleed. Under it, a handful
+of approved sectors sampled at random off the crew centre's public flight log
+(`AMV_CREW.pireps()`): real pilots, real routes, filed by flying them. Then the
+airline in four counted figures.
 
-That replaced a poster — the 787-9 drawn in its special livery, ringed by folk
-art, over the wordmark — which had itself replaced a two-column white header.
-The poster was memorable and it was a drawing, sitting one click away from
-photographs of the same aircraft. Both heroes' CSS was deleted rather than left
-behind; `assets/img/hero-poster.webp` and its phone crop went with it. If a
-third hero is ever needed, write it, and do not resurrect either from git.
+**There is no headline and no lede, and that is the point.** Three heroes have
+now been thrown out of this repo. A two-column white header, which was fine and
+in the VA's words not memorable. A poster — the 787-9 drawn in its special
+livery, ringed by folk art, over the wordmark — which was memorable and was a
+drawing, sitting one click from photographs of the same airframe. And then the
+photographs with the usual furniture on top: eyebrow, 70px tagline, a paragraph
+of positioning copy. That furniture came off because it covered up the subject,
+and because unlike the rest of this site it was written once and would have gone
+on being said.
 
-Four things about the new one are deliberate:
+What replaced it is `.hero__plate`: the aircraft on screen **naming itself** —
+type, registration, what the type is for, and a sector it flies, in cities where
+the site already names them. It is set in the display face because it is the
+headline now. Every word of it is read off `data.js` and changes when the stage
+does. The page is still named for a screen reader and a crawler by an `.sr-only`
+`<h1>`; it is simply not set in 70px over the aeroplane. `plane-hero.webp`,
+`plane-logo.webp` and `tools/crop-hero.py` went with the poster, and the share
+card on every page is a real photograph now.
+
+Four things about the stage are deliberate:
 
 - **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
-  failed image fetch or scripting off, and the hero is the tagline, the buttons
-  and the four counted facts on the airline's navy wash. A photo that 404s drops
-  out of the rotation; the flight strip stays `[hidden]` until real sectors
-  arrive. There is no skeleton and no placeholder leg anywhere in it.
-- **It only runs when it is being looked at.** The stage advances on a seven
-  second dwell, paused by an `IntersectionObserver` when the hero scrolls away,
-  by `visibilitychange` when the tab goes to the back, and by hover or focus.
-  Asked for reduced motion it does not advance at all — the dots still work,
-  and the drift and cross-fade come off in CSS.
+  failed image fetch or scripting off, and the hero is the airline's navy wash,
+  the two buttons and the counted facts. A photo that 404s drops out of the
+  rotation; the flight strip stays `[hidden]` until real sectors arrive. There
+  is no skeleton and no placeholder leg anywhere in it — and now no copy to fall
+  back on either, which is the whole reason that contract is strict.
+- **It only runs when it is being looked at.** Seven second dwell, paused by an
+  `IntersectionObserver` when the hero scrolls away, by `visibilitychange` when
+  the tab goes to the back, and by hover or focus. Asked for reduced motion it
+  does not advance at all — the dots still work, and the drift and cross-fade
+  come off in CSS.
 - **Photographs load as they are needed.** Only the first slide carries a `src`
   on first paint; each one loads as the slide before it comes up. Five 1920px
   photographs fetched to show one is the whole of an opening screen's budget.
 - **Airport photography would slot straight in.** There is none in this repo,
-  and a stock shot of Benito Juárez is not the airline's material. When the VA
-  has its own, `AMV_DATA.heroStills` takes `{ src, w, h, alt, title, reg, note,
-  route }` entries and they lead the rotation with no change to `hero.js`.
+  and a stock shot of Benito Juárez is not the airline's material, so hubs are
+  named rather than pictured. When the VA has its own, `AMV_DATA.heroStills`
+  takes `{ src, w, h, alt, title, reg, note, route }` entries and they lead the
+  rotation with no change to `hero.js`.
 
 **The one box on this site is `.panel`.** The rule in `brand.css` is that prose
 is opened by a hairline, never wrapped in a card, and that still holds. But that
