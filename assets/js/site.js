@@ -224,6 +224,13 @@
             try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
             paint();
         });
+        // The theme is not only ever set from this button. /crew adopts the one
+        // the visitor picks inside the framed crew center, and repainting only
+        // on click left this icon offering "switch to dark" on an already-dark
+        // page. Watching the attribute covers every route in, present or later.
+        new MutationObserver(paint).observe(document.documentElement, {
+            attributes: true, attributeFilter: ['data-theme'],
+        });
         paint();
     }
 

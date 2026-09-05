@@ -123,6 +123,21 @@
     new MutationObserver(pushTheme).observe(document.documentElement, {
         attributes: true, attributeFilter: ['data-theme'],
     });
+
+    // …and the other way. The crew center has a theme toggle of its own inside
+    // the frame, so pushing our state down was only half a conversation: use
+    // theirs and the two bars disagreed until the page was reloaded. Adopting
+    // it here means whichever toggle you reach for, both sides move — and the
+    // choice is stored under the key both products read.
+    addEventListener('message', (e) => {
+        if (e.origin !== 'https://inflight.info' || e.source !== frame.contentWindow) return;
+        const d = e.data;
+        if (!d || d.type !== 'inflight:crew:theme-changed') return;
+        if (d.theme !== 'dark' && d.theme !== 'light') return;
+        if (window.AMV.currentTheme() === d.theme) return;
+        document.documentElement.setAttribute('data-theme', d.theme);
+        try { localStorage.setItem(window.AMV.THEME_KEY, d.theme); } catch (_) {}
+    });
 })();
 </script>
 </body>
