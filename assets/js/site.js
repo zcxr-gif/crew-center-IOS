@@ -123,7 +123,16 @@
             }
         }, { passive: true });
 
-        const onScroll = () => nav.classList.toggle('is-stuck', scrollY > 8);
+        // The bar carries its own stuck treatment (opacity, the navy→red edge);
+        // the HOST carries the scrim that fades the content into it, because a
+        // fade drawn inside the bar would sit above the blur instead of below
+        // the bar. Both get the flag so neither needs `:has()` to find the
+        // other. See the NAV block in brand.css.
+        const onScroll = () => {
+            const stuck = scrollY > 8;
+            nav.classList.toggle('is-stuck', stuck);
+            host.classList.toggle('is-stuck', stuck);
+        };
         addEventListener('scroll', onScroll, { passive: true });
         onScroll();
 
