@@ -207,6 +207,51 @@
         return flown.length ? flown : null;
     }
 
+    /* ---- The flight log -----------------------------------------------------
+       GET /api/crew/<slug>/pireps → { pireps: [{ pilotName, callsign,
+       flightNumber, origin, destination, aircraftName, liveryName, durationMin,
+       distanceNm, landings, server, status, flownAt }], canReview }
+
+       Approved flights only for an unauthenticated caller — the endpoint gates
+       everything else behind flights.review, so this is the airline's public
+       flight log and nothing here can leak a pending or rejected report.
+
+       These are real people's sectors, so only what the flight log already
+       shows publicly crosses into the page: who flew it, what they flew, where
+       it went, and when. No member id, no XP, no violations — a home page has
+       no business printing a pilot's record at them.
+
+       Null on any failure and null on an empty log, per the contract at the top
+       of this file: a hero that has nothing to show shows nothing. */
+    async function pireps({ limit = 24 } = {}) {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/pireps`);
+        if (!data || !Array.isArray(data.pireps)) return null;
+
+        const rows = data.pireps
+            .filter(p => p && p.origin && p.destination)
+            // Belt and braces: the endpoint already filters for us, but this
+            // file is the one place that decides what a public page may print.
+            .filter(p => !p.status || p.status === 'approved')
+            .sort((a, b) => new Date(b.flownAt || b.createdAt || 0)
+                          - new Date(a.flownAt || a.createdAt || 0))
+            .slice(0, limit)
+            .map(p => ({
+                pilot:  (p.pilotName || '').trim(),
+                callsign: (p.callsign || '').trim(),
+                flight: (p.flightNumber || '').trim(),
+                from:   String(p.origin).trim().toUpperCase(),
+                to:     String(p.destination).trim().toUpperCase(),
+                ac:     (p.aircraftName || '').trim(),
+                livery: (p.liveryName || '').trim(),
+                min:    Number(p.durationMin) || 0,
+                dist:   Number(p.distanceNm) || 0,
+                server: (p.server || '').trim(),
+                at:     p.flownAt || p.createdAt || null,
+            }));
+
+        return rows.length ? rows : null;
+    }
+
     /* ---- Operating figures --------------------------------------------------
        GET /api/crew/<slug>/stats → { connected, stats: { pilots, hours,
        pireps, flightHours, … } }
@@ -329,5 +374,5 @@
         return stats().then((figures) => { paint(figures, root); return figures; });
     }
 
-    window.AMV_CREW = { get, routes, airports, events, pastEvents, stats, paint, mountStats, BACKEND, SLUG };
+    window.AMV_CREW = { get, routes, airports, events, pastEvents, pireps, stats, paint, mountStats, BACKEND, SLUG };
 })();

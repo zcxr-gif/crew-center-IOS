@@ -16,9 +16,12 @@
 <meta property="og:url" content="https://aeromexicova.org/">
 <meta property="og:title" content="Aeromexico Virtual — Fly the Eagle Warrior">
 <meta property="og:description" content="Aeromexico Virtual is an Infinite Flight virtual airline flying the Aeroméxico network from Mexico City across the Americas, Europe and the Pacific. Join the crew.">
-<!-- Absolute, because a share card is fetched by a crawler that has no page to
-     resolve a root-relative path against. -->
-<meta property="og:image" content="https://aeromexicova.org/assets/img/plane-hero.webp">
+<!-- The share card is the airline's own photograph of XA-ADD, off the same
+     community gallery the fleet page and the hero draw from — not the folk-art
+     poster that used to be here, which went with the hero it was drawn for.
+     Absolute because a crawler has no page to resolve a relative path against;
+     off-site because that is where the VA's photographs live. -->
+<meta property="og:image" content="https://thebucketstorage2.s3.us-east-2.amazonaws.com/community-aircraft/XAADD-1775817369312.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,50 +55,59 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         A title card, not a landing-page header.
+         The aeroplane, and what the airline did with it. No headline.
 
-         What was here was the stock arrangement: copy left, figures right,
-         artwork underneath, all on white. It was tidy and it was not memorable,
-         which is what the VA said about it. This is the airline's own poster —
-         the 787-9 in its special livery, ringed by the folk-art illustration
-         that livery carries, over the wordmark — set on the navy it was made
-         on, at the size it was drawn for.
+         Two things have been thrown out of this section now. The poster — the
+         787-9 drawn in its special livery, ringed by folk art, over the
+         wordmark — because it was a drawing sitting one click from photographs
+         of the same airframe. And then the copy that replaced it, because a
+         tagline and a paragraph laid over a photograph is the same move every
+         airline's homepage makes, and it was covering the picture up.
 
-         The poster's ground is a tiled navy, so its edges are masked into the
-         section rather than stopping at a hard rectangle. Below it the tagline,
-         and below that the airline in four counted figures. Nothing overlaps
-         the artwork: it was composed as a whole and it is used as one. -->
-    <section class="hero hero--poster">
-        <div class="hero__poster">
-          <div class="hero__poster-frame">
-            <picture>
-                <!-- On a phone the full poster puts the aeroplane at about
-                     250px across and its wordmark plate at 85 — smaller than
-                     the same wordmark in the nav right above it. Below 40rem
-                     the artwork is served cropped to the aircraft so it fills
-                     the screen, and the nav carries the name. -->
-                <source media="(max-width: 39.99rem)" srcset="/assets/img/hero-poster-sm.webp"
-                        width="756" height="228">
-                <img src="/assets/img/hero-poster.webp" width="848" height="376" fetchpriority="high"
-                     alt="Aeroméxico Boeing 787-9 XA-ADD in its Quetzalcóatl special livery, ringed by
-                          Mexican folk-art illustration — eagles, skulls, marigolds and a feathered
-                          serpent — above the Aeromexico Virtual wordmark.">
-            </picture>
-          </div>
+         What is left says more than the paragraph did, and none of it is
+         written here. The aircraft names ITSELF: hero.js captions each slide off
+         AMV_DATA.fleet — type, registration, what that type is for, and a sector
+         it actually flies, in cities where the site already names them. Under
+         it, sectors the crew have flown, sampled at random off the crew centre's
+         public flight log. Then the airline in four counted figures.
+
+         Every layer is optional and none of it is decoration: no photographs, a
+         quiet backend or scripting off, and this is the airline's navy, the two
+         buttons and the counted facts. Nothing here renders a placeholder. -->
+    <section class="hero hero--live" data-hero>
+        <!-- The stage. Empty in the markup on purpose: the slides are the fleet
+             photographs in data.js, so a type gained or lost changes the hero
+             with nothing typed in here. -->
+        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+
+        <!-- The page still has to be NAMED — for a screen reader arriving at it
+             and for a crawler indexing it. It is simply not set in 70px type
+             over the aircraft any more. -->
+        <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual airline
+            flying the Aeroméxico network from Mexico City.</h1>
+
+        <div class="wrap hero__marque">
+            <!-- Filled by hero.js with whatever is on the stage. The dots are
+                 real buttons: this is the only way to steer the hero from a
+                 keyboard. -->
+            <div class="hero__plate" data-hero-caption aria-live="polite"></div>
+            <div class="hero__controls">
+                <div class="hero__cta">
+                    <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                    <a class="btn btn--onink" href="/network">Route map</a>
+                </div>
+                <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+            </div>
         </div>
 
-        <div class="wrap hero__poster-copy">
-            <span class="eyebrow">Infinite Flight · Expert Server</span>
-            <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
-            <p class="lede">
-                We fly the Aeroméxico network inside Infinite Flight — Mexico City out to
-                New York, Madrid, Tokyo and Buenos Aires. Real routes, a rank ladder that
-                actually opens things up, and every hour logged for you.
+        <!-- Approved sectors off the crew centre's public flight log. Starts
+             [hidden] and is only revealed once real flights arrive — there is no
+             placeholder leg and no invented pilot. -->
+        <div class="wrap hero__log" data-hero-log hidden>
+            <p class="hero__log-head">
+                <i class="dot-live" aria-hidden="true"></i> Flown by the crew
             </p>
-            <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                <a class="btn btn--onink" href="/network">See the route map</a>
-            </div>
+            <ul class="hero__legs" data-hero-legs></ul>
         </div>
 
         <!-- The airline in four counted figures, every one derived from data.js
@@ -329,6 +341,9 @@
 <script src="/assets/js/site.js?v=3"></script>
 <script src="/assets/js/map.js?v=3"></script>
 <script src="/assets/js/crew.js?v=3"></script>
+<!-- After crew.js: the hero's flight strip reads the crew centre's flight log
+     through it. Home page only — nothing else on the site has a stage. -->
+<script src="/assets/js/hero.js?v=3"></script>
 <script src="/assets/js/live.js?v=3"></script>
 <script>
 (function () {

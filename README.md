@@ -25,7 +25,7 @@ assets/js/map.js   Draws the route map: great circles, dots, label placement
 assets/js/world.js GENERATED coastlines — see tools/make-worldmap.py
 assets/js/live.js  Mounts the live-traffic embed
 assets/js/crew.js  Read-only client for the crew center's public feeds
-tools/             Regenerate mark.svg, plane-hero.webp and world.js from source
+tools/             Regenerate mark.svg, the ruled device and world.js from source
 assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
 
@@ -104,7 +104,6 @@ motifs sharing a section, not that device.
 | file | what it is | where it runs |
 |---|---|---|
 | `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries, and faded behind dark sections |
-| `assets/img/plane-hero.webp` | the 787-9 special livery and its folk-art illustration | the landing-page hero |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
@@ -134,7 +133,6 @@ untouched:
 
 ```bash
 python3 tools/trace-mark.py   # Aeromexico-Symbol.webp -> mark.svg   (potrace)
-python3 tools/crop-hero.py    # plane-logo.webp        -> plane-hero.webp
 python3 tools/make-stripes.py # full-logo.webp         -> stripes.svg + stripes-mirror.svg
 python3 tools/make-greca.py   # (parameters only)      -> greca.svg + greca-tile.svg
 python3 tools/make-serpent.py # (parameters only)      -> serpent.svg
@@ -146,12 +144,6 @@ single `currentColor` group, and the white channels between the feathers are
 real **holes**, not white-filled shapes. `brand.css` paints it through a CSS
 mask, so one file serves every placement and recolours per theme — and a
 white-filled version would paint solid navy over the page instead.
-
-`crop-hero.py` finds the artwork band in the supplied image and crops to it,
-dropping the second AeroMexico lockup underneath (the nav already carries the
-mark) and the surrounding white, which was pushing the aircraft below the fold.
-It detects the band rather than hard-coding it, so a re-exported source still
-works.
 
 `make-stripes.py` produces the ruled columns that run down **both** edges of the
 dark sections — bars flush to the outside with the ragged edge facing in, the
@@ -493,24 +485,78 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**The home page opens on the airline's own poster.** `assets/img/hero-poster.webp`
-is the VA's artwork — the 787-9 special livery ringed by the folk-art
-illustration it carries, over the wordmark — trimmed to the composition and set
-on the navy it was made on. It replaced a two-column white hero that was a
-perfectly good landing-page header and, in the VA's own words, not memorable.
+**The home page opens on the aeroplane, and says nothing over it.**
+`assets/js/hero.js` builds the stage out of `AMV_DATA.fleet[].photo` — the VA's
+own sim shots of these exact airframes, the same ones the fleet page carries —
+flagship first, cross-faded with a slow drift, full bleed. Under it, a handful
+of approved sectors sampled at random off the crew centre's public flight log
+(`AMV_CREW.pireps()`): real pilots, real routes, filed by flying them. Then the
+airline in four counted figures.
 
-Two things about it are deliberate. The artwork's ground is a tiled navy, so its
-edge would land as a pasted rectangle; `.hero__poster-frame::after` paints the
-section colour back over the outer tenth from each side to dissolve the join —
-an overlay rather than a mask, because fading four straight edges with a mask
-needs `mask-composite`, which browsers still disagree about. And below 40rem a
-crop of the same file is served (`hero-poster-sm.webp`): at full width the
-aeroplane is about 250px across and its wordmark plate 85, which is smaller than
-the same wordmark in the nav directly above it.
+**There is no headline and no lede, and that is the point.** Three heroes have
+now been thrown out of this repo. A two-column white header, which was fine and
+in the VA's words not memorable. A poster — the 787-9 drawn in its special
+livery, ringed by folk art, over the wordmark — which was memorable and was a
+drawing, sitting one click from photographs of the same airframe. And then the
+photographs with the usual furniture on top: eyebrow, 70px tagline, a paragraph
+of positioning copy. That furniture came off because it covered up the subject,
+and because unlike the rest of this site it was written once and would have gone
+on being said.
 
-The old hero's CSS was deleted rather than left behind — one of its rules was
-already leaking a light hairline into the dark figures band. If a second hero is
-ever needed, write it; do not resurrect that one from git.
+What replaced it is `.hero__plate`: the aircraft on screen **naming itself** —
+type, registration, what the type is for, and a sector it flies, in cities where
+the site already names them. It is set in the display face because it is the
+headline now. Every word of it is read off `data.js` and changes when the stage
+does. The page is still named for a screen reader and a crawler by an `.sr-only`
+`<h1>`; it is simply not set in 70px over the aeroplane. `plane-hero.webp`,
+`plane-logo.webp` and `tools/crop-hero.py` went with the poster, and the share
+card on every page is a real photograph now.
+
+Four things about the stage are deliberate:
+
+- **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
+  failed image fetch or scripting off, and the hero is the airline's navy wash,
+  the two buttons and the counted facts. A photo that 404s drops out of the
+  rotation; the flight strip stays `[hidden]` until real sectors arrive. There
+  is no skeleton and no placeholder leg anywhere in it — and now no copy to fall
+  back on either, which is the whole reason that contract is strict.
+- **It only runs when it is being looked at.** Seven second dwell, paused by an
+  `IntersectionObserver` when the hero scrolls away, by `visibilitychange` when
+  the tab goes to the back, and by hover or focus. Asked for reduced motion it
+  does not advance at all — the dots still work, and the drift and cross-fade
+  come off in CSS.
+- **Photographs load as they are needed.** Only the first slide carries a `src`
+  on first paint; each one loads as the slide before it comes up. Five 1920px
+  photographs fetched to show one is the whole of an opening screen's budget.
+- **Nothing is cropped, on either screen.** `object-fit` is `contain`, not the
+  `cover` a full-bleed hero normally reaches for: these are 1920x886 photographs
+  of whole aeroplanes, and under `cover` a tall frame ate the tail off one side
+  and the nose off the other. Two geometries carry it. Wide (>= 48rem) the hero
+  is at least 50vw tall — taller than a 2.167 ratio needs at that width — so
+  `contain` fits by width and the slack lands as navy inside the veil, where it
+  is invisible. Narrow (< 48rem) the stage leaves the absolute layer, takes the
+  photograph's own `aspect-ratio`, and the plate stacks underneath it on navy;
+  that is the only arrangement in which this ratio fits a 390px screen whole
+  and still leaves the type somewhere legible. The one case `contain` gets
+  wrong is a viewport *wider* than the photograph, where fitting by width would
+  pillarbox it — an `(min-aspect-ratio: 19/10)` query falls back to `cover`
+  there, because a few percent off the sides beats two navy columns.
+- **The drift is `object-position`, not `transform: scale()`.** A Ken Burns
+  scale grows the image past its box and the box clips it, which is a crop —
+  the one thing this stage does not do. Percentage `object-position` on a
+  *contained* image is defined against the letterbox slack, so a 28% -> 72%
+  pan moves only through navy and cannot reach the picture's edges at any
+  viewport. On the phone band there is no slack, so the drift comes off there
+  and the cross-fade carries it.
+- **Hub photography slots in through `AMV_DATA.heroStills`.** Entries there
+  lead the rotation, ahead of the fleet, and the plate renders an ICAO in the
+  marigold slot where an airframe puts its tail number — so a hub still reads
+  "Benito Juárez Intl · MMMX · Primary hub · Mexico City" with no special
+  casing. The array ships **empty**, and the comment in `data.js` says why: a
+  stock picture of Terminal 2 is the "invented artwork standing in for a real
+  airline" that the header of `brand.css` exists to keep out, with a licensing
+  problem on top. The fleet shots clear that bar because they are the VA's own,
+  taken in the sim. Hub shots should clear the same one.
 
 **The one box on this site is `.panel`.** The rule in `brand.css` is that prose
 is opened by a hairline, never wrapped in a card, and that still holds. But that
@@ -547,18 +593,32 @@ scrolling back up is the case that catches this. `tools/test-motion.js` walks
 every page with the crew centre both down and answering and fails if a single
 element is stranded.
 
-**A pale section arrives; a dark one cuts.** The page alternates white and the
+**Every section arrives; none of them cut.** The page alternates white and the
 tint three or four times, and those changeovers used to be knife edges — one row
 of pixels where `#FFFFFF` became `#F7F8FA` and the greca field started
 mid-pattern. Four percent of tint is not what you saw; the seam was. The tint
-and its texture now ramp in and out over `--seam`, inside the section's own
-padding so no copy sits in the ramp.
+and its texture ramp in and out over `--seam`, inside the section's own padding
+so no copy sits in the ramp.
 
-The edge against a **dark** block is deliberate and stays hard: navy against
-white is the airline's own device, and the band and the footer already meet it
-with a marigold greca crown — a soft ramp there puts a 4rem sliver of white
-above that crown and reads as a gap. `:has()` is what spots those neighbours, so
-add any new dark block to the `--seam-bot: 0px` list in `brand.css`.
+The navy sections did not, and that was the bug the VA reported next: half the
+backgrounds moved and half of them snapped. A `.section--ink` now ramps out of
+whatever is above it and into whatever is below it over `--ink-seam`, which is
+shorter than `--seam` — the two colours are forty percent apart rather than
+four, and a straight white-to-navy interpolation spends its middle in mid-grey
+and reads as a blur. So the ramp is **eased**: almost nothing over the first
+third, the colour arriving over the last. `.hero--live` hands over the same way
+when the section under it is pale.
+
+Three things hold it together. The far colour is the **neighbour's** — `:has()`
+sets `--ink-near-top` / `--ink-near-bot` to `--bg` or `--bg-alt` so the ramp
+ends on exactly the colour the next section starts on. Dark neighbours still
+meet on a hard edge, because there is no edge: navy meets navy, and the band and
+footer meet theirs with a marigold greca crown that a ramp would leave floating
+in a pale sliver — add any new dark block to the `--ink-bot: 0px` and
+`--seam-bot: 0px` lists in `brand.css`. And the **decoration ramps with the
+ground**: the ruled-feather rails and the eagle watermark run the section's full
+height, so both carry the same fade in their own `background`, the greca's trick
+and for the greca's reason — one mask layer, no `mask-composite`.
 
 **The route map is generated, not drawn.** `assets/js/world.js` is Natural
 Earth's public-domain 1:110m land, reprojected Robinson and simplified by

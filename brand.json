@@ -19,7 +19,7 @@
     ],
     "network": "Infinite Flight"
   },
-  "$comment_motifs": "Only design TOKENS cross this boundary — the crew center maps each key onto a CSS custom property, and nothing here is ever interpreted as CSS. The site's decoration does not travel: it is the airline's own artwork (the Caballero Águila in assets/img/mark.svg, the 787-9 special livery in plane-hero.webp) plus the tricolour. What travels is the palette, the type and the shape, which is enough for the two products to read as one airline. Two things NOT to reintroduce on either product, both of which were tried and removed: a multi-hue gradient, and hand-drawn ornament standing in for real artwork.",
+  "$comment_motifs": "Only design TOKENS cross this boundary — the crew center maps each key onto a CSS custom property, and nothing here is ever interpreted as CSS. The site's decoration does not travel: it is the airline's own material (the Caballero Águila in assets/img/mark.svg, and the VA's own photographs of its own airframes) plus the tricolour. What travels is the palette, the type and the shape, which is enough for the two products to read as one airline. Two things NOT to reintroduce on either product, both of which were tried and removed: a multi-hue gradient, and hand-drawn ornament standing in for real artwork.",
   "theme": {
     "mode": "auto",
     "font": "Karla",

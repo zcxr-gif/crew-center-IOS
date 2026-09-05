@@ -23,11 +23,14 @@
    actually owns:
 
      Aeromexico-Symbol.webp  the Caballero Águila, traced to mark.svg
-     plane-logo.webp         the 787-9 special livery and its folk-art artwork
+     the fleet photographs   the VA's own sim shots of its own airframes, off
+                             the community gallery (AMV_DATA.fleet[].photo)
      the tricolour           hard stops, real flag colours
 
-   The hero is that aircraft on white. It is the most Mexican thing available
-   and it required no drawing.
+   The hero is those photographs, full bleed, one at a time. The folk-art
+   artwork that used to open the page (plane-logo.webp and the plane-hero.webp
+   crop of it) is gone with the two heroes that used it: a drawing of a 787-9
+   was sitting one click from photographs of the same airframe.
 
    Where the dark sections went next, still inside that rule: the ruled device
    now runs down BOTH edges and the eagle sits faded behind them. Both are the
@@ -143,6 +146,11 @@
        See SECTION SEAMS, below. Kept inside the section's own padding so the
        ramp never runs under the copy. */
     --seam:      clamp(1.75rem, 4.5vw, 4rem);
+    /* The same idea for a NAVY section meeting a pale one. Shorter, because the
+       two colours are forty percent apart rather than four: over the pale seam's
+       distance a white-to-navy ramp reads as a smear, and over this one it
+       reads as the section arriving. */
+    --ink-seam:  clamp(1.25rem, 3.5vw, 2.75rem);
     --shadow:    0 1px 2px rgba(15, 27, 46, .05), 0 10px 30px -14px rgba(15, 27, 46, .16);
     --shadow-lg: 0 28px 70px -24px rgba(15, 27, 46, .26);
 
@@ -263,8 +271,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .footer::after,
 .section--ink::after {
     content: ""; position: absolute; inset: 0;
+    /* The ramp at each end is the SECTION SEAM, not decoration: where a navy
+       section dissolves into a pale one the rails have to dissolve with it, or
+       they stand at full red over the fade. Carried in this gradient's alpha so
+       the stripes mask stays a single layer — the greca does the same thing for
+       the same reason. The band and the footer set no seam, so both stops
+       collapse to the edges and the rails are unchanged there. */
     background: linear-gradient(180deg,
-        var(--am-red) 0%, var(--am-rosa) 42%, var(--am-rosa) 58%, var(--am-red) 100%);
+        transparent 0,
+        transparent calc(var(--ink-top, 0px) * .45),
+        var(--am-red) var(--ink-top, 0px),
+        var(--am-rosa) 42%, var(--am-rosa) 58%,
+        var(--am-red) calc(100% - var(--ink-bot, 0px)),
+        transparent calc(100% - var(--ink-bot, 0px) * .45),
+        transparent 100%);
     --stripe-w: clamp(1.75rem, 5vw, 4rem);
     -webkit-mask:
         url('/assets/img/stripes.svg')        repeat-y right top / var(--stripe-w) var(--stripe-tile),
@@ -307,7 +327,17 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .band::before,
 .section--ink::before {
     content: ""; position: absolute; inset: 0;
-    background: #fff; opacity: .06;
+    /* Flat white, except across a section seam — same fade as the rails, so a
+       wing tip cannot appear in the pale ramp. Unchanged on the band, which
+       has no seam. */
+    background: linear-gradient(180deg,
+        transparent 0,
+        transparent calc(var(--ink-top, 0px) * .45),
+        #fff var(--ink-top, 0px),
+        #fff calc(100% - var(--ink-bot, 0px)),
+        transparent calc(100% - var(--ink-bot, 0px) * .45),
+        transparent 100%);
+    opacity: .06;
     -webkit-mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
             mask: url('/assets/img/mark.svg') no-repeat center / auto min(82%, 26rem);
     z-index: -2; pointer-events: none;
@@ -531,7 +561,81 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 /* A tight section has less padding than the ramp wants, so it gets a shorter
    one rather than a ramp running under its first line of type. */
 .section--alt.section--tight { --seam: clamp(1.25rem, 3vw, 2.25rem); }
-.section--ink   { position: relative; isolation: isolate; background: var(--am-navy); color: #EEF2F8; }
+/* ---- The navy seam --------------------------------------------------------
+   The pale sections have ramped into their neighbours for a while. The dark
+   ones did not: the rule above this one used to read "where the neighbour is
+   DARK, the hard edge is the right answer", which is true, and it had been
+   applied to every edge of a dark section rather than only to the dark ones.
+   So a page ramped gently between its two pale tints and then changed to navy
+   on a single row of pixels, and the VA's reading was the obvious one — some
+   of the backgrounds move and some of them snap.
+
+   They all move now. A navy section ramps out of whatever is above it and into
+   whatever is below it, over `--ink-seam`, and the ramp is EASED rather than
+   linear: nearly nothing happens over the first third and the colour arrives
+   over the last. A straight interpolation from white to navy spends its middle
+   in mid-grey and reads as a blur; weighted like this it reads as an edge that
+   was drawn softly, which is what was wanted.
+
+   Three things keep it honest:
+
+     - The far colour is the NEIGHBOUR's, not a guess. `--ink-near-*` is set off
+       `:has()` for the two grounds this site has (`--bg` and `--bg-alt`), so
+       the ramp ends on exactly the colour the next section starts on. Without
+       `:has()` (a browser older than 2023) both stay `--bg` and the join is a
+       whisker off on a `.section--alt` edge, which is looser than today, never
+       broken.
+     - Dark neighbours keep the hard edge, because there is no edge: navy meets
+       navy, and the band and footer meet theirs with a marigold greca crown
+       that a ramp would leave floating in a pale sliver.
+     - The decoration ramps with the ground. The ruled-feather rails and the
+       eagle watermark run the full height of the section; left alone they would
+       stand at full strength inside the seam, against white. Both take the same
+       fade in their own `background` — the greca's trick, and for the greca's
+       reason: one mask layer, no `mask-composite`. They come in over the back
+       HALF of the seam rather than all of it — a red bar at a third strength
+       standing on white paper reads as ghosting, not as a rail arriving. Every
+       other host of those two rules (the band, the footer) has no seam, so
+       `var(--ink-top, 0px)` leaves them exactly as they were. */
+.section--ink {
+    position: relative; isolation: isolate; color: #EEF2F8;
+    --ink-top: var(--ink-seam);
+    --ink-bot: var(--ink-seam);
+    --ink-near-top: var(--bg);
+    --ink-near-bot: var(--bg);
+    /* The flat colour first: a browser without color-mix() drops the gradient
+       below as invalid, and a navy section with no background at all is white
+       text on white paper. This is the floor, and it is what the section was. */
+    background: var(--am-navy);
+    background: linear-gradient(180deg,
+        var(--ink-near-top) 0,
+        color-mix(in srgb, var(--am-navy) 14%, var(--ink-near-top)) calc(var(--ink-top) * .32),
+        color-mix(in srgb, var(--am-navy) 52%, var(--ink-near-top)) calc(var(--ink-top) * .64),
+        color-mix(in srgb, var(--am-navy) 86%, var(--ink-near-top)) calc(var(--ink-top) * .86),
+        var(--am-navy) var(--ink-top),
+        var(--am-navy) calc(100% - var(--ink-bot)),
+        color-mix(in srgb, var(--am-navy) 86%, var(--ink-near-bot)) calc(100% - var(--ink-bot) * .86),
+        color-mix(in srgb, var(--am-navy) 52%, var(--ink-near-bot)) calc(100% - var(--ink-bot) * .64),
+        color-mix(in srgb, var(--am-navy) 14%, var(--ink-near-bot)) calc(100% - var(--ink-bot) * .32),
+        var(--ink-near-bot) 100%);
+}
+/* A neighbour that is already dark: no seam, nothing to dissolve. */
+.hero + .section--ink,
+.band + .section--ink,
+.section--ink + .section--ink,
+.section--ink:first-child { --ink-top: 0px; }
+
+.section--ink:has(+ .section--ink),
+.section--ink:has(+ .band),
+.section--ink:has(+ .footer),
+.section--ink:has(+ [data-site-footer]),
+.section--ink:last-child { --ink-bot: 0px; }
+
+/* A pale neighbour, on the tint it actually uses. `.section--alt` holds its
+   tint flat against a dark edge (see the --seam-top / --seam-bot rules above),
+   so the two meet on one colour. */
+.section--alt + .section--ink        { --ink-near-top: var(--bg-alt); }
+.section--ink:has(+ .section--alt)   { --ink-near-bot: var(--bg-alt); }
 .section--ink .muted   { color: #9DB0CE; }
 .section--ink .eyebrow { color: #9DB0CE; }
 
@@ -792,22 +896,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================ HERO =======================================
-   The home page hero is the poster — see "POSTER HERO" further down, where the
-   whole of it lives. What is left here is the shell it shares with nothing
-   else, kept because `.hero--poster` and `.hero__cta` are built on it.
+   The home page hero is the fleet, rotating — see "LIVE HERO" further down,
+   where the whole of it lives. What is left here is the shell it shares with
+   nothing else, kept because `.hero--live` and `.hero__cta` are built on it.
 
-   The previous hero was a two-column arrangement: copy left, four counted
-   figures right, the aircraft full-bleed underneath, all on white. It was a
-   perfectly good landing-page header and that turned out to be the problem —
-   the VA's reading was that it was not memorable, and it was not. Every rule
-   that composed it (.hero__inner, .hero__art, .hero__copy, and the ruled
-   .hero__facts column) went with it rather than being left behind to rot; one
-   of them was already leaking a light hairline into the dark facts band. If a
-   second hero is ever needed, write it, do not resurrect this one from git. */
+   Two heroes have been thrown out of this file, and both went with every rule
+   that composed them rather than being left behind to rot: a two-column white
+   header (copy left, figures right, aircraft underneath), which was perfectly
+   good and, in the VA's words, not memorable; and the poster that replaced it,
+   which was memorable and was a drawing. If a third is ever needed, write it —
+   do not resurrect either of those from git. */
 .hero { position: relative; background: var(--bg); color: var(--ink); overflow: hidden; }
 .hero h1 { margin-block: 1rem; text-wrap: balance; }
 .hero .eyebrow { margin-bottom: .3rem; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 2rem; }
+.hero--live .hero__cta { margin-top: .1rem; }
 @media (max-width: 48rem) {
     .hero__cta { margin-top: 1.6rem; gap: .6rem; }
     .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
@@ -1593,71 +1696,326 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .table-scroll { padding-block: .2rem; }
 }
 
-/* ============================ POSTER HERO ================================
-   The home page opens on the airline's own poster rather than on a layout.
+/* ============================== LIVE HERO ================================
+   The home page opens on the aeroplane. Not on words about the aeroplane.
 
-   The composition — aircraft, folk art, wordmark — was made as one piece on its
-   own tiled navy, so it is used whole and nothing is set on top of it. The
-   section takes that same navy, the artwork's edges are masked into it, and the
-   copy sits underneath where it has room to be read.
+   TWO HEROES DIED HERE, and the second one is the interesting note. First the
+   poster: the 787-9 drawn in its special livery, ringed by folk-art
+   illustration, over the wordmark, on flat navy — one immovable drawing,
+   sitting one click from photographs of the same airframe on the fleet page.
+   It was replaced by those photographs plus the usual furniture: eyebrow, 70px
+   tagline, a paragraph of positioning copy, then the buttons.
 
-   This is a fixed dark card in both themes on purpose: it is a title card, not
-   a surface, and a light version of it would mean recolouring artwork we did
-   not draw. */
-.hero--poster {
-    --poster-navy: #142238;
-    background: var(--poster-navy);
-    color: #EEF2F8;
-    overflow: hidden;
-    padding-bottom: clamp(2rem, 5vw, 3.25rem);
-    text-align: center;
+   That furniture came off too. A headline and a lede laid over a photograph is
+   the move every airline homepage makes, it covered up the thing worth looking
+   at, and — the part that decided it — none of it was true the way the rest of
+   this site is true. It was written once and would have gone on being said.
+
+   WHAT SAYS IT INSTEAD, every word read off data rather than typed here:
+
+     .hero__stage    the fleet photographs, one at a time, cross-faded with a
+                     slow drift. hero.js builds them off AMV_DATA.fleet[].photo,
+                     so the hero is whatever the airline actually operates.
+     .hero__plate    the aircraft naming ITSELF — type, registration, what the
+                     type is for, and a sector it flies, in cities where the
+                     site already names them. This is the display type now.
+     .hero__log      sectors the crew have flown, sampled off the crew centre.
+     .hero__facts    the airline in four counted figures.
+
+   The page is still NAMED, by an .sr-only <h1> in the markup: a page with no
+   heading is broken for a screen reader and invisible to a crawler. It is
+   simply not set in 70px over the aircraft.
+
+   Dark in both themes, like the poster before it: a photograph has no light
+   mode, and what sits over it needs one ground to be legible against.
+
+   EVERY LAYER IS OPTIONAL. No photographs, a quiet backend or scripting off,
+   and the stage stays the airline's navy wash, the plate collapses and the
+   flight strip never appears — leaving the buttons and the counted facts, which
+   is a working hero. Nothing here renders a skeleton or a placeholder leg. */
+.hero--live {
+    --hero-navy: var(--am-navy);
+    /* The colour the hero hands over to whatever follows, and how long it
+       takes. Navy and zero by default: on the home page the operating figures
+       are the next band and they are navy too. */
+    --hero-tail: var(--hero-navy);
+    --hero-tail-h: 0px;
+
+    position: relative; isolation: isolate; overflow: hidden;
+    background: var(--hero-navy); color: #EEF2F8;
+    display: grid; align-content: end;
+    row-gap: clamp(1.1rem, 2.6vw, 1.7rem);
+    /* The height is set at the wide breakpoint, off the photograph's ratio
+       rather than off the viewport's — see "The stage" below, where the whole
+       geometry lives. This is the floor for a hero with no photographs at all.
+       svh rather than vh throughout: on a phone vh is the address bar's
+       promise, not the viewport, and the last row ends up under the chrome. */
+    min-height: 28rem;
+    padding-block: clamp(3rem, 12vw, 7rem) clamp(1.4rem, 3vw, 2.2rem);
 }
-.hero--poster .lede    { color: #A9BBD6; margin-inline: auto; max-width: 54ch; }
-.hero--poster .eyebrow { color: #8FA6C8; }
-.hero--poster .eyebrow::before { box-shadow: none; }
-.hero--poster h1 {
-    margin: .5rem auto .9rem;
-    max-width: 16ch;
-    font-size: clamp(2.3rem, 7.5vw, 4.4rem);
+/* The facts band carries its own generous margin for the hero it was drawn
+   for; in here the row-gap above is already doing that job. */
+.hero--live .hero__facts--band { margin-top: .4rem; }
+
+/* ---- The plate -----------------------------------------------------------
+   What the headline used to be, and set as display type because it IS the
+   headline now. The difference is that every word of it is read off the fleet
+   and changes when the stage does — an aircraft introducing itself, rather
+   than a sentence about aircraft in general.
+
+   Three parts, each of which degrades to nothing rather than to a placeholder:
+   the type, in the display face; the registration, in mono and marigold,
+   because a tail number is flight data and is set here like flight data; and
+   the line under them naming what the type is for and one sector it flies. */
+.hero__marque { position: relative; display: grid; justify-items: stretch; gap: 1.15rem; }
+/* The buttons and the dots share a line: the dots are the stage's controls and
+   they belong with the other controls, not stranded under the plate where they
+   read as an underline of it. Pushed to the far edge so the two groups are
+   obviously separate things. */
+.hero__controls {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: .9rem 1.4rem;
 }
-.hero--poster .grad-text { color: var(--am-marigold); }
-.hero--poster .hero__cta { justify-content: center; margin-top: 1.9rem; }
+.hero__controls .hero__dots { margin-left: auto; }
+@media (max-width: 40rem) { .hero__controls .hero__dots { margin-left: 0; } }
+.hero__plate  { display: grid; gap: .3rem; margin: 0; }
+.hero__plate:empty { display: none; }
+.hero__plate-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .9rem; }
+.hero__plate b {
+    font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em;
+    font-size: clamp(1.75rem, 4.6vw, 3.1rem); line-height: 1.05; color: #fff;
+    /* The type sits on a photograph, not on a colour. A shadow this soft is
+       invisible over the veil's dark end, and is what keeps the name legible
+       when a bright frame comes up behind it. */
+    text-shadow: 0 2px 26px rgba(7, 20, 38, .62);
+}
+.hero__plate .mono {
+    font-size: clamp(.85rem, 1.5vw, 1rem); font-weight: 700; letter-spacing: .06em;
+    color: var(--am-marigold); text-shadow: 0 2px 18px rgba(7, 20, 38, .7);
+}
+.hero__plate-sub {
+    font-size: clamp(.9rem, 1.7vw, 1.05rem); color: #C7D4E8;
+    text-shadow: 0 1px 16px rgba(7, 20, 38, .72);
+}
 
-.hero__poster { padding-top: clamp(.5rem, 2vw, 1.75rem); }
-.hero__poster-frame { position: relative; max-width: 58rem; margin-inline: auto; }
-.hero__poster img { display: block; width: 100%; height: auto; }
+/* ---- The stage -----------------------------------------------------------
+   NOTHING IS CROPPED. This is the rule the stage is built around, and it is
+   why `object-fit` here is `contain` rather than the `cover` a full-bleed hero
+   normally reaches for. These are 1920x886 photographs of whole aeroplanes:
+   under `cover` a tall frame ate the tail off one side and the nose off the
+   other, and on a phone it ate everything but a fuselage. An aircraft with its
+   wingtips outside the frame is not a photograph of that aircraft.
 
-/* The artwork's ground is a tiled navy, so its edge lands as a pasted
-   rectangle on the flat navy behind it. This paints the section's own colour
-   back over the outer tenth from each side, which dissolves the join.
+   Two geometries, because a phone and a monitor are not the same problem:
 
-   Done as an overlay rather than a mask on purpose: a mask needs two gradients
-   composited to fade four straight edges, and `mask-composite` is the one part
-   of this that browsers still disagree about. The section colour is flat and
-   known, so painting it is exact and works everywhere. The stops use the navy
-   at zero alpha rather than `transparent` so nothing greys out mid-ramp. */
-.hero__poster-frame::after {
+     WIDE (>= 48rem)   full bleed. The hero is at least 50vw tall, which is
+                       taller than the photograph needs at that width (a 2.167
+                       ratio needs 46.2vw), so `contain` fits it by WIDTH and
+                       the slack lands as navy above and below — inside the
+                       veil, which is navy there anyway, so it is invisible.
+     NARROW (< 48rem)  a band. The stage leaves the absolute layer, takes the
+                       photograph's own aspect ratio, and the plate, buttons,
+                       sectors and figures stack underneath it on navy. Full
+                       width, nothing cropped, and no screen of empty sky.
+
+   The one case `contain` gets wrong is a viewport WIDER than the photograph —
+   an ultrawide monitor — where fitting by width would pillarbox it in navy.
+   There, and only there, it falls back to `cover`: a few percent off the sides
+   beats two navy columns.
+
+   The wash underneath is the band's own gradient, so a hero whose photographs
+   never arrive is still the airline's navy rather than a flat grey hole. */
+.hero__stage { position: absolute; inset: 0; z-index: -2; background: var(--am-wash); }
+.hero__slide {
+    position: absolute; inset: 0; opacity: 0;
+    transition: opacity 1.1s var(--ease);
+}
+.hero__slide.is-on { opacity: 1; }
+.hero__slide img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    /* Aircraft sit above the middle of these shots more often than not. */
+    object-position: 50% 42%;
+}
+@media (min-aspect-ratio: 19/10) {
+    /* Wider than the photograph: crop rather than pillarbox. */
+    .hero__slide img { object-fit: cover; }
+}
+
+/* The drift, and the reason it is written in `object-position` rather than the
+   `transform: scale()` a Ken Burns pan is usually built from. A scale grows the
+   image past its box and the box clips it — which is a crop, which is the one
+   thing this stage does not do. Percentage `object-position` on a CONTAINED
+   image is defined against the slack: 0% pins the top edge of the photograph to
+   the top of the box, 100% pins its bottom to the bottom. So a 30% -> 70% pan
+   moves only through the navy letterbox and cannot reach the picture's edges,
+   whatever size the slack happens to be at that viewport.
+
+   Slow, and alternating so consecutive slides do not all pan the same way. 16s
+   against a 7s dwell means it is still moving when the next one takes over,
+   which is the point: it never arrives and stops. */
+.hero__slide.is-on img { animation: heroDrift 16s var(--ease) forwards; }
+.hero__slide:nth-child(even).is-on img { animation-name: heroDriftAlt; }
+@keyframes heroDrift {
+    from { object-position: 50% 28%; }
+    to   { object-position: 50% 72%; }
+}
+@keyframes heroDriftAlt {
+    from { object-position: 50% 70%; }
+    to   { object-position: 50% 30%; }
+}
+
+/* The veil. Lighter than it was, because there is no paragraph to keep legible
+   over the middle of the picture any more — only the plate and the buttons, and
+   both sit low. One gradient down, which grounds those and lands the section on
+   flat navy; on a wide screen a second one across, weighting the left where the
+   plate is and leaving the right open for the aeroplane. */
+.hero__stage::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-        linear-gradient(90deg,
-            var(--poster-navy) 0, rgba(20, 34, 56, 0) 10%,
-            rgba(20, 34, 56, 0) 90%, var(--poster-navy) 100%),
-        linear-gradient(180deg,
-            var(--poster-navy) 0, rgba(20, 34, 56, 0) 14%,
-            rgba(20, 34, 56, 0) 82%, var(--poster-navy) 100%);
+    background: linear-gradient(180deg,
+        rgba(10, 29, 59, .5) 0, rgba(10, 29, 59, .1) 24%,
+        rgba(10, 29, 59, .34) 48%, rgba(10, 29, 59, .84) 70%,
+        var(--hero-navy) 88%, var(--hero-navy) 100%);
 }
-@media (max-width: 39.99rem) {
-    /* The cropped art is all aircraft and bleeds the full width, so only the
-       top and bottom need dissolving. */
-    .hero__poster { padding-top: 0; margin-inline: calc(clamp(1.15rem, 4vw, 2rem) * -1); }
-    .hero__poster-frame::after {
-        background: linear-gradient(180deg,
-            var(--poster-navy) 0, rgba(20, 34, 56, 0) 16%,
-            rgba(20, 34, 56, 0) 84%, var(--poster-navy) 100%);
+@media (min-width: 48rem) {
+    /* Tall enough that `contain` fits the photograph by width and letterboxes
+       it, rather than pillarboxing it — see the geometry note above. */
+    .hero--live { min-height: clamp(32rem, 50vw, 92svh); }
+    .hero__stage::after {
+        background:
+            linear-gradient(180deg,
+                rgba(10, 29, 59, .5) 0, rgba(10, 29, 59, .1) 24%,
+                rgba(10, 29, 59, .34) 48%, rgba(10, 29, 59, .84) 70%,
+                var(--hero-navy) 88%, var(--hero-navy) 100%),
+            linear-gradient(90deg,
+                rgba(10, 29, 59, .74) 0, rgba(10, 29, 59, .34) 34%,
+                rgba(10, 29, 59, .08) 66%, rgba(10, 29, 59, 0) 100%);
     }
 }
 
-.hero__poster-copy { padding-top: clamp(.25rem, 1.5vw, 1rem); }
+/* ---- The phone: a band, not a backdrop -----------------------------------
+   The stage stops being an absolute layer and becomes the hero's first row, at
+   the photograph's own aspect ratio. That is the only arrangement in which a
+   2.167 ratio picture fits a 390px-wide phone uncropped AND still leaves the
+   plate somewhere legible: laid over it, the type would either sit on the
+   aeroplane or push it out of frame.
+
+   `cover` rather than `contain` here on purpose — the box IS the photograph's
+   ratio, so the two are identical and `cover` guarantees no hairline of
+   background down an edge from a rounding error. The drift comes off for the
+   same reason: with no slack to pan through, motion could only be a crop. */
+@media (max-width: 47.99rem) {
+    .hero--live {
+        min-height: 0;
+        align-content: start;
+        padding-top: 0;
+        row-gap: clamp(1rem, 3.5vw, 1.5rem);
+    }
+    .hero__stage {
+        /* `relative`, not `static`: the slides inside are absolutely
+           positioned, and a static stage stops being their containing block —
+           they escape to .hero--live and go full bleed over the whole section,
+           which is the layout this breakpoint exists to replace. */
+        position: relative; inset: auto; z-index: auto;
+        aspect-ratio: 1920 / 886;
+        margin-bottom: clamp(.4rem, 2vw, 1rem);
+        background: none;
+    }
+    .hero__slide img { object-fit: cover; object-position: 50% 50%; animation: none; }
+    /* Only the bottom edge needs dissolving now: the band meets the navy the
+       plate sits on, and everything above it is the picture. */
+    .hero__stage::after {
+        background: linear-gradient(180deg,
+            rgba(10, 29, 59, 0) 62%, rgba(10, 29, 59, .3) 84%, var(--hero-navy) 100%);
+    }
+    /* Nothing is laid over the photograph any more, so the type does not need
+       to be lifted off it. */
+    .hero__plate b, .hero__plate .mono, .hero__plate-sub { text-shadow: none; }
+}
+
+/* ---- Handing over to the next section ------------------------------------
+   The hero ends on flat navy, which is right when the operating figures follow
+   it and wrong when they do not — that band removes itself when the crew centre
+   has no figures, and the pale section behind it then meets navy on a hard
+   edge. Same ramp the navy sections take, for the same reason. */
+.hero--live::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: -1;
+    height: var(--hero-tail-h); pointer-events: none;
+    background: linear-gradient(180deg, var(--hero-navy) 0, var(--hero-tail) 100%);
+    background: linear-gradient(180deg,
+        var(--hero-navy) 0,
+        color-mix(in srgb, var(--hero-navy) 86%, var(--hero-tail)) 14%,
+        color-mix(in srgb, var(--hero-navy) 52%, var(--hero-tail)) 36%,
+        color-mix(in srgb, var(--hero-navy) 14%, var(--hero-tail)) 68%,
+        var(--hero-tail) 100%);
+}
+.hero--live:has(+ .section--alt),
+.hero--live:has(+ .section--ink[hidden])   /* the figures band, before it fills */
+    { --hero-tail: var(--bg-alt); --hero-tail-h: var(--ink-seam); }
+.hero--live:has(+ .section:not(.section--alt):not(.section--ink))
+    { --hero-tail: var(--bg); --hero-tail-h: var(--ink-seam); }
+
+/* ---- Steering the stage --------------------------------------------------
+   Buttons with real labels rather than decorated spans: this is the only way
+   to change the aircraft from a keyboard. */
+.hero__dots { display: flex; gap: .4rem; }
+.hero__dot {
+    width: 1.5rem; height: 3px; padding: 0; border: 0; border-radius: 999px;
+    background: rgba(255, 255, 255, .3); cursor: pointer;
+    transition: background .3s var(--ease), width .3s var(--ease);
+}
+.hero__dot:hover { background: rgba(255, 255, 255, .62); }
+.hero__dot.is-on { background: var(--am-marigold); width: 2.5rem; }
+.hero__dot:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+/* ---- Who has been flying it ----------------------------------------------
+   Approved sectors off the crew centre, sampled at random. Rules rather than
+   boxes, like everything else on this site that is information. */
+.hero__log-head {
+    display: flex; align-items: center; gap: .5rem; margin: 0 0 .85rem;
+    font-size: .72rem; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: #8FA6C8;
+}
+.hero__legs {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: .8rem; grid-template-columns: 1fr;
+    transition: opacity .3s var(--ease);
+}
+.hero__legs.is-swapping { opacity: 0; }
+.hero__leg {
+    display: grid; gap: .18rem;
+    padding-top: .7rem; border-top: 1px solid rgba(255, 255, 255, .2);
+}
+.hero__leg-route { font-size: .95rem; font-weight: 700; color: #EEF2F8; letter-spacing: -.01em; }
+.hero__leg-route i { font-style: normal; color: var(--am-marigold); padding-inline: .1rem; }
+.hero__leg-who { font-size: .85rem; color: #C3D0E4; }
+.hero__leg-meta {
+    display: flex; flex-wrap: wrap; gap: .2rem .7rem;
+    font-size: .74rem; color: #8FA6C8;
+}
+.hero__leg-meta b { color: #A9BBD6; font-weight: 700; }
+/* One leg on a phone, two on a large one, three from tablet up. The strip is
+   context, not a list to read — three sectors stacked on a 375px screen would
+   push the counted facts off the opening screen entirely. */
+.hero__leg:nth-child(n+2) { display: none; }
+@media (min-width: 34rem) {
+    .hero__legs { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .hero__leg:nth-child(2) { display: grid; }
+}
+@media (min-width: 48rem) {
+    .hero__legs { grid-template-columns: repeat(3, 1fr); }
+    .hero__leg:nth-child(3) { display: grid; }
+}
+
+/* Asked for less motion: the stage still changes when a dot is pressed, and it
+   never moves on its own — hero.js stops advancing, and the drift and the
+   cross-fade come off here. */
+@media (prefers-reduced-motion: reduce) {
+    .hero__slide { transition: none; }
+    .hero__slide.is-on img,
+    .hero__slide:nth-child(even).is-on img { animation: none; object-position: 50% 42%; }
+    .hero__legs { transition: none; }
+}
 
 /* The four figures as one ruled band under the copy, rather than the column
    they were in beside it. */

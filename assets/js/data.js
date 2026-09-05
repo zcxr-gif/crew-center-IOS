@@ -215,6 +215,43 @@ window.AMV_DATA = {
         },
     ],
 
+    /* ---- The hero stage: hub stills (optional) ----------------------------
+       Photographs that lead the home page's rotation, ahead of the fleet.
+       Meant for the airline's HUBS — Benito Juárez first, then the bases —
+       because a hero that opens on where the airline flies FROM says something
+       the aircraft shots cannot.
+
+       EMPTY ON PURPOSE, and it stays empty until the VA has photographs it
+       owns. There is no hub photography in this repo, and a stock picture of
+       Terminal 2 pulled off the internet is exactly the "invented artwork
+       standing in for a real airline" that the header of brand.css was written
+       to keep out — with a licensing problem on top. The fleet shots work
+       because they are the VA's own, taken in the sim, of its own airframes.
+       Hub shots should clear the same bar: a screenshot on stand or short
+       final at MMMX in Infinite Flight is ideal, and the crew centre's own
+       gallery is the natural place to host them.
+
+       One entry per photograph, and hero.js needs nothing else:
+
+           {
+               src:   'https://…/MMMX-1234567890.webp',   // absolute
+               w: 1920, h: 886,                            // the file's real size
+               alt:   'Aeroméxico 787-9 on stand at Mexico City Benito Juárez.',
+               title: 'Benito Juárez Intl',   // the plate's display line
+               reg:   'MMMX',                 // set in mono marigold beside it,
+                                              // where an airframe puts its tail
+                                              // number — an ICAO reads the same
+               note:  'Primary hub',          // → "Primary hub · Mexico City"
+               route: 'Mexico City',          // an ICAO PAIR here ("MMMX–EGLL")
+                                              // is expanded into city names;
+                                              // anything else prints as written
+           }
+
+       `w` and `h` are not optional: these are off-site images, and without the
+       real dimensions the stage has no intrinsic ratio while one is in flight.
+       Any entry whose photograph 404s drops out of the rotation by itself. */
+    heroStills: [],
+
     /* ---- Fleet development (plan §5, §14) ---------------------------------
        Types the Operations Plan names and the airline has not put into service.
        They are listed as planned, NOT as fleet, because the plan's own closing
