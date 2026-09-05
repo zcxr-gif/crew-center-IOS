@@ -198,7 +198,6 @@
                 </div>
             </div>
         </footer>`;
-        host.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
     }
 
     // ---- Theme --------------------------------------------------------------
@@ -443,6 +442,11 @@
         const scope = root || document;
         scope.querySelectorAll('[data-icon]:empty').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
         scope.querySelectorAll('[data-mark]:empty').forEach(el => { el.innerHTML = MARK; });
+        // The year used to be written by renderFooter alone, so it was blank on
+        // any page carrying a [data-year] outside the footer — /crew, which
+        // states its own copyright line rather than the whole footer, was the
+        // first. It belongs in the pass that fills every other placeholder.
+        scope.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
         wireReveal();
         wireCounters();
     }
