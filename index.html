@@ -52,39 +52,30 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         A title card, not a landing-page header.
+         The airline as it is running, not a picture of one.
 
-         What was here was the stock arrangement: copy left, figures right,
-         artwork underneath, all on white. It was tidy and it was not memorable,
-         which is what the VA said about it. This is the airline's own poster —
-         the 787-9 in its special livery, ringed by the folk-art illustration
-         that livery carries, over the wordmark — set on the navy it was made
-         on, at the size it was drawn for.
+         What was here was a poster: one flat illustration of the 787-9 ringed
+         by folk art, over the wordmark, on navy. A title card is a picture of
+         an airline, and the drawn eagle and the pasted aeroplane were reading
+         as exactly that next to the real photographs the fleet page already
+         carries of these same airframes.
 
-         The poster's ground is a tiled navy, so its edges are masked into the
-         section rather than stopping at a hard rectangle. Below it the tagline,
-         and below that the airline in four counted figures. Nothing overlaps
-         the artwork: it was composed as a whole and it is used as one. -->
-    <section class="hero hero--poster">
-        <div class="hero__poster">
-          <div class="hero__poster-frame">
-            <picture>
-                <!-- On a phone the full poster puts the aeroplane at about
-                     250px across and its wordmark plate at 85 — smaller than
-                     the same wordmark in the nav right above it. Below 40rem
-                     the artwork is served cropped to the aircraft so it fills
-                     the screen, and the nav carries the name. -->
-                <source media="(max-width: 39.99rem)" srcset="/assets/img/hero-poster-sm.webp"
-                        width="756" height="228">
-                <img src="/assets/img/hero-poster.webp" width="848" height="376" fetchpriority="high"
-                     alt="Aeroméxico Boeing 787-9 XA-ADD in its Quetzalcóatl special livery, ringed by
-                          Mexican folk-art illustration — eagles, skulls, marigolds and a feathered
-                          serpent — above the Aeromexico Virtual wordmark.">
-            </picture>
-          </div>
-        </div>
+         So the opening screen is those photographs — the VA's own sim shots,
+         flagship first, cross-faded behind the copy — captioned with what is on
+         screen and what that type flies, and with a handful of the crew's own
+         approved sectors underneath, sampled at random off the crew centre.
 
-        <div class="wrap hero__poster-copy">
+         Everything below the copy is built by hero.js and everything it builds
+         is optional: no photographs, a quiet backend or scripting off and this
+         is the tagline, the buttons and the four counted facts on navy, which
+         is what the hero was before any of it. -->
+    <section class="hero hero--live" data-hero>
+        <!-- The stage. Empty in the markup on purpose: the slides are the fleet
+             photographs in data.js, so a type gained or lost changes the hero
+             with nothing typed in here. -->
+        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+
+        <div class="wrap hero__body">
             <span class="eyebrow">Infinite Flight · Expert Server</span>
             <h1>Fly the <span class="grad-text">Eagle&nbsp;Warrior</span>.</h1>
             <p class="lede">
@@ -96,6 +87,24 @@
                 <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/network">See the route map</a>
             </div>
+
+            <!-- What is on the stage, and the controls for it. Buttons rather
+                 than dots-in-name-only: this is the one way to steer the hero
+                 from a keyboard. -->
+            <div class="hero__stagebar">
+                <p class="hero__caption" data-hero-caption aria-live="polite"></p>
+                <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+            </div>
+        </div>
+
+        <!-- Approved sectors off the crew centre's public flight log. Starts
+             [hidden] and is only revealed once real flights arrive — there is no
+             placeholder leg and no invented pilot. -->
+        <div class="wrap hero__log" data-hero-log hidden>
+            <p class="hero__log-head">
+                <i class="dot-live" aria-hidden="true"></i> Flown by the crew
+            </p>
+            <ul class="hero__legs" data-hero-legs></ul>
         </div>
 
         <!-- The airline in four counted figures, every one derived from data.js
@@ -329,6 +338,9 @@
 <script src="/assets/js/site.js?v=3"></script>
 <script src="/assets/js/map.js?v=3"></script>
 <script src="/assets/js/crew.js?v=3"></script>
+<!-- After crew.js: the hero's flight strip reads the crew centre's flight log
+     through it. Home page only — nothing else on the site has a stage. -->
+<script src="/assets/js/hero.js?v=3"></script>
 <script src="/assets/js/live.js?v=3"></script>
 <script>
 (function () {

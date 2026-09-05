@@ -14,9 +14,12 @@
 //     the run appeared to stutter halfway down. Delays now come from the
 //     child's position in its group, and this checks they keep increasing.
 //   * A SEAM IS EITHER A RAMP OR DELIBERATE. Pale sections fade in and out of
-//     the white around them; the edge against a dark block stays a knife edge,
-//     because navy against white is the airline's own device and the band
-//     meets it with a greca crown. Both are asserted by reading pixels.
+//     the white around them, and the navy ones ramp too — over a shorter
+//     distance and on an eased curve, because a straight white-to-navy
+//     interpolation spends its middle in mid-grey and reads as a blur. The one
+//     edge left crisp is the band's: it wears a marigold greca crown, and a
+//     ramp would leave that crown floating in a pale sliver. All three are
+//     asserted by reading pixels.
 //   * REDUCED MOTION MEANS NO MOTION. Not a shorter animation — none, and
 //     nothing depending on one having run.
 //
@@ -171,13 +174,21 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
     }
 
     // --- 5. The seams -------------------------------------------------------
+    //
+    // Both ways round, because the operating figures band removes itself when
+    // the crew centre has nothing to say — and that changes which section the
+    // hero hands over to, and therefore which edge has to ramp.
     console.log('\nSection seams');
-    {
-        const page = await open('index');
+    for (const live of [false, true]) {
+        const label = live ? 'crew centre answering' : 'crew centre down';
+        const page = await open('index', { live });
         await settle(page);
         await page.evaluate(() => scrollTo(0, 0));
         await page.waitForTimeout(400);
+        // A section that removed itself has no seam to judge; measuring it
+        // reads the top-left corner of the page instead, which is the nav.
         const bounds = await page.evaluate(() => [...document.querySelectorAll('main > section, main > .band')]
+            .filter(e => e.getClientRects().length)
             .map(e => ({ cls: e.className, top: Math.round(e.getBoundingClientRect().top + scrollY) })));
         const shot = await page.screenshot({ fullPage: true });
 
@@ -188,40 +199,61 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
             await new Promise(r => { img.onload = r; img.src = 'data:image/png;base64,' + b64; });
             const c = document.getElementById('c'); c.width = img.width; c.height = img.height;
             const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
-            // The left gutter: section background and nothing else.
-            const at = (y) => { const d = ctx.getImageData(8, y, 1, 1).data; return [d[0], d[1], d[2]]; };
+            // The MEDIAN luminance of nine columns rather than one pixel in the
+            // gutter. The dark sections wear ruled rails down both edges, the
+            // pale ones a greca field, and a single column lands on or off a
+            // bar by luck; a median steps over a rail, a texture and a stray
+            // glyph alike, and what is left is the ground colour.
+            const cols = Array.from({ length: 9 }, (_, i) => Math.round(img.width * (0.06 + i * 0.11)));
+            const at = (y) => cols
+                .map(x => { const d = ctx.getImageData(x, y, 1, 1).data;
+                            return 0.2126 * d[0] + 0.7152 * d[1] + 0.0722 * d[2]; })
+                .sort((a, b) => a - b)[4];
             return bounds.map((s, i) => i === 0 ? null : ({
                 cls: s.cls,
-                above: at(s.top - 6),
-                below: at(s.top + 6),
+                // far / deep are clear of the ramp on either side, so they say
+                // what the changeover IS. above / below straddle it by 6px, so
+                // they say how abruptly it happens.
+                far:    at(s.top - 70),
+                above:  at(s.top - 6),
+                below:  at(s.top + 6),
                 // Well inside the block, past the greca crown a dark section
                 // wears on its top edge — that crown is marigold, and reading
                 // it as "the section's colour" would call the band pale.
-                inside: at(s.top + 40),
-                run: [-40, -25, -10, 5, 20, 35].map(dy => at(s.top + dy)),
+                deep:   at(s.top + 80),
+                run: [-70, -40, -25, -10, 5, 20, 35, 60, 80].map(dy => Math.round(at(s.top + dy))),
             })).filter(Boolean);
         }, { b64: shot.toString('base64'), bounds });
         await probe.close();
 
-        const lum = (p) => 0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2];
-        const dark = (p) => lum(p) < 90;
+        const dark = (l) => l < 90;
 
-        // Every pale/white changeover must be gradual: no single 6px step may
-        // account for most of the difference across the seam.
-        const soft = read.filter(r => !dark(r.above) && !dark(r.inside));
-        check('there is at least one pale/white changeover to judge', soft.length >= 2, String(soft.length));
+        // Pale into pale: four percent of tint, and no single 12px step may
+        // account for any real part of it.
+        const soft = read.filter(r => !dark(r.far) && !dark(r.deep));
+        check(`[${label}] there is a pale/white changeover to judge`, soft.length >= 2, String(soft.length));
         soft.forEach(r => {
-            const step = Math.abs(lum(r.above) - lum(r.below));
-            check(`the seam into "${r.cls}" is a ramp, not an edge (Δ${step.toFixed(1)} across 12px)`,
+            const step = Math.abs(r.above - r.below);
+            check(`[${label}] the seam into "${r.cls}" is a ramp, not an edge (Δ${step.toFixed(1)} across 12px)`,
                 step < 4, JSON.stringify(r.run));
         });
 
-        // …and the edge into a dark block stays a hard one.
-        const hard = read.filter(r => dark(r.inside));
-        check('there is a dark block to judge', hard.length >= 1, String(hard.length));
-        hard.forEach(r => {
-            check(`the edge into "${r.cls}" is kept crisp`,
-                Math.abs(lum(r.above) - lum(r.inside)) > 100, JSON.stringify([r.above, r.inside]));
+        // Navy against pale. Two hundred luminance rather than four, so the
+        // test is not "is it small" but "is it spread": a ramp puts only a
+        // fraction of the change in the 12px at the join, and a knife edge puts
+        // nearly all of it there.
+        const mixed = read.filter(r => dark(r.far) !== dark(r.deep));
+        check(`[${label}] there is a navy changeover to judge`, mixed.length >= 2, String(mixed.length));
+        mixed.forEach(r => {
+            const total = Math.abs(r.far - r.deep);
+            const step = Math.abs(r.above - r.below);
+            if (/\bband\b/.test(r.cls)) {
+                check(`[${label}] the edge into "${r.cls}" is kept crisp (${step.toFixed(0)} of ${total.toFixed(0)})`,
+                    total > 100 && step > total * 0.6, JSON.stringify(r.run));
+            } else {
+                check(`[${label}] the seam into "${r.cls}" ramps out of navy (${step.toFixed(0)} of ${total.toFixed(0)})`,
+                    total > 100 && step < total * 0.35, JSON.stringify(r.run));
+            }
         });
         await page.close();
     }

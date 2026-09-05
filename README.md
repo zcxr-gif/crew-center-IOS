@@ -493,24 +493,40 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**The home page opens on the airline's own poster.** `assets/img/hero-poster.webp`
-is the VA's artwork — the 787-9 special livery ringed by the folk-art
-illustration it carries, over the wordmark — trimmed to the composition and set
-on the navy it was made on. It replaced a two-column white hero that was a
-perfectly good landing-page header and, in the VA's own words, not memorable.
+**The home page opens on the fleet, rotating.** `assets/js/hero.js` builds the
+stage out of `AMV_DATA.fleet[].photo` — the VA's own sim shots of these exact
+airframes, the same ones the fleet page carries — flagship first, cross-faded
+with a slow drift, captioned with the type, its registration and the sector that
+type flies. Underneath it, a handful of approved sectors sampled at random off
+the crew centre's public flight log (`AMV_CREW.pireps()`): real pilots, real
+routes, filed by flying them.
 
-Two things about it are deliberate. The artwork's ground is a tiled navy, so its
-edge would land as a pasted rectangle; `.hero__poster-frame::after` paints the
-section colour back over the outer tenth from each side to dissolve the join —
-an overlay rather than a mask, because fading four straight edges with a mask
-needs `mask-composite`, which browsers still disagree about. And below 40rem a
-crop of the same file is served (`hero-poster-sm.webp`): at full width the
-aeroplane is about 250px across and its wordmark plate 85, which is smaller than
-the same wordmark in the nav directly above it.
+That replaced a poster — the 787-9 drawn in its special livery, ringed by folk
+art, over the wordmark — which had itself replaced a two-column white header.
+The poster was memorable and it was a drawing, sitting one click away from
+photographs of the same aircraft. Both heroes' CSS was deleted rather than left
+behind; `assets/img/hero-poster.webp` and its phone crop went with it. If a
+third hero is ever needed, write it, and do not resurrect either from git.
 
-The old hero's CSS was deleted rather than left behind — one of its rules was
-already leaking a light hairline into the dark figures band. If a second hero is
-ever needed, write it; do not resurrect that one from git.
+Four things about the new one are deliberate:
+
+- **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
+  failed image fetch or scripting off, and the hero is the tagline, the buttons
+  and the four counted facts on the airline's navy wash. A photo that 404s drops
+  out of the rotation; the flight strip stays `[hidden]` until real sectors
+  arrive. There is no skeleton and no placeholder leg anywhere in it.
+- **It only runs when it is being looked at.** The stage advances on a seven
+  second dwell, paused by an `IntersectionObserver` when the hero scrolls away,
+  by `visibilitychange` when the tab goes to the back, and by hover or focus.
+  Asked for reduced motion it does not advance at all — the dots still work,
+  and the drift and cross-fade come off in CSS.
+- **Photographs load as they are needed.** Only the first slide carries a `src`
+  on first paint; each one loads as the slide before it comes up. Five 1920px
+  photographs fetched to show one is the whole of an opening screen's budget.
+- **Airport photography would slot straight in.** There is none in this repo,
+  and a stock shot of Benito Juárez is not the airline's material. When the VA
+  has its own, `AMV_DATA.heroStills` takes `{ src, w, h, alt, title, reg, note,
+  route }` entries and they lead the rotation with no change to `hero.js`.
 
 **The one box on this site is `.panel`.** The rule in `brand.css` is that prose
 is opened by a hairline, never wrapped in a card, and that still holds. But that
@@ -547,18 +563,32 @@ scrolling back up is the case that catches this. `tools/test-motion.js` walks
 every page with the crew centre both down and answering and fails if a single
 element is stranded.
 
-**A pale section arrives; a dark one cuts.** The page alternates white and the
+**Every section arrives; none of them cut.** The page alternates white and the
 tint three or four times, and those changeovers used to be knife edges — one row
 of pixels where `#FFFFFF` became `#F7F8FA` and the greca field started
 mid-pattern. Four percent of tint is not what you saw; the seam was. The tint
-and its texture now ramp in and out over `--seam`, inside the section's own
-padding so no copy sits in the ramp.
+and its texture ramp in and out over `--seam`, inside the section's own padding
+so no copy sits in the ramp.
 
-The edge against a **dark** block is deliberate and stays hard: navy against
-white is the airline's own device, and the band and the footer already meet it
-with a marigold greca crown — a soft ramp there puts a 4rem sliver of white
-above that crown and reads as a gap. `:has()` is what spots those neighbours, so
-add any new dark block to the `--seam-bot: 0px` list in `brand.css`.
+The navy sections did not, and that was the bug the VA reported next: half the
+backgrounds moved and half of them snapped. A `.section--ink` now ramps out of
+whatever is above it and into whatever is below it over `--ink-seam`, which is
+shorter than `--seam` — the two colours are forty percent apart rather than
+four, and a straight white-to-navy interpolation spends its middle in mid-grey
+and reads as a blur. So the ramp is **eased**: almost nothing over the first
+third, the colour arriving over the last. `.hero--live` hands over the same way
+when the section under it is pale.
+
+Three things hold it together. The far colour is the **neighbour's** — `:has()`
+sets `--ink-near-top` / `--ink-near-bot` to `--bg` or `--bg-alt` so the ramp
+ends on exactly the colour the next section starts on. Dark neighbours still
+meet on a hard edge, because there is no edge: navy meets navy, and the band and
+footer meet theirs with a marigold greca crown that a ramp would leave floating
+in a pale sliver — add any new dark block to the `--ink-bot: 0px` and
+`--seam-bot: 0px` lists in `brand.css`. And the **decoration ramps with the
+ground**: the ruled-feather rails and the eagle watermark run the section's full
+height, so both carry the same fade in their own `background`, the greca's trick
+and for the greca's reason — one mask layer, no `mask-composite`.
 
 **The route map is generated, not drawn.** `assets/js/world.js` is Natural
 Earth's public-domain 1:110m land, reprojected Robinson and simplified by
