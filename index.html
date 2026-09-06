@@ -271,6 +271,35 @@
         </div>
     </section>
 
+    <!-- ==================== WHAT THE AIRLINE DID ====================
+         The crew center's own record of what happened — a pilot joined,
+         somebody made Captain, an event went up. Written by the crew center,
+         not by us, which is the point: these are the only lines on this page
+         that cannot be out of date, because an airline that has not done
+         anything has none of them.
+
+         The section starts hidden and is REMOVED unless the feed answers with
+         something. There is no honest static version of "this week" to leave
+         in its place — every other section on this page holds a fallback in
+         data.js because the fallback is still true when the backend is quiet,
+         and a hand-written list of recent joiners would not be. -->
+    <section class="section" id="recent" hidden>
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Lately</span>
+                <h2>What the airline has been doing</h2>
+                <p class="lede">
+                    Straight off the crew center's own board — written as it happens,
+                    by the system the airline is actually run on.
+                </p>
+            </div>
+            <div class="timeline" id="recentList" data-reveal></div>
+            <p style="margin-top:2rem" data-reveal>
+                <a class="btn btn--ghost" href="/crew">Sign in to the crew center <span data-icon="arrow"></span></a>
+            </p>
+        </div>
+    </section>
+
     <!-- ==================== FROM THE CEO ==================== -->
     <section class="section">
         <div class="wrap">
@@ -316,6 +345,24 @@
             <p style="margin-top:2rem" data-reveal>
                 <a class="btn btn--ghost" href="/events">Full event calendar <span data-icon="arrow"></span></a>
             </p>
+        </div>
+    </section>
+
+    <!-- ==================== THE WALL ====================
+         The Instagram posts staff chose on the crew center, hung here too.
+         Same posts, same order, one place to change them.
+
+         Hidden and removed when there is no wall, for the same reason as the
+         section above: an airline that has not posted anything should show
+         nothing here, not an empty grid with a heading over it. -->
+    <section class="section section--alt" id="wall" hidden>
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">On Instagram</span>
+                <h2>The airline, photographed</h2>
+            </div>
+            <div class="wall" id="wallGrid" data-reveal></div>
+            <p class="wall__handle" id="wallHandle" hidden></p>
         </div>
     </section>
 
@@ -486,6 +533,143 @@
     // handle on failure: crew.js removes what it cannot fill, and the section is
     // gated on `pilots`, so a dead backend simply costs us this band.
     if (window.AMV_CREW) window.AMV_CREW.mountStats();
+
+    // ---- What the airline has been doing ----
+    //
+    // The crew center's automatic rows: joins, promotions, published events.
+    // The section is removed unless there is something to put in it — see the
+    // note on the markup for why this one has no data.js fallback.
+    const recent = document.getElementById('recent');
+    const GLYPH = {
+        joined:    '✦',   // a pilot on the roster
+        promotion: '▲',   // a rank up
+        checkride: '◆',   // a check-ride due or flown
+        event:     '●',   // an event published
+        schedule:  '■',   // a schedule up
+    };
+
+    function paintRecent(rows) {
+        if (!rows || !rows.length) { recent.remove(); return; }
+        const when = (at) => {
+            const t = Date.parse(at);
+            if (!isFinite(t)) return '';
+            const days = Math.floor((Date.now() - t) / 86400000);
+            if (days <= 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7)  return `${days} days ago`;
+            return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' }).format(t);
+        };
+        document.getElementById('recentList').innerHTML = rows.map(r => `
+            <div class="timeline__row">
+                <span class="timeline__when">${esc(when(r.at) || (GLYPH[r.kind] || '·'))}</span>
+                <p class="timeline__what">
+                    <b>${esc(r.title)}</b>
+                    ${r.body ? `<span>${esc(r.body)}</span>` : ''}
+                </p>
+            </div>`).join('');
+        recent.hidden = false;
+        A.refresh(recent);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.activity({ limit: 6 }).then(paintRecent);
+    else recent.remove();
+
+    // ---- The wall ----
+    //
+    // Nine Instagram embeds is several megabytes, and this section sits near
+    // the bottom of a long page most visitors never reach the end of. So each
+    // tile is a button until it is scrolled to, and the frame is built then.
+    // Clicking one before that mounts it early rather than leaving the visitor
+    // with a button that does nothing.
+    //
+    // NOTHING FROM THE FEED REACHES `src` AS TYPED. crew.js rebuilds both
+    // addresses from the shortcode; this only reads what it built.
+    const wall = document.getElementById('wall');
+
+    function mountTile(btn) {
+        if (btn.dataset.mounted) return;
+        btn.dataset.mounted = '1';
+        const frame = document.createElement('iframe');
+        frame.src = btn.dataset.embed;
+        frame.title = 'Instagram post';
+        frame.loading = 'lazy';
+        frame.setAttribute('scrolling', 'no');
+        frame.setAttribute('allowtransparency', 'true');
+        // The embed is somebody else's page. It gets to be a photograph and
+        // nothing else: no scripts of ours to reach, no top-level navigation,
+        // no camera, no payment. `allow-popups` is the one concession, so the
+        // post's own "view on Instagram" still opens.
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+        frame.referrerPolicy = 'no-referrer-when-downgrade';
+        btn.innerHTML = '';
+        btn.appendChild(frame);
+        fitTile(btn, frame);
+    }
+
+    // 326 × 470 is the only size Instagram's embed lays out at, and a
+    // cross-origin frame cannot be measured. So it is built at that size and
+    // scaled to whatever the grid gave the tile.
+    function fitTile(btn, frame) {
+        const w = btn.clientWidth;
+        if (!w) return;
+        const k = w / 326;
+        frame.style.transform = `scale(${k})`;
+    }
+
+    function paintWall(data) {
+        if (!data || !data.posts.length) { wall.remove(); return; }
+        const grid = document.getElementById('wallGrid');
+        grid.innerHTML = data.posts.map(p => `
+            <button class="wall__tile" type="button"
+                    data-embed="${esc(p.embedUrl)}"
+                    aria-label="Open an Instagram post">
+                <span class="wall__ph">
+                    <span>Instagram</span>
+                    <b>View post</b>
+                </span>
+            </button>`).join('');
+
+        const tiles = Array.from(grid.querySelectorAll('.wall__tile'));
+        tiles.forEach((t, i) => { t.dataset.url = data.posts[i].url; });
+        grid.addEventListener('click', (e) => {
+            const btn = e.target.closest('.wall__tile');
+            if (btn) mountTile(btn);
+        });
+
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((en) => {
+                    if (!en.isIntersecting) return;
+                    mountTile(en.target);
+                    io.unobserve(en.target);
+                });
+            }, { rootMargin: '200px' });
+            tiles.forEach(t => io.observe(t));
+        } else {
+            tiles.forEach(mountTile);
+        }
+
+        // Re-scale on resize: the grid is fluid, the frame is not.
+        let rt = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(rt);
+            rt = setTimeout(() => {
+                tiles.forEach(t => { const f = t.querySelector('iframe'); if (f) fitTile(t, f); });
+            }, 150);
+        });
+
+        if (data.handle) {
+            const h = document.getElementById('wallHandle');
+            h.innerHTML = `Follow the airline at <a href="https://www.instagram.com/${esc(data.handle)}/"
+                rel="noopener" target="_blank">@${esc(data.handle)}</a>`;
+            h.hidden = false;
+        }
+        wall.hidden = false;
+        A.refresh(wall);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.social({ limit: 9 }).then(paintWall);
+    else wall.remove();
 })();
 </script>
 </body>

@@ -2138,3 +2138,51 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .hero__facts--band dd span { display: none; }
     .hero__facts--band > div { padding: .85rem 0; }
 }
+
+/* ============================== THE WALL =================================
+   The Instagram posts staff hung on the crew center, drawn on the website.
+
+   EVERY TILE IS A PLACEHOLDER UNTIL IT IS SCROLLED TO. An Instagram embed
+   loads a whole Instagram page and its scripts; nine of them mounted at once
+   is several megabytes for a section most visitors never reach. The tile is a
+   button until it comes into view, and the frame is built then — see the
+   observer in index.html.
+
+   The frame is a fixed 326×470 because Instagram's embed refuses to lay out
+   under 326px and cannot be measured across origins. The tile scales the whole
+   frame with a transform rather than letting it be clipped, which is why the
+   host carries an explicit height and the frame is absolutely placed. */
+.wall {
+    display: grid; gap: clamp(.9rem, 2vw, 1.4rem);
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+.wall__tile {
+    position: relative; overflow: hidden; padding: 0;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--surface-2);
+    /* 326 × 470 is 1 : 1.442. Held so the placeholder and the frame that
+       replaces it occupy exactly the same box — no reflow on mount. */
+    aspect-ratio: 326 / 470;
+    display: grid; place-items: center;
+    color: var(--muted); font: inherit; text-align: center;
+    cursor: pointer; transition: border-color .2s ease, transform .2s ease;
+}
+.wall__tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+.wall__tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wall__ph { display: grid; gap: .5rem; justify-items: center; padding: 1.2rem; }
+.wall__ph span {
+    font-family: var(--font-mono); font-size: .74rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint);
+}
+.wall__ph b { font-family: var(--font-display); font-weight: 700; color: var(--ink); }
+.wall__tile iframe {
+    position: absolute; top: 0; left: 0; width: 326px; height: 470px;
+    border: 0; transform-origin: top left;
+}
+/* The follow line under the wall. Mono, because it is a handle. */
+.wall__handle {
+    margin-top: clamp(1.2rem, 3vw, 1.8rem);
+    font-family: var(--font-mono); font-size: .86rem; color: var(--muted);
+}
+.wall__handle a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.wall__handle a:hover { text-decoration: underline; }

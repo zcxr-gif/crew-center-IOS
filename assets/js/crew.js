@@ -252,6 +252,86 @@
         return rows.length ? rows : null;
     }
 
+    /* ---- What the airline did this week -------------------------------------
+       GET /api/crew/<slug>/announcements → { announcements: [{ title, body,
+       kind, auto, pinned, createdAt }] }
+
+       The crew center's noticeboard carries two kinds of row and they are not
+       the same thing on a public page.
+
+       A human writes one — "Winter schedule is up, bids close Friday". That is
+       an announcement, it is aimed at people who already fly here, and it goes
+       stale in a way a marketing page notices: a visitor reading a three-month
+       -old bid deadline learns that nobody is minding the site.
+
+       The crew center writes the other, with `auto: true`, when something
+       actually happens: a pilot joined, somebody made Captain, an event was
+       published. Those are the rows worth having out front. They are short,
+       they are dated, they cannot go stale — an airline that has not done
+       anything simply has none — and collectively they say the one thing this
+       page most needs to be believed about, which is that the operation on it
+       is running rather than described.
+
+       So this returns the automatic rows only. Nothing here is a fact the crew
+       center does not already publish on its own public noticeboard.
+
+       Returns null when the board is quiet, unreachable, or holds nothing
+       automatic — the caller then leaves the page exactly as authored. */
+    async function activity({ limit = 6 } = {}) {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/announcements`);
+        if (!data || !Array.isArray(data.announcements)) return null;
+
+        const rows = data.announcements
+            .filter(a => a && a.auto && a.status !== 'draft' && String(a.title || '').trim())
+            .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+            .slice(0, limit)
+            .map(a => ({
+                title: String(a.title).trim(),
+                body:  String(a.body || '').trim(),
+                // 'joined' | 'promotion' | 'checkride' | 'event' | 'schedule' |
+                // whatever the crew center recorded. Used only to pick a glyph;
+                // an unknown kind draws the neutral one rather than nothing.
+                kind:  String(a.kind || '').trim(),
+                at:    a.createdAt || null,
+            }));
+
+        return rows.length ? rows : null;
+    }
+
+    /* ---- The Instagram wall -------------------------------------------------
+       GET /api/crew/<slug>/social → { handle, posts: [{ kind, code, url,
+       embedUrl }] }
+
+       The posts staff hung on the crew center. Same posts, same order, one
+       place to change them — which is the whole reason this file exists.
+
+       THE ADDRESS IS BUILT HERE, from `kind` and `code`, and `code` is checked
+       against [A-Za-z0-9_-] before it is used. The backend already sent an
+       `embedUrl` it had assembled the same way from the same closed alphabet,
+       and it is still not the one that goes in the frame. A `src` is the one
+       attribute on this page where being wrong means somebody else's script
+       runs on our domain, and "the API would not do that" is not a property
+       this file can check. Rebuilding costs a line and removes the question. */
+    const POST_KINDS = new Set(['p', 'reel', 'tv']);
+
+    async function social({ limit = 9 } = {}) {
+        const data = await get(`/api/crew/${encodeURIComponent(SLUG)}/social`);
+        if (!data || !Array.isArray(data.posts)) return null;
+
+        const handle = String(data.handle || '').trim().replace(/^@+/, '');
+        const posts = data.posts
+            .filter(p => p && POST_KINDS.has(p.kind) && /^[A-Za-z0-9_-]{1,64}$/.test(String(p.code || '')))
+            .slice(0, limit)
+            .map(p => ({
+                kind: p.kind,
+                code: p.code,
+                url:      `https://www.instagram.com/${p.kind}/${p.code}/`,
+                embedUrl: `https://www.instagram.com/${p.kind}/${p.code}/embed/`,
+            }));
+
+        return posts.length ? { handle, posts } : null;
+    }
+
     /* ---- Operating figures --------------------------------------------------
        GET /api/crew/<slug>/stats → { connected, stats: { pilots, hours,
        pireps, flightHours, … } }
@@ -374,5 +454,5 @@
         return stats().then((figures) => { paint(figures, root); return figures; });
     }
 
-    window.AMV_CREW = { get, routes, airports, events, pastEvents, pireps, stats, paint, mountStats, BACKEND, SLUG };
+    window.AMV_CREW = { get, routes, airports, events, pastEvents, pireps, activity, social, stats, paint, mountStats, BACKEND, SLUG };
 })();
