@@ -123,7 +123,16 @@
             }
         }, { passive: true });
 
-        const onScroll = () => nav.classList.toggle('is-stuck', scrollY > 8);
+        // The bar carries its own stuck treatment (opacity, the navy→red edge);
+        // the HOST carries the scrim that fades the content into it, because a
+        // fade drawn inside the bar would sit above the blur instead of below
+        // the bar. Both get the flag so neither needs `:has()` to find the
+        // other. See the NAV block in brand.css.
+        const onScroll = () => {
+            const stuck = scrollY > 8;
+            nav.classList.toggle('is-stuck', stuck);
+            host.classList.toggle('is-stuck', stuck);
+        };
         addEventListener('scroll', onScroll, { passive: true });
         onScroll();
 
@@ -189,7 +198,6 @@
                 </div>
             </div>
         </footer>`;
-        host.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
     }
 
     // ---- Theme --------------------------------------------------------------
@@ -214,6 +222,13 @@
             document.documentElement.setAttribute('data-theme', next);
             try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
             paint();
+        });
+        // The theme is not only ever set from this button. /crew adopts the one
+        // the visitor picks inside the framed crew center, and repainting only
+        // on click left this icon offering "switch to dark" on an already-dark
+        // page. Watching the attribute covers every route in, present or later.
+        new MutationObserver(paint).observe(document.documentElement, {
+            attributes: true, attributeFilter: ['data-theme'],
         });
         paint();
     }
@@ -427,6 +442,11 @@
         const scope = root || document;
         scope.querySelectorAll('[data-icon]:empty').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
         scope.querySelectorAll('[data-mark]:empty').forEach(el => { el.innerHTML = MARK; });
+        // The year used to be written by renderFooter alone, so it was blank on
+        // any page carrying a [data-year] outside the footer — /crew, which
+        // states its own copyright line rather than the whole footer, was the
+        // first. It belongs in the pass that fills every other placeholder.
+        scope.querySelectorAll('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
         wireReveal();
         wireCounters();
     }
