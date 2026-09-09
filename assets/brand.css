@@ -372,6 +372,58 @@ button, input, select, textarea { font: inherit; color: inherit; }
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
     box-shadow: inset 0 -1px 0 rgba(15, 27, 46, .10);
 }
+/* ---- The lockup, and the Connect sub-brand --------------------------------
+   Aeroméxico runs its regional operation as Aeroméxico Connect — a second
+   lockup, the same eagle, the word CONNECT set under the wordmark. The VA asked
+   for the virtual equivalent, and it is not an invention here: the E190 in
+   data.js already flies `livery: 'Aeromexico Connect'` on regional and feeder
+   sectors, released at Cadet, and there is already a Connect event for newer
+   pilots. Connect is what a cadet starts on. This gives that a name and a mark.
+
+   BUILT FROM TYPE, NOT FROM THEIR LOGO FILE. The VA sent the real Aeroméxico
+   Connect lockup as a picture. Shipping that would be shipping the airline's
+   registered wordmark as artwork, which is the provenance problem the serape
+   note already walks through — and it would be the only raster brand asset on
+   a site that draws its mark from a traced SVG and sets everything else in
+   type. So this is the nav's own wordmark treatment with a third line added:
+   Fraunces for the name, the letter-spaced sans beneath it for the sub-brand.
+   Same eagle, our typography.
+
+   Sub-brand centred UNDER the wordmark rather than beside it, which is the one
+   structural thing carried over from the real lockup — it is what makes a
+   sub-brand read as a division of the airline rather than as a second airline
+   standing next to it. */
+.lockup { display: inline-flex; align-items: center; gap: .8rem; }
+.lockup .mark { width: 3rem; color: var(--am-blue); flex: none; }
+.lockup__type { display: grid; justify-items: center; line-height: 1; min-width: 0; }
+.lockup__type b {
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 50, 'WONK' 1;
+    font-size: clamp(1.15rem, 2.4vw, 1.5rem); letter-spacing: -.02em;
+    color: var(--ink);
+}
+.lockup__type span {
+    margin-top: .34rem;
+    font-size: clamp(.6rem, 1.1vw, .7rem); font-weight: 700;
+    letter-spacing: .3em; text-transform: uppercase; color: var(--muted);
+    /* The tracking pushes the last letter off its own centre; the padding puts
+       the word back over the wordmark above it. */
+    padding-left: .3em;
+}
+/* Inline-flex by default so it can sit in a line of type. Standing on its own
+   it needs to be a block, or it shares a line with whatever came before it —
+   which on the home two-up put the eyebrow and the lockup side by side. */
+.lockup--block { display: flex; }
+.lockup--lg .mark { width: 4rem; }
+.lockup--lg .lockup__type b { font-size: clamp(1.4rem, 3vw, 1.95rem); }
+
+/* On a dark ground the eagle goes to the on-dark blue, like every other place
+   the mark is used against navy. */
+:root[data-theme="dark"] .lockup .mark { color: var(--am-blue-300); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .lockup .mark { color: var(--am-blue-300); }
+}
+
 /* ---- The crest ------------------------------------------------------------
    The tricolour with a crest in the centre band. THE CREST IS OURS, NOT THE
    NATION'S, and that is a deliberate substitution rather than an approximation.
