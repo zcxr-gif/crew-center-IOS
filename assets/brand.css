@@ -654,14 +654,31 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
    patch that with inline rgba() on every element. It belongs here instead, so
    a new dark section is right without anyone remembering the incantation.
    Opaque, not translucent — a route table wants a solid ground. */
+/* A card on navy cannot be the page's white — a white slab on a dark band is
+   the brightest thing on the screen and the section stops being a band. It is
+   the same card lit from the front instead: a wash of white over the navy,
+   closed by a brighter hairline. No shadow, because there is nothing for a
+   shadow to fall on. */
 .section--ink .card {
-    background: none; border: 0; border-top: 1px solid rgba(255, 255, 255, .2);
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .14);
+    box-shadow: none;
 }
 .section--ink .card p       { color: #9DB0CE; }
-.section--ink .card__icon   { color: #fff; }
-.section--ink .card--hover:hover { border-top-color: rgba(255, 255, 255, .55); }
+.section--ink .card__icon   { background: rgba(255, 255, 255, .12); color: #fff; }
+.section--ink .card__foot   { border-top-color: rgba(255, 255, 255, .14); }
+.section--ink .card__foot a { color: var(--am-marigold); }
+.section--ink .card--hover:hover {
+    background: rgba(255, 255, 255, .09);
+    border-color: rgba(255, 255, 255, .3);
+    box-shadow: none;
+}
 
-.section--ink .table-scroll { background: none; border: 0; }
+.section--ink .table-scroll {
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .14);
+    box-shadow: none;
+}
 .section--ink thead th {
     background: none; color: #B7C6DE; border-bottom-color: rgba(255, 255, 255, .28);
     border-bottom-color: rgba(255, 255, 255, .14);
@@ -681,7 +698,10 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .head .eyebrow { display: inline-flex; margin-bottom: .85rem; }
 .head p { margin-top: .9rem; }
 
-.grid { display: grid; gap: clamp(1rem, 2vw, 1.4rem); }
+/* A hairline-opened column needs only enough gutter to separate two rules; a
+   card needs enough for the shadow to fall into and for the white to read as
+   a discrete object. Hence the wider gap since the cards came back. */
+.grid { display: grid; gap: clamp(1.1rem, 2.2vw, 1.5rem); }
 .grid-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
 .grid-3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr)); }
 .grid-4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
@@ -719,34 +739,84 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .btn--sm { padding: .6rem 1.2rem; font-size: .86rem; }
 
 /* --- Cards ---
-   NOT cards. Every piece of information on this site used to sit in a
-   bordered, rounded, shadowed box — six of them in a grid for "why fly with
-   us", three for the hubs, four for the stats, one per aircraft. A page built
-   entirely from rounded boxes is the most generic layout there is, and it made
-   a magazine's worth of copy read like a settings screen.
+   THESE ARE CARDS AGAIN, ON THE VA'S INSTRUCTION. Read this before stripping
+   them back out, because the paragraphs this replaces argued the other way.
 
-   An item is now opened by a hairline and set in type, the way a print column
-   is. The class name stays because the pages already use it. There is no
-   background, no border box, no radius and no shadow here on purpose — if you
-   are adding one back, add it to something that is genuinely a surface (a
-   table, a framed embed), not to a paragraph. */
+   What was here: the first build put every piece of information in a bordered,
+   rounded, shadowed box — six for "why fly with us", three for the hubs, four
+   for the stats, one per aircraft. A page built entirely from boxes reads like
+   a settings screen, so all of it was stripped to hairline-opened columns set
+   in type, the way a print column is.
+
+   The VA has now asked for the opposite, having seen a site they want this one
+   to feel like. Be honest about what is different rather than pretending the
+   old objection did not apply:
+
+     - a card is a SURFACE now, not a rectangle. It is the page's own white,
+       lifted off the ground by a shadow mixed from the navy, closed by a
+       hairline that is barely there. The old version drew a hard border and
+       let the box do the work;
+     - there is exactly one radius (--radius) and one shadow (--shadow) across
+       every card on the site, so a grid of them reads as one material rather
+       than as six separate widgets;
+     - the hover is a 3px lift, not a colour change — the card behaves like a
+       physical thing.
+
+   The rule that DOES survive from the old note: a card holds a discrete thing
+   — an aircraft, a rank, a person, a counted figure, a partner. It does not
+   hold a run of prose. Body copy still sets as a column against the page. If
+   you are about to wrap a paragraph in one of these, don't. */
 .card {
-    background: none; border: 0; border-radius: 0; padding: 0;
-    border-top: 1px solid var(--line);
-    padding-top: 1.3rem;
-    transition: border-color .3s var(--ease);
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: clamp(1.25rem, 2.4vw, 1.6rem);
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease),
+                border-color .3s var(--ease);
 }
-.card--hover:hover { border-top-color: var(--accent); }
+/* Doubled up as `.card.card--hover` on purpose, and do not simplify it back.
+   Every card on the site also carries [data-reveal], whose resting state is
+   `[data-reveal].is-in { transform: none }` — the same (0,2,0) weight as a
+   single-class hover, declared several hundred lines further down. At equal
+   weight the later rule wins, so a one-class hover lifts nothing once the card
+   has been revealed, which is every card the visitor can actually see. */
+.card.card--hover:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+}
 .card h3 { margin-bottom: .5rem; }
 .card p  { color: var(--muted); font-size: .96rem; }
 
-/* The icon was a tinted rounded square — another small block. It is just the
-   glyph now, in the accent, sitting above the heading. */
+/* The glyph sits on a tint of the accent — a small surface inside a larger
+   one. It is 10% of the accent rather than a saturated chip: at this size a
+   solid blue square competes with the heading next to it. */
 .card__icon {
-    width: auto; height: auto; background: none; border-radius: 0;
-    display: block; margin-bottom: .85rem; color: var(--accent);
+    width: 2.6rem; height: 2.6rem; border-radius: var(--radius-sm);
+    display: grid; place-items: center;
+    margin-bottom: 1rem; flex: none;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
 }
-.card__icon svg { width: 1.45rem; height: 1.45rem; }
+.card__icon svg { width: 1.3rem; height: 1.3rem; }
+
+/* The card's footer link, ruled off from the body above it. Borrowed shape:
+   a quiet hairline, the label in the accent, and a chevron that steps out on
+   hover so the affordance is motion rather than an underline. */
+.card__foot {
+    margin-top: auto; padding-top: 1rem;
+    border-top: 1px solid var(--line-soft);
+}
+.card__foot a {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-size: .86rem; font-weight: 700; color: var(--accent);
+}
+.card__foot a svg,
+.card__foot a [data-icon] { width: 1em; height: 1em; transition: transform .25s var(--ease); }
+.card__foot a:hover [data-icon],
+.card__foot a:hover svg { transform: translateX(3px); }
 
 /* --- Chips / pills --- */
 .chip {
@@ -796,9 +866,17 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .section--ink .rule, .hero .rule, .band .rule { box-shadow: none; }
 
 /* --- Table --- */
-/* Scroll container only. The table rules itself with hairlines; wrapping it in
-   a rounded bordered panel just puts a box round a box. */
-.table-scroll { overflow-x: auto; }
+/* Now a framed panel, on the same instruction as the cards, and this is the
+   one place the old note already allowed it: a table IS genuinely a surface.
+   Same white, same radius, same shadow, so a table and a card sitting in the
+   same column read as the same material. */
+.table-scroll {
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
 table { width: 100%; border-collapse: collapse; min-width: 40rem; }
 thead th {
     text-align: left; padding: .95rem 1.15rem; white-space: nowrap;
@@ -1038,7 +1116,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 @media (min-width: 40rem) { .ops__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 64rem) { .ops__grid { grid-template-columns: repeat(4, 1fr); } }
 
-.ops__grid .stat { padding-top: 1.1rem; border-top: 1px solid rgba(255, 255, 255, .22); }
+.ops__grid .stat {
+    background: rgba(255, 255, 255, .055);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: var(--radius);
+    padding: clamp(1.35rem, 2.6vw, 1.75rem);
+}
 /* Bigger than .stat elsewhere: on this band the figures are the content. */
 .ops__grid .stat__num { font-size: clamp(2.5rem, 5.5vw, 3.6rem); color: var(--am-marigold); }
 .section--ink .stat__label, .section--ink .stat__note { color: #9DB0CE; }
@@ -1057,18 +1140,26 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
    is now a column opened by a RULE in its own livery colour, with the mark
    small above the name — the colour survives, the block does not. Same move as
    the ornament: a band along an edge instead of a filled field. */
+/* The per-type colour is held in a variable now rather than being set six
+   times as a border-colour. It has three jobs on the card — the rule across
+   the top, the mark, and the tail badge on the photograph — and a card that
+   lifts on hover has to be able to put the colour BACK after .card--hover
+   rewrites border-color on all four sides. `inherit` used to do that; against
+   a card with its own border it inherits the grid's colour and the rule goes
+   grey. */
 .fleet-card {
-    display: flex; flex-direction: column; gap: .35rem;
-    background: none; border: 0; border-radius: 0; padding: 0;
-    border-top: 3px solid var(--am-blue);
-    padding-top: 1.2rem;
+    --type-color: var(--am-blue);
+    display: flex; flex-direction: column; gap: 0;
+    padding: 0; overflow: hidden;
+    border-top: 3px solid var(--type-color);
 }
-.fleet-card:nth-child(6n+2) { border-top-color: var(--am-jade); }
-.fleet-card:nth-child(6n+3) { border-top-color: var(--am-clay); }
-.fleet-card:nth-child(6n+4) { border-top-color: var(--am-turquoise); }
-.fleet-card:nth-child(6n+5) { border-top-color: var(--am-rosa); }
-.fleet-card:nth-child(6n+6) { border-top-color: var(--am-cobalt); }
-.fleet-card--hover:hover, .fleet-card.card--hover:hover { border-top-color: inherit; }
+.fleet-card:nth-child(6n+2) { --type-color: var(--am-jade); }
+.fleet-card:nth-child(6n+3) { --type-color: var(--am-clay); }
+.fleet-card:nth-child(6n+4) { --type-color: var(--am-turquoise); }
+.fleet-card:nth-child(6n+5) { --type-color: var(--am-rosa); }
+.fleet-card:nth-child(6n+6) { --type-color: var(--am-cobalt); }
+.fleet-card--hover:hover,
+.fleet-card.card--hover:hover { border-top-color: var(--type-color); }
 
 /* Holds the mark once there is one. Collapses while there isn't, so the
    coloured rule and the type carry the entry on their own. */
@@ -1076,13 +1167,13 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     background: none; aspect-ratio: auto; display: block; overflow: visible;
 }
 .fleet-card__media:empty { display: none; }
-.fleet-card__media:not(:empty) { margin-bottom: .9rem; }
-.fleet-card__media .mark { width: 3.4rem; opacity: 1; color: var(--am-blue); }
-.fleet-card:nth-child(6n+2) .fleet-card__media .mark { color: var(--am-jade); }
-.fleet-card:nth-child(6n+3) .fleet-card__media .mark { color: var(--am-clay); }
-.fleet-card:nth-child(6n+4) .fleet-card__media .mark { color: var(--am-turquoise); }
-.fleet-card:nth-child(6n+5) .fleet-card__media .mark { color: var(--am-rosa); }
-.fleet-card:nth-child(6n+6) .fleet-card__media .mark { color: var(--am-cobalt); }
+/* The photograph runs to the card's own edge — the card is the frame, so a
+   second inset frame around the image is a box inside a box. The mark-only
+   fallback has no edge of its own to meet, so it keeps the body's inset. */
+.fleet-card__media:not(:has(.fleet-photo)) {
+    padding: clamp(1.15rem, 2.4vw, 1.5rem) clamp(1.15rem, 2.4vw, 1.5rem) 0;
+}
+.fleet-card__media .mark { width: 3.4rem; opacity: 1; color: var(--type-color); }
 .fleet-card__media img { width: 100%; height: auto; }
 
 /* The airframe itself, where there is a photograph of it. These are the VA's
@@ -1102,7 +1193,6 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .fleet-card__media .fleet-photo {
     aspect-ratio: 1920 / 886;
     object-fit: cover;
-    border-radius: var(--radius-sm);
     background: var(--surface-2);
 }
 
@@ -1128,7 +1218,10 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .fleet-card__media .fleet-badge .mark { width: 1.7rem; }
 
-.fleet-card__body { padding: 0; display: flex; flex-direction: column; gap: .35rem; flex: 1; }
+.fleet-card__body {
+    padding: clamp(1.15rem, 2.4vw, 1.5rem);
+    display: flex; flex-direction: column; gap: .35rem; flex: 1;
+}
 .fleet-card__body .type {
     font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em;
     color: var(--muted); font-weight: 700; text-transform: uppercase;
@@ -1604,9 +1697,23 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .staff-grid--exec { grid-template-columns: 1fr; }
 @media (min-width: 48rem) { .staff-grid--exec { grid-template-columns: repeat(2, 1fr); } }
 
+/* A person is exactly the kind of discrete item the card note allows, so the
+   staff entries take the same surface as everything else rather than staying
+   the one hairline grid left on the site. */
 .staff {
     display: grid; gap: .55rem; align-content: start;
-    border-top: 1px solid var(--line); padding-top: 1.3rem;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: clamp(1.25rem, 2.4vw, 1.6rem);
+    box-shadow: var(--shadow);
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.staff:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.section--ink .staff {
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .14);
+    box-shadow: none;
 }
 .staff__role {
     font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
