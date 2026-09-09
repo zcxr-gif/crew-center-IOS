@@ -199,6 +199,13 @@
     --serpent-band: 128px 29px;
     --serpent-h:    29px;
 
+    /* The serape, exactly as tools/make-serape.py emits it. Sized in px for the
+       same reason every other generated tile here is: `auto` ties the weave to
+       the element's width, and a 4px thread crossing collapses to nothing on a
+       phone. Re-run the script and it prints the value to put here. */
+    --serape-tile:  224px 60px;
+    --serape-h:     14px;
+
     /* The pinned header, in two parts: the tricolour hairline and the bar
        under it. Named because crew.html sizes the framed crew centre against
        them — a viewport-height stage has to subtract the whole header, not
@@ -1212,6 +1219,60 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .band p { color: var(--muted); max-width: 52ch; margin: 1.1rem auto 0; }
 .band .hero__cta { justify-content: center; }
 
+/* ============================ THE CLOSE ==================================
+   Two pieces of the airline's own geometry, at the bottom of every page, doing
+   opposite jobs on purpose.
+
+   THE RAIL, FAINT AND BEHIND. The ruled-feather device — tools/make-stripes.py,
+   the ragged profile measured off full-logo.webp — down both edges of the
+   closing band and the footer at a few percent. This is the treatment the flag
+   gets behind the hero and it is the treatment that suits it: at full strength
+   on white it is a graphic you look at, and it spent a commit on the hero
+   proving that. At 4% it is the paper having something in it.
+
+   Both edges here, not the hero's one. An edge treatment picks a side; a
+   texture behind a closing band wants to be symmetrical, or the page finishes
+   lopsided.
+
+   THE SERAPE, ON THE SEAM. A 14px woven ribbon across the join between the
+   band and the footer — generated in our palette by tools/make-serape.py, see
+   that file for why a script rather than the photograph the VA sent.
+
+   It is the one thing down here at full colour, and that is the point: it is
+   14 pixels tall and it is a JOIN. Textile trim is what closes a garment, and
+   a hard seam between two same-tinted surfaces was the one edge on this page
+   that had nothing to say. Everything else at the bottom is a whisper; this is
+   a line of colour, and it works because it is the only one. */
+.band, .footer { position: relative; isolation: isolate; }
+.band::after,
+.footer::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    opacity: .04;
+    background: linear-gradient(180deg,
+        var(--am-red) 0, var(--am-rosa) 50%, var(--am-red) 100%);
+    --rail-w: clamp(1.7rem, 4.6vw, 3.4rem);
+    -webkit-mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--rail-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--rail-w) var(--stripe-tile);
+            mask:
+        url('/assets/img/stripes.svg')        repeat-y right top / var(--rail-w) var(--stripe-tile),
+        url('/assets/img/stripes-mirror.svg') repeat-y left  top / var(--rail-w) var(--stripe-tile);
+}
+/* On navy the same rail needs more to be there at all. */
+:root[data-theme="dark"] :is(.band, .footer)::after { opacity: .09; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) :is(.band, .footer)::after { opacity: .09; }
+}
+
+/* The ribbon. On the FOOTER's top edge rather than the band's bottom one, so a
+   page that has no closing band still gets it — every page has a footer. */
+.footer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0;
+    height: var(--serape-h);
+    background: url('/assets/img/serape.svg') repeat-x left center / var(--serape-tile);
+    z-index: 1; pointer-events: none;
+}
+
 /* ============================ FOOTER ===================================== */
 /* Light, like the rest of the page. A dark footer is the one black field most
    sites keep, the reference site included — but the brief here is that nothing
@@ -1220,8 +1281,9 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
    hairline and a tint instead. */
 .footer {
     position: relative; background: var(--bg-alt); color: var(--muted);
-    border-top: 1px solid var(--line-soft);
-    padding-block: clamp(3.5rem, 7vw, 5.5rem) 2.25rem;
+    /* No hairline: the serape ribbon IS the top edge now, and a grey rule
+       under a woven band reads as the band having come loose. */
+    padding-block: calc(var(--serape-h) + clamp(3rem, 6vw, 4.5rem)) 2.25rem;
 }
 .footer a { color: var(--muted); transition: color .2s var(--ease); }
 .footer a:hover { color: var(--ink); }
@@ -1923,48 +1985,17 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     :root:not([data-theme="light"]) .hero--live::before { opacity: .1; }
 }
 
-/* ---- The ruled-feather device, back ---------------------------------------
-   THIS WAS REMOVED TWO COMMITS AGO AND THE REASON IT COMES BACK IS INSTRUCTIVE.
-   It was taken out with the note that red rails down a white page are not a
-   quieter version of a device drawn for navy, they are a different and louder
-   thing. That was a judgement about how loud the page wanted to be, and the
-   VA's answer — pointing at the same device on aeromexico.com's own hero — is
-   that it wants to be that loud. It is the airline's device on the airline's
-   own site; the earlier caution was mine, not theirs.
+/* ---- The ruled-feather device: NOT ON THE HERO ---------------------------
+   It was here for one commit and the VA moved it. Worth recording why, because
+   the instinct to put it back will return: on the reference site the rail runs
+   down a hero that is a flat dark field with nothing else happening in it. Our
+   hero is not that any more — it has the crest, the flag behind, the aircraft
+   naming and a photograph, and a saturated red rail down the edge of that is
+   one more thing competing rather than an edge treatment.
 
-   Same generated file (tools/make-stripes.py measures the ragged profile off
-   full-logo.webp rather than inventing one), same red → rosa mexicano → red
-   ramp. Two things are different from the version that was removed:
-
-     ONE EDGE, NOT TWO. On navy the rails framed a dark field and needed both
-     sides to read as a frame. On white there is no field to frame — the device
-     is an edge treatment, and the reference runs it down the right only.
-
-     IT RESERVES ITS OWN GUTTER. padding-inline-end on the host pushes the
-     hero's centred column clear of the rail. The old build did this with a
-     `padding-inline: max(...)` on three separate `> .wrap` selectors, which is
-     why removing the rails left those sections mysteriously narrow. Here the
-     rail's width and the space it needs are the same custom property, so they
-     cannot drift apart.
-
-   Absolutely positioned children resolve against the PADDING box, so `inset:0`
-   puts the rail flush to the viewport edge while the padding holds the content
-   off it. That is the whole trick. */
-.hero--live {
-    /* Wide enough that a bar reads as a RULE rather than a dash. The bars'
-       thickness and pitch come from --stripe-tile and do not scale with this,
-       so a narrow rail keeps the same weight of line and just makes each one
-       short — which reads as a dotted border, not as the device. */
-    --rail-w: clamp(1.7rem, 4.6vw, 3.4rem);
-    padding-inline-end: var(--rail-w);
-}
-.hero--live::after {
-    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: linear-gradient(180deg,
-        var(--am-red) 0, var(--am-rosa) 46%, var(--am-rosa) 58%, var(--am-red) 100%);
-    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / var(--rail-w) var(--stripe-tile);
-            mask: url('/assets/img/stripes.svg') repeat-y right top / var(--rail-w) var(--stripe-tile);
-}
+   So the device moved to the back of the page and dropped to a whisper, on the
+   same terms as the flag: a texture you read as the paper having something in
+   it, not a graphic you look at. See THE CLOSE, below the footer rules. */
 
 /* ---- The two columns ------------------------------------------------------
    Copy left, photograph right, and the flight strip and the counted figures
