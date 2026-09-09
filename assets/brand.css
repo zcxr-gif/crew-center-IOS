@@ -1420,6 +1420,51 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     @view-transition { navigation: none; }
 }
 
+/* ============================ SEARCH & PAGER =============================
+   Five sectors a page, and a box to search them. Both exist because the route
+   list had grown past the point where scrolling it was reading it.
+
+   The pager states the range in words as well as offering the buttons —
+   "Showing 6-10 of 23" — because Previous/Next alone tells you which way you
+   can go and nothing about where you are or how much is left. */
+.route-controls { margin-bottom: clamp(1.1rem, 2.5vw, 1.5rem); }
+
+.field { display: block; position: relative; }
+.field input {
+    width: 100%;
+    padding: .82rem 1.15rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-size: .95rem;
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.field input::placeholder { color: var(--faint); }
+.field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+/* Safari draws its own clear affordance on type=search and it does not follow
+   the theme; the field is short enough that clearing it by hand is no hardship. */
+.field input::-webkit-search-decoration,
+.field input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.pager {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: .9rem 1.4rem;
+    margin-top: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+.pager__count { font-size: .88rem; color: var(--muted); margin: 0; }
+.pager__count b { color: var(--ink); font-weight: 700; font-family: var(--font-mono); }
+.pager__nav { display: flex; align-items: center; gap: .8rem; }
+.pager__at {
+    font-size: .84rem; color: var(--muted);
+    font-family: var(--font-mono); white-space: nowrap;
+}
+.pager .btn[disabled] { opacity: .4; pointer-events: none; }
+
 /* ============================ SKELETON ===================================
    For the second half of the same complaint: a section that is in the layout
    but still waiting on the crew centre used to pop its content in. This is the

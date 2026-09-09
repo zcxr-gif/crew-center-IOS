@@ -585,13 +585,37 @@
         }
     }
 
-    paintNetwork(D.routes, D.airports);
+    // NOT painted from data.js first. The map used to draw this repo's route
+    // table and then visibly redraw the crew centre's a moment later — two
+    // different networks, one after the other, on the same screen. The local
+    // table stays as a LOOKUP (cityOf, above, names an airport more readably)
+    // but it is no longer a source of sectors. Until the crew centre answers
+    // the map holds its shape; if it answers with nothing, the section says so.
+    if (window.AMV_CREW) {
+        document.getElementById('mapHost').innerHTML =
+            '<div class="skeleton" aria-hidden="true"><div class="skeleton__block"' +
+            ' style="aspect-ratio:16/9;border-radius:var(--radius)"></div></div>';
+    } else {
+        emptyNetwork();
+    }
+
+    function emptyNetwork() {
+        document.getElementById('mapHost').innerHTML = `<div class="empty">
+            <b>The route map is not available</b>
+            <p>Sectors are published in the crew centre and drawn here. Nothing has come back
+               from it just now.</p>
+        </div>`;
+        document.getElementById('networkLede').textContent =
+            'The published network is read live from our crew centre.';
+    }
 
     if (window.AMV_CREW) {
         const key = r => `${r.from}-${r.to}`;
         const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
-        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()]).then(([live, pos]) => {
-            if (!live) return;              // backend quiet — keep what data.js said
+        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()])
+          .catch(() => [null, null])
+          .then(([live, pos]) => {
+            if (!live || !live.length) { emptyNetwork(); return; }
             // Tier comes from the sector's twin in data.js, or from the plan's
             // own Codeshare tier when the crew centre says it is one. A sector
             // we have never seen still counts towards the total; it just has no
