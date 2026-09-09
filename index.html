@@ -295,6 +295,45 @@
     </section>
 
     <!-- ==================== LIVE NOW ==================== -->
+    <!-- ==================== TWO-UPS ====================
+         The shape aeromexico.com is mostly built from: a photograph on one
+         side, a four-word title and one sentence on the other, alternating
+         side, one on white and one on the tint. Their component, our words and
+         our photographs — see TWO-UP in brand.css for why none of their copy
+         came with it. The images are filled from AMV_DATA.fleet by type code
+         at the foot of this file, so no URL is written here. -->
+    <section class="twoup twoup--square" data-reveal>
+        <div class="twoup__media">
+            <img data-fleet-photo="789" alt="" loading="lazy" decoding="async">
+        </div>
+        <div class="twoup__text">
+            <span class="eyebrow">The fleet</span>
+            <h2 class="twoup__title">Six types, and you unlock them</h2>
+            <p class="twoup__intro">
+                From thirty-minute Connect hops on the E190 to the 787-9 on the Europe and
+                Pacific runs. Each type is released at a rank, so the fleet opens up as you
+                fly rather than sitting there as a catalogue.
+            </p>
+            <a class="btn btn--primary" href="/fleet">See the fleet <span data-icon="arrow"></span></a>
+        </div>
+    </section>
+
+    <section class="twoup twoup--circle twoup--right twoup--tint" data-reveal>
+        <div class="twoup__media">
+            <img data-fleet-photo="E90" alt="" loading="lazy" decoding="async">
+        </div>
+        <div class="twoup__text">
+            <span class="eyebrow">Your first sector</span>
+            <h2 class="twoup__title">Start on the E190</h2>
+            <p class="twoup__intro">
+                Every pilot starts at Cadet on short Connect sectors, inside a three-hour
+                limit, on a network a Cadet already has. Applications get a human answer
+                inside 72 hours.
+            </p>
+            <a class="btn btn--primary" href="/join">Apply to join <span data-icon="arrow"></span></a>
+        </div>
+    </section>
+
     <section class="section section--alt">
         <div class="wrap">
             <div class="head" data-reveal>
@@ -454,6 +493,20 @@
             <dt>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
+
+    // ---- The two-up photographs ----
+    //
+    // Addressed by TYPE CODE rather than by URL. A photograph swapped in
+    // data.js follows the site everywhere it is used; a URL pasted into the
+    // markup is a second copy that goes stale silently.
+    document.querySelectorAll('[data-fleet-photo]').forEach(img => {
+        const a = D.fleet.find(f => f.short === img.dataset.fleetPhoto);
+        if (!a || !a.photo || !a.photo.src) { img.closest('.twoup').hidden = true; return; }
+        img.src = a.photo.src;
+        img.width = a.photo.w || 1920;
+        img.height = a.photo.h || 886;
+        img.alt = `${a.livery || 'Aeromexico'} ${a.type}${a.photo.reg ? ' ' + a.photo.reg : ''}`;
+    });
 
     // ---- The CEO, read off the staff list ----
     const ceo = D.staff.find(s => s.short === 'CEO');

@@ -695,6 +695,77 @@ tbody tr:last-child td { border-bottom: 0; }
 tbody tr { transition: background .2s var(--ease); }
 tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
 
+/* ============================ TWO-UP =====================================
+   Lifted from aeromexico.com's own ContentTwoUp, which is the component that
+   airline's site is mostly BUILT from: a photograph on one side, a short title,
+   one sentence and a button on the other, alternating side down the page, some
+   of them on white and some on the brand's blue.
+
+   Two shapes there and both are kept, because they do different jobs:
+
+     --square   the photograph runs to the page's outer edge. Reads as a
+                spread. Use it where the picture is the point.
+     --circle   the photograph is a disc inside its half, with air around it.
+                Reads as a portrait. Use it where the WORDS are the point and
+                the picture is there to give the section a face.
+
+   What is NOT copied is their copy. The paragraphs on that page describe a
+   rewards programme this airline does not run, and a virtual airline writing
+   "your points never expire" underneath a disclaimer saying it is not that
+   airline is the exact failure this whole file has been avoiding. What
+   travelled is the SHAPE of the writing — a four-word title, one sentence that
+   says the thing, one link — filled with what is already true here.
+
+   The media is a real <img>, not their background-image. Their version cannot
+   be given alt text and does not participate in lazy loading; ours is the same
+   fleet photography the hero and the fleet page use, addressed by type so the
+   markup never carries a URL that data.js could change underneath it. */
+.twoup { position: relative; display: grid; align-items: center; }
+.twoup--tint { background: var(--bg-alt); }
+
+.twoup__media { position: relative; min-width: 0; }
+.twoup__media img {
+    width: 100%; height: 100%; display: block;
+    object-fit: cover;
+    background: var(--surface-2);
+}
+/* The tinted ground behind a loading photograph, and the hairline that keeps a
+   pale image from dissolving into the page — same reasoning as the hero panel. */
+.twoup--square .twoup__media img { aspect-ratio: 4 / 3; }
+.twoup--circle .twoup__media {
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    display: grid; justify-items: center;
+}
+.twoup--circle .twoup__media img {
+    aspect-ratio: 1; width: min(100%, 26rem); height: auto;
+    border-radius: 50%;
+    box-shadow: var(--shadow-lg);
+}
+
+.twoup__text { padding: clamp(2.25rem, 6vw, 4rem) clamp(1.15rem, 4vw, 2rem); }
+.twoup__text > * + * { margin-top: 1rem; }
+.twoup__title { font-size: clamp(1.6rem, 3vw, 2.3rem); }
+.twoup__intro { color: var(--muted); max-width: 46ch; line-height: 1.6; }
+.twoup__text .btn { margin-top: 1.6rem; }
+
+@media (min-width: 62rem) {
+    .twoup { grid-template-columns: 1fr 1fr; }
+    /* The image half is the FIRST column by default and the second when the
+       section is flipped. Written with `order` rather than by reordering the
+       markup, so every two-up on a page has the same source order — the media
+       first, then the words — and a screen reader gets one shape, not two. */
+    .twoup--right .twoup__media { order: 2; }
+    .twoup__text {
+        padding-block: clamp(3rem, 6vw, 5rem);
+        max-width: 40rem;
+    }
+    /* Hug the middle: the text column sits against the photograph rather than
+       floating in the centre of its own half. */
+    .twoup:not(.twoup--right) .twoup__text { padding-inline: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 3rem); }
+    .twoup--right .twoup__text { margin-left: auto; padding-inline: clamp(1.5rem, 4vw, 3rem) clamp(2.5rem, 5vw, 4.5rem); }
+    .twoup--square .twoup__media img { aspect-ratio: auto; min-height: 26rem; }
+}
+
 /* ============================ NAV ========================================
    THE HEADER IS PINNED FROM THE HOST, NOT FROM `.nav`. READ THIS BEFORE
    MOVING `position: sticky` BACK DOWN A LEVEL.
