@@ -1766,7 +1766,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
        svh rather than vh throughout: on a phone vh is the address bar's
        promise, not the viewport, and the last row ends up under the chrome. */
     min-height: 0;
-    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(1.4rem, 3vw, 2.2rem);
+    padding-block: clamp(1.5rem, 3.6vw, 2.75rem) clamp(1.4rem, 3vw, 2.2rem);
 }
 
 /* ---- La bandera, and the eagle standing on it ----------------------------
@@ -1804,23 +1804,15 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
             mask: linear-gradient(180deg,
         transparent 0, #000 26%, #000 52%, transparent 92%);
 }
-.hero--live::after {
-    content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none;
-    background: var(--am-blue);
-    /* Weaker and smaller than the first attempt at this. At 5% and 26rem the
-       bird was a grey mass sitting directly behind the aircraft's name — the
-       old note's "cropped and loud reads as noise", arrived at from the other
-       direction. Whole, small and barely there reads as the mark. */
-    opacity: .038;
-    -webkit-mask: url('/assets/img/mark.svg') no-repeat left 4% center / auto min(58%, 17rem);
-            mask: url('/assets/img/mark.svg') no-repeat left 4% center / auto min(58%, 17rem);
-}
-/* On navy, the blue eagle disappears and the flag's own colours are already
-   dark. Both step up to the on-dark values the rest of the sheet uses. */
-:root[data-theme="dark"] .hero--live::after { background: var(--am-blue-300); opacity: .05; }
+/* THE WATERMARK EAGLE IS GONE, and this is the second time it has been taken
+   out of this file for a different reason each time. First it was white on a
+   white hero, where it did not fade so much as cease to exist. It came back in
+   the brand blue, which worked — and then the crest arrived above it. Two
+   eagles on one screen, one of them a 4% ghost of the other, is not a
+   watermark and a logo; it is the logo printed twice. The crest is the mark
+   now. What stays behind the hero is the flag alone. */
 :root[data-theme="dark"] .hero--live::before { opacity: .1; }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero--live::after { background: var(--am-blue-300); opacity: .05; }
     :root:not([data-theme="light"]) .hero--live::before { opacity: .1; }
 }
 
@@ -1830,15 +1822,90 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
    goes FIRST: on a phone the picture is the opening screen and the naming
    reads under it, which is the arrangement the old full-bleed stage collapsed
    to as well. */
-.hero__top { display: grid; gap: clamp(1.5rem, 4vw, 2.75rem); align-items: center; }
-.hero__marque { min-width: 0; }
-.hero__stage  { min-width: 0; }
-@media (max-width: 61.99rem) {
-    .hero__stage { order: -1; }
+/* ---- The crest, and where it goes -----------------------------------------
+   The airline's name opens the page at full size and centred, then shrinks
+   into the nav bar as you scroll. hero.js drives it: the whole effect is one
+   custom property, --morph, running 0 -> 1 over the scroll distance between
+   the crest's resting position and the nav's own brand, plus a transform on
+   the mark. Everything else here is expressed in terms of that property.
+
+   THE MATH IS IN hero.js, not here, and it is worth knowing why the mark needs
+   no vertical transform for most of the travel: scrolling already carries the
+   crest upward at exactly the rate needed to arrive at the nav. The script
+   only has to scale it, slide it left, and hand over.
+
+   Degrades in both directions. With no JS, --morph stays 0, the crest sits
+   there at full size and the nav brand is visible as it always was — two
+   lockups on one screen, which is untidy but not broken. With reduced motion
+   the script sets --morph to 1 immediately and skips the transform, so the
+   crest is simply not part of the page. */
+.hero__lockup {
+    display: grid; justify-items: center; text-align: center;
+    gap: .55rem;
+    margin-bottom: clamp(.9rem, 2.4vw, 1.6rem);
+    /* Fades out only at the very end of the travel, when it is already the
+       same size and in the same place as the nav's brand — so the swap between
+       the two is not something you can see happen. */
+    opacity: clamp(0, calc((1 - var(--morph, 0)) * 12), 1);
 }
-@media (min-width: 62rem) {
-    .hero__top { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+.hero__lockup-mark {
+    width: clamp(4.5rem, 11vw, 8.5rem);
+    color: var(--am-blue);
+    transform-origin: 0 0;
+    will-change: transform;
 }
+:root[data-theme="dark"] .hero__lockup-mark { color: var(--am-blue-300); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .hero__lockup-mark { color: var(--am-blue-300); }
+}
+/* The word and the tagline are gone well before the mark lands. They have no
+   counterpart to morph INTO — the nav's wordmark is a different size at a
+   different weight — so they leave early and let the eagle travel alone. */
+.hero__lockup-word,
+.hero__lockup-tag { opacity: clamp(0, calc((0.42 - var(--morph, 0)) * 4), 1); }
+.hero__lockup-word {
+    display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap;
+    justify-content: center;
+}
+.hero__lockup-word b {
+    font-family: var(--font-display); font-weight: 800;
+    font-variation-settings: 'SOFT' 60, 'WONK' 1;
+    font-size: clamp(1.9rem, 5vw, 3.2rem); letter-spacing: -.025em;
+    line-height: 1; color: var(--ink);
+}
+.hero__lockup-word span {
+    font-size: clamp(.72rem, 1.5vw, .92rem); font-weight: 700;
+    letter-spacing: .34em; text-transform: uppercase; color: var(--muted);
+}
+.hero__lockup-tag {
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(.95rem, 1.8vw, 1.15rem); color: var(--muted);
+}
+
+/* The nav's own brand is the destination. It fades up over the last stretch of
+   the travel, against the crest fading down over the same stretch. Guarded on
+   .is-morphing so that a page without a crest — every page but the home page —
+   is never touched by this at all. */
+[data-site-nav].is-morphing .nav__brand {
+    opacity: clamp(0, calc((var(--morph, 0) - 0.88) * 12), 1);
+}
+
+/* ONE CENTRED COLUMN, and the two-column arrangement that was here first is
+   worth a note. Copy left, photograph right reads well on its own — it is what
+   the reference site does. It stopped working the moment the crest went in
+   above it: a centred lockup over a left-aligned column is two different
+   layouts sharing a screen, and the eye sees the disagreement before it sees
+   either one.
+
+   So the whole hero centres. Crest, then the aircraft naming itself, then the
+   controls, then the photograph, then the counted figures — one axis all the
+   way down. The photograph is capped rather than full-width: at the full 1180
+   a 1920/886 panel is 545px tall and pushes everything else off the opening
+   screen. */
+.hero__top { display: grid; gap: clamp(1.2rem, 2.8vw, 1.9rem); justify-items: center; }
+.hero__marque { min-width: 0; width: 100%; text-align: center; }
+.hero__stage  { min-width: 0; width: 100%; max-width: 54rem; }
+.hero__plate-name { justify-content: center; }
 /* The facts band carries its own generous margin for the hero it was drawn
    for; in here the row-gap above is already doing that job. */
 .hero--live .hero__facts--band { margin-top: .4rem; }
@@ -1856,14 +1923,20 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .hero__marque { position: relative; display: grid; justify-items: stretch; gap: 1.15rem; }
 /* The buttons and the dots share a line: the dots are the stage's controls and
    they belong with the other controls, not stranded under the plate where they
-   read as an underline of it. Pushed to the far edge so the two groups are
-   obviously separate things. */
+   read as an underline of it.
+
+   They used to be pushed apart with `margin-left: auto` on the dots, which was
+   right when the hero was left-aligned and the far edge meant something. On a
+   centred axis it just drags the dots off to the right of a symmetrical
+   composition, so the row centres and the gap separates the two groups. */
 .hero__controls {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: .9rem 1.4rem;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: .9rem 1.6rem;
 }
-.hero__controls .hero__dots { margin-left: auto; }
-@media (max-width: 40rem) { .hero__controls .hero__dots { margin-left: 0; } }
+/* The dots take their own line under the buttons, which puts them directly
+   above the photograph they steer. Beside the buttons they were read as a
+   third control in that group, and they pulled the row off its own centre. */
+.hero__controls .hero__dots { flex: 0 0 100%; justify-content: center; }
 .hero__plate  { display: grid; gap: .3rem; margin: 0; }
 .hero__plate:empty { display: none; }
 .hero__plate-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .9rem; }
@@ -1947,7 +2020,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* ---- Steering the stage --------------------------------------------------
    Buttons with real labels rather than decorated spans: this is the only way
    to change the aircraft from a keyboard. */
-.hero__dots { display: flex; gap: .4rem; }
+.hero__dots { display: flex; gap: .4rem; justify-content: center; }
 .hero__dot {
     width: 1.5rem; height: 3px; padding: 0; border: 0; border-radius: 999px;
     background: var(--line); cursor: pointer;

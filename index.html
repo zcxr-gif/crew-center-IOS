@@ -81,6 +81,22 @@
         <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual airline
             flying the Aeroméxico network from Mexico City.</h1>
 
+        <!-- The crest. At the top of the page this is the airline's name, set
+             large and centred; as the page scrolls it shrinks and flies into
+             the nav bar, and the nav's own brand fades up underneath it at the
+             moment the two are the same size in the same place.
+
+             aria-hidden because the nav brand is the real one — a screen
+             reader should hear the airline named once, and the .sr-only h1
+             above already names the page. -->
+        <div class="hero__lockup" data-hero-lockup aria-hidden="true">
+            <span class="mark hero__lockup-mark" data-hero-lockup-mark></span>
+            <div class="hero__lockup-word">
+                <b>Aeromexico</b><span>Virtual</span>
+            </div>
+            <p class="hero__lockup-tag">Fly the Eagle Warrior.</p>
+        </div>
+
         <!-- Two columns on a wide screen: the aircraft naming itself on the
              left, the photograph of it on the right. The stage used to be an
              absolute layer behind the whole section, which is what made the
