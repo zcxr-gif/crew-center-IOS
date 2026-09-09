@@ -272,7 +272,16 @@
 
         window.AMV_CREW.pastEvents().then(flown => {
             const host = document.getElementById('flownSection');
-            if (!flown) { host.remove(); return; }
+            if (!flown || !flown.length) {
+                host.querySelector('.table-scroll').outerHTML = `<div class="empty">
+                    <b>No events flown yet</b>
+                    <p>Once an event has run, it is listed here with the route, the aircraft and
+                       how many pilots attended.</p>
+                </div>`;
+                host.removeAttribute('hidden');
+                A.refresh(host);
+                return;
+            }
             host.querySelector('#flownTable tbody').innerHTML = flown.map(e => `
                 <tr>
                     <td data-th="Event"><b>${esc(e.title)}</b></td>

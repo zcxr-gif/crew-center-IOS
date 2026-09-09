@@ -695,6 +695,42 @@ tbody tr:last-child td { border-bottom: 0; }
 tbody tr { transition: background .2s var(--ease); }
 tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
 
+/* ============================ EMPTY STATE ================================
+   THE RULE: a section with no data says so. It does not invent a row to fill
+   itself, and — the change here — it no longer silently deletes itself either.
+
+   The site already refused the first half. data.js and crew.js both carry a
+   null contract, and every feed on this site would rather render nothing than
+   render a plausible-looking figure nobody flew. That part stands and is not
+   negotiable: an invented pilot, a sample sector or a placeholder hour on a
+   page whose whole argument is "every hour here was flown" would undo the
+   argument.
+
+   What was wrong was the other half. A section that calls .remove() when its
+   feed is quiet leaves a page that is silently shorter than it should be — the
+   visitor cannot tell the difference between "this airline does not do events"
+   and "the events feed is down", and neither can the person who has to debug
+   it. So the feed sections say the true thing instead: there is nothing here
+   yet.
+
+   Dashed rather than solid, because that is the one border on this site that
+   means "not content". A solid card at this size reads as a thing that failed
+   to load; a dashed one reads as a space waiting to be filled. */
+.empty {
+    display: grid; gap: .55rem; justify-items: center; text-align: center;
+    padding: clamp(2.25rem, 6vw, 3.5rem) clamp(1.15rem, 4vw, 2rem);
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    color: var(--muted);
+}
+.empty b {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 1.12rem; color: var(--ink);
+}
+.empty p { font-size: .94rem; max-width: 46ch; line-height: 1.6; }
+.empty a { color: var(--accent); font-weight: 700; }
+
 /* ============================ TWO-UP =====================================
    Lifted from aeromexico.com's own ContentTwoUp, which is the component that
    airline's site is mostly BUILT from: a photograph on one side, a short title,
@@ -1885,6 +1921,49 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 :root[data-theme="dark"] .hero--live::before { opacity: .1; }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .hero--live::before { opacity: .1; }
+}
+
+/* ---- The ruled-feather device, back ---------------------------------------
+   THIS WAS REMOVED TWO COMMITS AGO AND THE REASON IT COMES BACK IS INSTRUCTIVE.
+   It was taken out with the note that red rails down a white page are not a
+   quieter version of a device drawn for navy, they are a different and louder
+   thing. That was a judgement about how loud the page wanted to be, and the
+   VA's answer — pointing at the same device on aeromexico.com's own hero — is
+   that it wants to be that loud. It is the airline's device on the airline's
+   own site; the earlier caution was mine, not theirs.
+
+   Same generated file (tools/make-stripes.py measures the ragged profile off
+   full-logo.webp rather than inventing one), same red → rosa mexicano → red
+   ramp. Two things are different from the version that was removed:
+
+     ONE EDGE, NOT TWO. On navy the rails framed a dark field and needed both
+     sides to read as a frame. On white there is no field to frame — the device
+     is an edge treatment, and the reference runs it down the right only.
+
+     IT RESERVES ITS OWN GUTTER. padding-inline-end on the host pushes the
+     hero's centred column clear of the rail. The old build did this with a
+     `padding-inline: max(...)` on three separate `> .wrap` selectors, which is
+     why removing the rails left those sections mysteriously narrow. Here the
+     rail's width and the space it needs are the same custom property, so they
+     cannot drift apart.
+
+   Absolutely positioned children resolve against the PADDING box, so `inset:0`
+   puts the rail flush to the viewport edge while the padding holds the content
+   off it. That is the whole trick. */
+.hero--live {
+    /* Wide enough that a bar reads as a RULE rather than a dash. The bars'
+       thickness and pitch come from --stripe-tile and do not scale with this,
+       so a narrow rail keeps the same weight of line and just makes each one
+       short — which reads as a dotted border, not as the device. */
+    --rail-w: clamp(1.7rem, 4.6vw, 3.4rem);
+    padding-inline-end: var(--rail-w);
+}
+.hero--live::after {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg,
+        var(--am-red) 0, var(--am-rosa) 46%, var(--am-rosa) 58%, var(--am-red) 100%);
+    -webkit-mask: url('/assets/img/stripes.svg') repeat-y right top / var(--rail-w) var(--stripe-tile);
+            mask: url('/assets/img/stripes.svg') repeat-y right top / var(--rail-w) var(--stripe-tile);
 }
 
 /* ---- The two columns ------------------------------------------------------

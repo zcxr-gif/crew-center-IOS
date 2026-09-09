@@ -586,8 +586,11 @@
         const next = (list || []).filter(e => Date.parse(e.date) > Date.now())
                                  .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))[0];
         if (!next) {
-            host.innerHTML = `<div class="card"><p>No event on the calendar right now — check the
-                <a href="/events" style="color:var(--accent);font-weight:600">events page</a> shortly.</p></div>`;
+            host.innerHTML = `<div class="empty">
+                <b>Nothing on the calendar yet</b>
+                <p>The next event has not been published. When it is, it will appear here and on
+                   the <a href="/events">events page</a>.</p>
+            </div>`;
             return;
         }
         const fmt = new Intl.DateTimeFormat(undefined, {
@@ -644,7 +647,7 @@
     };
 
     function paintRecent(rows) {
-        if (!rows || !rows.length) { recent.remove(); return; }
+        if (!rows || !rows.length) { emptyRecent(); return; }
         const when = (at) => {
             const t = Date.parse(at);
             if (!isFinite(t)) return '';
@@ -666,8 +669,21 @@
         A.refresh(recent);
     }
 
-    if (window.AMV_CREW) window.AMV_CREW.activity({ limit: 6 }).then(paintRecent);
-    else recent.remove();
+    // A quiet feed and no feed at all land in the same place on purpose: from
+    // the visitor's side they are the same fact, and a section that deletes
+    // itself cannot tell you which one happened.
+    function emptyRecent() {
+        document.getElementById('recentList').outerHTML = `<div class="empty">
+            <b>Nothing logged yet</b>
+            <p>Approved flights, promotions and published events show up here as the crew
+               files them.</p>
+        </div>`;
+        recent.hidden = false;
+        A.refresh(recent);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.activity({ limit: 6 }).then(paintRecent).catch(emptyRecent);
+    else emptyRecent();
 
     // ---- The wall ----
     //
@@ -712,7 +728,7 @@
     }
 
     function paintWall(data) {
-        if (!data || !data.posts.length) { wall.remove(); return; }
+        if (!data || !data.posts.length) { emptyWall(); return; }
         const grid = document.getElementById('wallGrid');
         grid.innerHTML = data.posts.map(p => `
             <button class="wall__tile" type="button"
@@ -763,8 +779,17 @@
         A.refresh(wall);
     }
 
-    if (window.AMV_CREW) window.AMV_CREW.social({ limit: 9 }).then(paintWall);
-    else wall.remove();
+    function emptyWall() {
+        document.getElementById('wallGrid').outerHTML = `<div class="empty">
+            <b>No posts yet</b>
+            <p>Photographs the crew hang on the crew centre are drawn here.</p>
+        </div>`;
+        wall.hidden = false;
+        A.refresh(wall);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.social({ limit: 9 }).then(paintWall).catch(emptyWall);
+    else emptyWall();
 })();
 </script>
 </body>

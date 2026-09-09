@@ -343,7 +343,10 @@
             html = `<section class="panel" data-reveal>${rows.map(card).join('')}</section>`;
         }
 
-        list.innerHTML = html || '<p class="lede">No sectors in this tier yet.</p>';
+        list.innerHTML = html || `<div class="empty">
+            <b>No sectors in this tier yet</b>
+            <p>Sectors appear here as they are published to the route network.</p>
+        </div>`;
         renderDestLine();
         // The cards are injected, so their [data-reveal] has to be wired each
         // time — without this a filtered-in card sits at opacity 0 forever.
