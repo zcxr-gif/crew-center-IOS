@@ -372,6 +372,42 @@ button, input, select, textarea { font: inherit; color: inherit; }
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
     box-shadow: inset 0 -1px 0 rgba(15, 27, 46, .10);
 }
+/* ---- The crest ------------------------------------------------------------
+   The tricolour with a crest in the centre band. THE CREST IS OURS, NOT THE
+   NATION'S, and that is a deliberate substitution rather than an approximation.
+
+   The VA asked for the flag "with the eagle and snake in the middle", which is
+   the escudo nacional. This file already refused that once, in the note that
+   used to sit above the serpent frieze: the eagle-and-serpent of the coat of
+   arms is a state emblem whose reproduction is regulated under the Ley sobre
+   el Escudo, la Bandera y el Himno Nacionales, and a virtual airline has no
+   claim on it. That is not a style opinion and it does not change because the
+   airline would like it to.
+
+   What is here instead gives the same picture honestly: the Caballero Águila
+   off Aeromexico-Symbol.webp, standing in the white band where the escudo
+   stands. An eagle on the tricolour, and it is the airline's own eagle — which
+   is a better answer than the borrowed one, because it says Aeromexico rather
+   than saying Mexico with Aeromexico's name underneath it.
+
+   Sized off the crest's WIDTH, not its height. The mark is 1.31:1 and the
+   centre band of a 7:4 flag is 2.33 units wide; at 30% of the flag the mark is
+   2.1 units and sits inside the band with air, which is roughly the proportion
+   the real device keeps. Sized by height it spills into the green and the red
+   at any value large enough to read. */
+.flag-crest {
+    display: inline-grid; place-items: center;
+    width: var(--crest-w, 6.5rem); aspect-ratio: 7 / 4;
+    border-radius: 5px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    /* The hairline is load-bearing for the same reason it is on .rule: the
+       middle band is white and would otherwise have no edge on white paper. */
+    box-shadow: inset 0 0 0 1px rgba(15, 27, 46, .16);
+}
+.flag-crest .mark { width: 34%; color: var(--am-blue); }
+.flag-crest--lg { --crest-w: 8.5rem; }
+
 .flag {
     width: 1.6rem; height: 1.1rem; border-radius: 3px; flex: none;
     background: linear-gradient(90deg,
@@ -642,6 +678,11 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
 .chip--live { background: color-mix(in srgb, var(--am-jade) 15%, transparent); color: #0B7049; }
 :root[data-theme="dark"] .chip--live { color: #45C48C; }
 .chip--onink { background: rgba(255, 255, 255, .13); color: #fff; }
+
+/* A row of them. Used where a list is a CHECKLIST — something you scan to see
+   whether it applies to you — rather than something you read. */
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.chips .chip { font-size: .82rem; padding: .46rem 1rem; }
 
 .dot-live {
     width: .45rem; height: .45rem; border-radius: 50%; background: currentColor;
@@ -1215,6 +1256,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .band__wash { display: none; }
 .band__tile { display: none; }   /* retired with .hero__grid */
 .band__inner { padding-block: clamp(3.5rem, 8vw, 6rem); text-align: center; position: relative; }
+.band__inner > .flag-crest { margin: 0 auto clamp(1.1rem, 2.5vw, 1.6rem); }
 .band h2 { max-width: 20ch; margin-inline: auto; }
 .band p { color: var(--muted); max-width: 52ch; margin: 1.1rem auto 0; }
 .band .hero__cta { justify-content: center; }
