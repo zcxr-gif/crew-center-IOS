@@ -1380,6 +1380,93 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* The disclaimer is not decoration — keep it legible. */
 .disclaimer { font-size: .78rem; line-height: 1.6; color: var(--muted); max-width: 68ch; }
 
+/* ============================ PAGE TRANSITIONS ===========================
+   Every link on this site is a real navigation to a real document — there is
+   no router here and there should not be one. What was missing was the frame
+   between the two: the old page vanished and the new one appeared, which reads
+   as a snap even when the load itself is instant.
+
+   Cross-document view transitions fix exactly that and need no JavaScript. The
+   browser snapshots the outgoing page, snapshots the incoming one, and
+   animates between them; a browser that does not support it navigates the way
+   it always did. There is no fallback to write and nothing to go wrong.
+
+   The chrome is NAMED so it does not take part. Without this the whole
+   viewport cross-fades, header and footer included — and a navigation bar
+   dissolving into an identical navigation bar is the one thing that would make
+   this feel worse rather than better. Named, it is lifted out of the root
+   snapshot and simply persists while the content changes underneath it, which
+   is the whole effect: the frame stays, the page moves.
+
+   Out goes faster than in comes: 180ms against 340ms. Symmetrical timing reads
+   as a dissolve — for a moment neither page is really there. Clearing the old
+   one quickly and letting the new one arrive on its own curve reads as the new
+   page ARRIVING, which is what actually happened. */
+@view-transition { navigation: auto; }
+
+[data-site-nav]    { view-transition-name: site-chrome-top; }
+[data-site-footer] { view-transition-name: site-chrome-bottom; }
+
+@keyframes vt-out { to   { opacity: 0; } }
+@keyframes vt-in  { from { opacity: 0; transform: translateY(10px); } }
+
+::view-transition-old(root) { animation: vt-out .18s var(--ease) both; }
+::view-transition-new(root) { animation: vt-in .34s var(--ease-rise) both; }
+
+/* Asked for less motion: navigate the way the browser always did. `none` here
+   is not a degraded transition, it is no transition — which is the honest
+   reading of the request. */
+@media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+}
+
+/* ============================ SKELETON ===================================
+   For the second half of the same complaint: a section that is in the layout
+   but still waiting on the crew centre used to pop its content in. This is the
+   shape of what is coming, held until it arrives.
+
+   WHERE THIS SITS AGAINST THE NO-PLACEHOLDER RULE, because the rule is real
+   and this is not a hole in it. What crew.js and hero.js refuse is INVENTED
+   DATA — a row of dashes, a sample sector, a plausible figure nobody flew, on
+   a page whose whole argument is that every hour on it was flown. A skeleton
+   claims nothing. It is a grey rectangle that says "something is loading
+   here", and it resolves to one of exactly two things: the real content, or
+   the .empty note saying there is none. It never resolves to a number.
+
+   The rule it must obey: only ever shown where the section is ALREADY in the
+   layout and a request is genuinely in flight. A skeleton for something that
+   turns out not to exist is worse than showing nothing, because it promised. */
+.skeleton { display: grid; gap: .8rem; }
+.skeleton__row { display: grid; gap: .55rem; }
+.skeleton__bar,
+.skeleton__block {
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    position: relative; overflow: hidden;
+}
+.skeleton__bar   { height: .78rem; }
+.skeleton__bar--sm { height: .62rem; width: 42%; }
+.skeleton__bar--md { width: 76%; }
+.skeleton__block { aspect-ratio: 1; border-radius: var(--radius); }
+
+/* One sweep across the whole group rather than a separate animation per bar,
+   so a column of them reads as one surface catching the light instead of a
+   dozen things blinking out of step. */
+.skeleton__bar::after,
+.skeleton__block::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0, color-mix(in srgb, var(--ink) 6%, transparent) 50%, transparent 100%);
+    animation: skeleton-sweep 1.5s linear infinite;
+}
+@keyframes skeleton-sweep {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skeleton__bar::after, .skeleton__block::after { animation: none; }
+}
+
 /* ============================ REVEAL =====================================
    What was here: everything on every page rose 14px over 700ms on `--ease`,
    and the stagger between siblings was a setTimeout. Three things were wrong

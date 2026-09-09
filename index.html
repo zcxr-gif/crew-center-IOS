@@ -364,7 +364,7 @@
          in its place — every other section on this page holds a fallback in
          data.js because the fallback is still true when the backend is quiet,
          and a hand-written list of recent joiners would not be. -->
-    <section class="section" id="recent" hidden>
+    <section class="section" id="recent">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">Lately</span>
@@ -436,7 +436,7 @@
          Hidden and removed when there is no wall, for the same reason as the
          section above: an airline that has not posted anything should show
          nothing here, not an empty grid with a heading over it. -->
-    <section class="section section--alt" id="wall" hidden>
+    <section class="section section--alt" id="wall">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">On Instagram</span>
@@ -496,6 +496,37 @@
             <dt>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
+
+    // ---- Skeletons -----------------------------------------------------
+    //
+    // Shown ONLY where the section is already in the layout and a request is
+    // actually in flight. A skeleton for something that may not exist is worse
+    // than showing nothing, because it promises. Each of these resolves to the
+    // real content or to the .empty note — never to a number.
+    const skelRows = (n) => Array.from({ length: n },
+        () => `<div class="skeleton__row">
+                   <div class="skeleton__bar skeleton__bar--sm"></div>
+                   <div class="skeleton__bar skeleton__bar--md"></div>
+               </div>`).join('');
+
+    function skeleton(id, html) {
+        const host = document.getElementById(id);
+        if (host) host.innerHTML = `<div class="skeleton" aria-hidden="true">${html}</div>`;
+    }
+
+    // No crew centre at all means nothing is in flight, so there is nothing to
+    // wait for and no skeleton — those paths go straight to the empty note.
+    if (window.AMV_CREW) {
+        // NOT the next event. That one is painted from D.events first and only
+        // then refreshed from the crew centre, so it is never actually waiting
+        // — a skeleton there renders and is overwritten in the same frame,
+        // which is a flash rather than a loading state.
+        skeleton('recentList', skelRows(3));
+        skeleton('wallGrid',
+            `<div style="display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))">
+                 ${Array.from({ length: 6 }, () => '<div class="skeleton__block"></div>').join('')}
+             </div>`);
+    }
 
     // ---- The two-up photographs ----
     //
@@ -668,7 +699,6 @@
                     ${r.body ? `<span>${esc(r.body)}</span>` : ''}
                 </p>
             </div>`).join('');
-        recent.hidden = false;
         A.refresh(recent);
     }
 
@@ -681,7 +711,6 @@
             <p>Approved flights, promotions and published events show up here as the crew
                files them.</p>
         </div>`;
-        recent.hidden = false;
         A.refresh(recent);
     }
 
@@ -778,7 +807,6 @@
                 rel="noopener" target="_blank">@${esc(data.handle)}</a>`;
             h.hidden = false;
         }
-        wall.hidden = false;
         A.refresh(wall);
     }
 
@@ -787,7 +815,6 @@
             <b>No posts yet</b>
             <p>Photographs the crew hang on the crew centre are drawn here.</p>
         </div>`;
-        wall.hidden = false;
         A.refresh(wall);
     }
 
