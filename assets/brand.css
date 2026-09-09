@@ -807,24 +807,44 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .twoup { position: relative; display: grid; align-items: center; }
 .twoup--tint { background: var(--bg-alt); }
 
+/* NOTHING IS CROPPED — the same rule the hero stage is built around, and the
+   first version of this component broke it three separate ways.
+
+   The fleet photographs are 1920x886, a ratio of 2.167. What was here:
+
+     --square   a 4/3 box with object-fit: cover, which throws away about 39%
+                of the width. Both wingtips.
+     --square   above 62rem, `aspect-ratio: auto; min-height: 26rem` with
+                `height: 100%` — so the box took whatever height the TEXT
+                column happened to be and cropped the aeroplane to fit it. The
+                crop changed with the length of the copy beside it.
+     --circle   a square box, which throws away about 54%. That is most of an
+                aeroplane.
+
+   The fix is the hero panel's: give the box the photograph's OWN ratio, and
+   `cover` becomes an exact fit — no crop and no letterbox, at any width, with
+   no dependence on the text beside it. --photo-ratio is a variable so a source
+   of a different shape can say so rather than being cropped to this one. */
 .twoup__media { position: relative; min-width: 0; }
 .twoup__media img {
-    width: 100%; height: 100%; display: block;
+    width: 100%; height: auto; display: block;
+    aspect-ratio: var(--photo-ratio, 1920 / 886);
     object-fit: cover;
+    /* The tinted ground is what shows while an off-site image is in flight, so
+       the panel holds its shape instead of flashing white. */
     background: var(--surface-2);
 }
-/* The tinted ground behind a loading photograph, and the hairline that keeps a
-   pale image from dissolving into the page — same reasoning as the hero panel. */
-.twoup--square .twoup__media img { aspect-ratio: 4 / 3; }
-.twoup--circle .twoup__media {
-    padding: clamp(1.5rem, 5vw, 3.5rem);
-    display: grid; justify-items: center;
-}
-.twoup--circle .twoup__media img {
-    aspect-ratio: 1; width: min(100%, 26rem); height: auto;
-    border-radius: 50%;
-    box-shadow: var(--shadow-lg);
-}
+
+/* --circle IS GONE, and this note is here so it is not casually re-added. A
+   disc is a square box, and the only photography this site has is 2.167:1 —
+   there is no version of a circle that holds one of these without cutting the
+   aeroplane in half. It looked right in the reference because the pictures
+   there are of PEOPLE, shot square.
+
+   If squarish photography ever arrives, bring it back as a variant that sets
+   --photo-ratio: 1 and states that requirement out loud. Until then a shape
+   that can only be filled by breaking the site's oldest rule is not a shape
+   this component should offer. */
 
 .twoup__text { padding: clamp(2.25rem, 6vw, 4rem) clamp(1.15rem, 4vw, 2rem); }
 .twoup__text > * + * { margin-top: 1rem; }
@@ -847,7 +867,9 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
        floating in the centre of its own half. */
     .twoup:not(.twoup--right) .twoup__text { padding-inline: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 3rem); }
     .twoup--right .twoup__text { margin-left: auto; padding-inline: clamp(1.5rem, 4vw, 3rem) clamp(2.5rem, 5vw, 4.5rem); }
-    .twoup--square .twoup__media img { aspect-ratio: auto; min-height: 26rem; }
+    /* No aspect override here on purpose. The image keeps the photograph's
+       ratio at every width; it is the TEXT column that grows, and
+       `align-items: center` on the section centres the picture against it. */
 }
 
 /* ============================ NAV ========================================
