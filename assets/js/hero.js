@@ -317,6 +317,111 @@
         window.AMV_CREW.pireps({ limit: 24 }).then(mountLog).catch(() => {});
     }
 
+    // ---- The crest flying into the nav --------------------------------------
+    // The airline's name opens the page centred and full size, and shrinks into
+    // the nav bar as you scroll.
+    //
+    // THE ONE INSIGHT THAT MAKES THIS CHEAP: scrolling already moves the crest
+    // upward. Over the distance between where it rests and where the nav brand
+    // sits, the page carries it to exactly the right height on its own — so for
+    // that travel the script owes no vertical transform at all, only a scale
+    // and a slide to the left. The general form below still computes a `ty`,
+    // because the resting gap can be shorter than the distance the morph wants
+    // to take (a short viewport, a phone), and then the two have to be
+    // reconciled. Where the gap is long enough, ty works out to zero.
+    //
+    // Everything is measured ONCE and re-measured on resize. Nothing calls
+    // getBoundingClientRect during a scroll — that is a layout read per frame,
+    // and this runs on every frame of every scroll on the busiest page.
+    function mountCrest() {
+        const crest = root.querySelector('[data-hero-lockup]');
+        const mark = root.querySelector('[data-hero-lockup-mark]');
+        const navHost = document.querySelector('[data-site-nav]');
+        const navBrand = navHost && navHost.querySelector('[data-nav-brand]');
+        const navMark = navBrand && navBrand.querySelector('.mark');
+        if (!crest || !mark || !navMark) return;
+
+        // Asked for less motion: hand over immediately and leave the crest out
+        // of it. --morph at 1 hides the crest and shows the nav brand, which is
+        // the page's resting state anyway.
+        if (calm.matches) {
+            navHost.classList.add('is-morphing');
+            document.documentElement.style.setProperty('--morph', '1');
+            crest.style.display = 'none';
+            return;
+        }
+
+        const M = {};
+        let ready = false;
+
+        function measure() {
+            mark.style.transform = '';
+            const a = mark.getBoundingClientRect();
+            const b = navMark.getBoundingClientRect();
+            if (!a.width || !b.width) { ready = false; return; }
+            // The crest scrolls with the page, so its resting position is a
+            // DOCUMENT coordinate. The nav is pinned, so its position is a
+            // viewport one and is already constant.
+            M.top0 = a.top + scrollY;
+            M.left0 = a.left;
+            M.w0 = a.width;
+            M.navTop = b.top;
+            M.navLeft = b.left;
+            M.navW = b.width;
+            // Never shorter than this, or the whole effect is over before the
+            // first flick of a trackpad has finished.
+            M.dist = Math.max(240, M.top0 - M.navTop);
+            ready = true;
+        }
+
+        function paint() {
+            if (!ready) return;
+            const p = Math.min(1, Math.max(0, scrollY / M.dist));
+            // Where the crest's top edge should be, in viewport terms, at p.
+            // Subtract where scrolling has already put it, and the remainder is
+            // the transform. Along the natural gap this cancels to zero.
+            const ty = scrollY + p * (M.navTop - M.top0);
+            const tx = p * (M.navLeft - M.left0);
+            const sc = 1 + (M.navW / M.w0 - 1) * p;
+            mark.style.transform =
+                'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) scale(' + sc.toFixed(4) + ')';
+            // On the ROOT, not on the nav host: the crest is in the hero and
+            // the nav brand is in the header, and the two share no ancestor
+            // below <html>. Set on the nav, the crest simply never sees it and
+            // silently falls back to 0 — which looks like the fade is broken.
+            document.documentElement.style.setProperty('--morph', p.toFixed(4));
+        }
+
+        navHost.classList.add('is-morphing');
+        measure();
+        paint();
+
+        let queued = false;
+        addEventListener('scroll', () => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(() => { queued = false; paint(); });
+        }, { passive: true });
+
+        // The mark is a masked span with no intrinsic size, and the display
+        // face it sits beside loads late; both settle after this script runs.
+        addEventListener('load', () => { measure(); paint(); });
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => { measure(); paint(); });
+        }
+        addEventListener('resize', () => { measure(); paint(); }, { passive: true });
+    }
+    // site.js RENDERS the nav, and it does that on DOMContentLoaded — which has
+    // not fired yet when this file runs, both being ordinary scripts at the end
+    // of the body. So there is no nav brand to measure against yet. Waiting for
+    // the same event is enough and is not a race: site.js is loaded first, so
+    // its listener was registered first and runs first.
+    if (document.readyState === 'loading') {
+        addEventListener('DOMContentLoaded', mountCrest, { once: true });
+    } else {
+        mountCrest();
+    }
+
     // The stage, the caption and the strip were all injected after site.js ran.
     if (A && A.refresh) A.refresh(root);
 })();

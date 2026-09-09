@@ -75,29 +75,53 @@
          quiet backend or scripting off, and this is the airline's navy, the two
          buttons and the counted facts. Nothing here renders a placeholder. -->
     <section class="hero hero--live" data-hero>
-        <!-- The stage. Empty in the markup on purpose: the slides are the fleet
-             photographs in data.js, so a type gained or lost changes the hero
-             with nothing typed in here. -->
-        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
-
         <!-- The page still has to be NAMED — for a screen reader arriving at it
              and for a crawler indexing it. It is simply not set in 70px type
              over the aircraft any more. -->
         <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual airline
             flying the Aeroméxico network from Mexico City.</h1>
 
-        <div class="wrap hero__marque">
-            <!-- Filled by hero.js with whatever is on the stage. The dots are
-                 real buttons: this is the only way to steer the hero from a
-                 keyboard. -->
-            <div class="hero__plate" data-hero-caption aria-live="polite"></div>
-            <div class="hero__controls">
-                <div class="hero__cta">
-                    <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
-                    <a class="btn btn--onink" href="/network">Route map</a>
-                </div>
-                <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+        <!-- The crest. At the top of the page this is the airline's name, set
+             large and centred; as the page scrolls it shrinks and flies into
+             the nav bar, and the nav's own brand fades up underneath it at the
+             moment the two are the same size in the same place.
+
+             aria-hidden because the nav brand is the real one — a screen
+             reader should hear the airline named once, and the .sr-only h1
+             above already names the page. -->
+        <div class="hero__lockup" data-hero-lockup aria-hidden="true">
+            <span class="mark hero__lockup-mark" data-hero-lockup-mark></span>
+            <div class="hero__lockup-word">
+                <b>Aeromexico</b><span>Virtual</span>
             </div>
+            <p class="hero__lockup-tag">Fly the Eagle Warrior.</p>
+        </div>
+
+        <!-- Two columns on a wide screen: the aircraft naming itself on the
+             left, the photograph of it on the right. The stage used to be an
+             absolute layer behind the whole section, which is what made the
+             hero dark; it is a panel in the flow now, so the hero's ground is
+             the page's own white. On a phone the two stack and the stage goes
+             first — see LIVE HERO in brand.css. -->
+        <div class="wrap hero__top">
+            <div class="hero__marque">
+                <!-- Filled by hero.js with whatever is on the stage. The dots
+                     are real buttons: this is the only way to steer the hero
+                     from a keyboard. -->
+                <div class="hero__plate" data-hero-caption aria-live="polite"></div>
+                <div class="hero__controls">
+                    <div class="hero__cta">
+                        <a class="btn btn--primary" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                        <a class="btn btn--ghost" href="/network">Route map</a>
+                    </div>
+                    <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+                </div>
+            </div>
+
+            <!-- Empty in the markup on purpose: the slides are the fleet
+                 photographs in data.js, so a type gained or lost changes the
+                 hero with nothing typed in here. -->
+            <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
         </div>
 
         <!-- Approved sectors off the crew centre's public flight log. Starts
@@ -190,6 +214,9 @@
                     <p>Fly under an Aeromexico callsign on the Expert Server and the crew center
                        captures the leg, matches it to the fleet and route network, and credits the
                        hours. No forms unless something needs fixing.</p>
+                    <div class="card__foot">
+                        <a href="/crew">See the crew center <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
                 <article class="card card--hover">
                     <div class="card__icon" data-icon="route"></div>
@@ -197,6 +224,9 @@
                     <p>The real Aeroméxico map, published in five tiers — regional Connect hops on
                        the E190, transborder sectors on the MAX, and 787 flagship runs to Europe
                        and the Pacific.</p>
+                    <div class="card__foot">
+                        <a href="/network">View the route map <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
                 <article class="card card--hover">
                     <div class="card__icon" data-icon="award"></div>
@@ -204,6 +234,9 @@
                     <p>Each rank releases more of the fleet <em>and</em> raises the longest sector
                        you may file — three hours at Cadet, no limit at Senior Captain. Promotions
                        come off validated hours, not vibes.</p>
+                    <div class="card__foot">
+                        <a href="/ranks">See the rank ladder <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
                 <article class="card card--hover">
                     <div class="card__icon" data-icon="calendar"></div>
@@ -211,6 +244,9 @@
                     <p>At least two a month, published a fortnight ahead, run with staffed
                        controllers, published slots and a proper briefing — not a Discord message
                        and a hope.</p>
+                    <div class="card__foot">
+                        <a href="/events">What's on the calendar <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
                 <article class="card card--hover">
                     <div class="card__icon" data-icon="users"></div>
@@ -218,6 +254,9 @@
                     <p>Our staff are line pilots first, and every one of them is named on the staff
                        page. Applications get a human answer inside 72 hours, and every decision is
                        explained.</p>
+                    <div class="card__foot">
+                        <a href="/staff">Meet the staff <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
                 <article class="card card--hover">
                     <div class="card__icon" data-icon="shield"></div>
@@ -225,6 +264,9 @@
                     <p>How the airline is governed, what is expected of a pilot and how flights are
                        validated are all written down, published, and reviewed every quarter. We
                        operate in compliance with the IFVARB.</p>
+                    <div class="card__foot">
+                        <a href="/about">How the airline is run <span data-icon="arrow"></span></a>
+                    </div>
                 </article>
             </div>
         </div>
@@ -253,6 +295,49 @@
     </section>
 
     <!-- ==================== LIVE NOW ==================== -->
+    <!-- ==================== TWO-UPS ====================
+         The shape aeromexico.com is mostly built from: a photograph on one
+         side, a four-word title and one sentence on the other, alternating
+         side, one on white and one on the tint. Their component, our words and
+         our photographs — see TWO-UP in brand.css for why none of their copy
+         came with it. The images are filled from AMV_DATA.fleet by type code
+         at the foot of this file, so no URL is written here. -->
+    <section class="twoup twoup--square" data-reveal>
+        <div class="twoup__media">
+            <img data-fleet-photo="789" alt="" loading="lazy" decoding="async">
+        </div>
+        <div class="twoup__text">
+            <span class="eyebrow">The fleet</span>
+            <h2 class="twoup__title">Six types, and you unlock them</h2>
+            <p class="twoup__intro">
+                From thirty-minute Connect hops on the E190 to the 787-9 on the Europe and
+                Pacific runs. Each type is released at a rank, so the fleet opens up as you
+                fly rather than sitting there as a catalogue.
+            </p>
+            <a class="btn btn--primary" href="/fleet">See the fleet <span data-icon="arrow"></span></a>
+        </div>
+    </section>
+
+    <section class="twoup twoup--square twoup--right twoup--tint" data-reveal>
+        <div class="twoup__media">
+            <img data-fleet-photo="E90" alt="" loading="lazy" decoding="async">
+        </div>
+        <div class="twoup__text">
+            <span class="eyebrow">Where a cadet starts</span>
+            <span class="lockup lockup--lg lockup--block" role="img" aria-label="Aeromexico Virtual Connect">
+                <span class="mark" aria-hidden="true"></span>
+                <span class="lockup__type"><b>Aeromexico</b><span>Virtual Connect</span></span>
+            </span>
+            <h2 class="twoup__title">The regional operation</h2>
+            <p class="twoup__intro">
+                Every pilot starts at Cadet on the E190, in Connect livery, flying the regional
+                and feeder sectors inside a three-hour limit. It is the network a Cadet already
+                has on day one — and the rest of the fleet opens up from there.
+            </p>
+            <a class="btn btn--primary" href="/join">Apply to join <span data-icon="arrow"></span></a>
+        </div>
+    </section>
+
     <section class="section section--alt">
         <div class="wrap">
             <div class="head" data-reveal>
@@ -283,7 +368,7 @@
          in its place — every other section on this page holds a fallback in
          data.js because the fallback is still true when the backend is quiet,
          and a hand-written list of recent joiners would not be. -->
-    <section class="section" id="recent" hidden>
+    <section class="section" id="recent">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">Lately</span>
@@ -355,7 +440,7 @@
          Hidden and removed when there is no wall, for the same reason as the
          section above: an airline that has not posted anything should show
          nothing here, not an empty grid with a heading over it. -->
-    <section class="section section--alt" id="wall" hidden>
+    <section class="section section--alt" id="wall">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">On Instagram</span>
@@ -370,6 +455,9 @@
     <section class="band">
         <div class="band__wash"></div>
         <div class="wrap band__inner">
+            <span class="flag-crest" role="img" aria-label="Aeromexico Virtual — the Caballero Águila on the Mexican tricolour">
+                <span class="mark"></span>
+            </span>
             <h2>The eagle flies at 0600. Be on it.</h2>
             <p>Applications take about three minutes and get a human answer inside 72 hours.</p>
             <div class="hero__cta">
@@ -412,6 +500,51 @@
             <dt>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
+
+    // ---- Skeletons -----------------------------------------------------
+    //
+    // Shown ONLY where the section is already in the layout and a request is
+    // actually in flight. A skeleton for something that may not exist is worse
+    // than showing nothing, because it promises. Each of these resolves to the
+    // real content or to the .empty note — never to a number.
+    const skelRows = (n) => Array.from({ length: n },
+        () => `<div class="skeleton__row">
+                   <div class="skeleton__bar skeleton__bar--sm"></div>
+                   <div class="skeleton__bar skeleton__bar--md"></div>
+               </div>`).join('');
+
+    function skeleton(id, html) {
+        const host = document.getElementById(id);
+        if (host) host.innerHTML = `<div class="skeleton" aria-hidden="true">${html}</div>`;
+    }
+
+    // No crew centre at all means nothing is in flight, so there is nothing to
+    // wait for and no skeleton — those paths go straight to the empty note.
+    if (window.AMV_CREW) {
+        // NOT the next event. That one is painted from D.events first and only
+        // then refreshed from the crew centre, so it is never actually waiting
+        // — a skeleton there renders and is overwritten in the same frame,
+        // which is a flash rather than a loading state.
+        skeleton('recentList', skelRows(3));
+        skeleton('wallGrid',
+            `<div style="display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))">
+                 ${Array.from({ length: 6 }, () => '<div class="skeleton__block"></div>').join('')}
+             </div>`);
+    }
+
+    // ---- The two-up photographs ----
+    //
+    // Addressed by TYPE CODE rather than by URL. A photograph swapped in
+    // data.js follows the site everywhere it is used; a URL pasted into the
+    // markup is a second copy that goes stale silently.
+    document.querySelectorAll('[data-fleet-photo]').forEach(img => {
+        const a = D.fleet.find(f => f.short === img.dataset.fleetPhoto);
+        if (!a || !a.photo || !a.photo.src) { img.closest('.twoup').hidden = true; return; }
+        img.src = a.photo.src;
+        img.width = a.photo.w || 1920;
+        img.height = a.photo.h || 886;
+        img.alt = `${a.livery || 'Aeromexico'} ${a.type}${a.photo.reg ? ' ' + a.photo.reg : ''}`;
+    });
 
     // ---- The CEO, read off the staff list ----
     const ceo = D.staff.find(s => s.short === 'CEO');
@@ -456,13 +589,37 @@
         }
     }
 
-    paintNetwork(D.routes, D.airports);
+    // NOT painted from data.js first. The map used to draw this repo's route
+    // table and then visibly redraw the crew centre's a moment later — two
+    // different networks, one after the other, on the same screen. The local
+    // table stays as a LOOKUP (cityOf, above, names an airport more readably)
+    // but it is no longer a source of sectors. Until the crew centre answers
+    // the map holds its shape; if it answers with nothing, the section says so.
+    if (window.AMV_CREW) {
+        document.getElementById('mapHost').innerHTML =
+            '<div class="skeleton" aria-hidden="true"><div class="skeleton__block"' +
+            ' style="aspect-ratio:16/9;border-radius:var(--radius)"></div></div>';
+    } else {
+        emptyNetwork();
+    }
+
+    function emptyNetwork() {
+        document.getElementById('mapHost').innerHTML = `<div class="empty">
+            <b>The route map is not available</b>
+            <p>Sectors are published in the crew centre and drawn here. Nothing has come back
+               from it just now.</p>
+        </div>`;
+        document.getElementById('networkLede').textContent =
+            'The published network is read live from our crew centre.';
+    }
 
     if (window.AMV_CREW) {
         const key = r => `${r.from}-${r.to}`;
         const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
-        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()]).then(([live, pos]) => {
-            if (!live) return;              // backend quiet — keep what data.js said
+        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()])
+          .catch(() => [null, null])
+          .then(([live, pos]) => {
+            if (!live || !live.length) { emptyNetwork(); return; }
             // Tier comes from the sector's twin in data.js, or from the plan's
             // own Codeshare tier when the crew centre says it is one. A sector
             // we have never seen still counts towards the total; it just has no
@@ -491,8 +648,11 @@
         const next = (list || []).filter(e => Date.parse(e.date) > Date.now())
                                  .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))[0];
         if (!next) {
-            host.innerHTML = `<div class="card"><p>No event on the calendar right now — check the
-                <a href="/events" style="color:var(--accent);font-weight:600">events page</a> shortly.</p></div>`;
+            host.innerHTML = `<div class="empty">
+                <b>Nothing on the calendar yet</b>
+                <p>The next event has not been published. When it is, it will appear here and on
+                   the <a href="/events">events page</a>.</p>
+            </div>`;
             return;
         }
         const fmt = new Intl.DateTimeFormat(undefined, {
@@ -549,7 +709,7 @@
     };
 
     function paintRecent(rows) {
-        if (!rows || !rows.length) { recent.remove(); return; }
+        if (!rows || !rows.length) { emptyRecent(); return; }
         const when = (at) => {
             const t = Date.parse(at);
             if (!isFinite(t)) return '';
@@ -567,12 +727,23 @@
                     ${r.body ? `<span>${esc(r.body)}</span>` : ''}
                 </p>
             </div>`).join('');
-        recent.hidden = false;
         A.refresh(recent);
     }
 
-    if (window.AMV_CREW) window.AMV_CREW.activity({ limit: 6 }).then(paintRecent);
-    else recent.remove();
+    // A quiet feed and no feed at all land in the same place on purpose: from
+    // the visitor's side they are the same fact, and a section that deletes
+    // itself cannot tell you which one happened.
+    function emptyRecent() {
+        document.getElementById('recentList').outerHTML = `<div class="empty">
+            <b>Nothing logged yet</b>
+            <p>Approved flights, promotions and published events show up here as the crew
+               files them.</p>
+        </div>`;
+        A.refresh(recent);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.activity({ limit: 6 }).then(paintRecent).catch(emptyRecent);
+    else emptyRecent();
 
     // ---- The wall ----
     //
@@ -617,7 +788,7 @@
     }
 
     function paintWall(data) {
-        if (!data || !data.posts.length) { wall.remove(); return; }
+        if (!data || !data.posts.length) { emptyWall(); return; }
         const grid = document.getElementById('wallGrid');
         grid.innerHTML = data.posts.map(p => `
             <button class="wall__tile" type="button"
@@ -664,12 +835,19 @@
                 rel="noopener" target="_blank">@${esc(data.handle)}</a>`;
             h.hidden = false;
         }
-        wall.hidden = false;
         A.refresh(wall);
     }
 
-    if (window.AMV_CREW) window.AMV_CREW.social({ limit: 9 }).then(paintWall);
-    else wall.remove();
+    function emptyWall() {
+        document.getElementById('wallGrid').outerHTML = `<div class="empty">
+            <b>No posts yet</b>
+            <p>Photographs the crew hang on the crew centre are drawn here.</p>
+        </div>`;
+        A.refresh(wall);
+    }
+
+    if (window.AMV_CREW) window.AMV_CREW.social({ limit: 9 }).then(paintWall).catch(emptyWall);
+    else emptyWall();
 })();
 </script>
 </body>

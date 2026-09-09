@@ -82,7 +82,7 @@
         <div class="flagline" aria-hidden="true"></div>
         <nav class="nav" id="siteNav">
             <div class="wrap nav__inner">
-                <a class="nav__brand" href="/" aria-label="Aeromexico Virtual — home">
+                <a class="nav__brand" href="/" data-nav-brand aria-label="Aeromexico Virtual — home">
                     ${MARK}
                     <span class="wordmark"><b>Aeromexico</b><span>Virtual</span></span>
                 </a>

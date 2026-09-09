@@ -58,52 +58,54 @@
 
 <main id="main">
 
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+    <!-- ==================== APPLY ====================
+         THE ORDER OF THIS PAGE CHANGED, and the reason is worth keeping: the
+         application form used to be the THIRD thing on it, under a header and
+         a two-column block of requirements and timeline. An applicant who
+         arrived meaning to apply had to read a page about applying first, and
+         on a phone the form was most of a screen-height below the fold.
+
+         So the action comes first. The header is one sentence and a button;
+         the requirements are a strip of chips you can check yourself against
+         at a glance; then the form. Everything that was above it — why we ask
+         for each thing, what the timeline is, what membership involves, the
+         questions people ask — is still here, underneath, where someone who
+         wants it will look for it. Nothing was deleted, it was reordered.
+
+         The general rule this is the first instance of: on a page with one
+         obvious action, that action goes above the fold and the reasoning goes
+         below it. -->
+    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4rem);padding-bottom:0">
         <div class="wrap">
-            <div class="head">
+            <div class="head" style="max-width:52ch">
                 <span class="eyebrow">Recruitment · Open</span>
                 <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Join the crew</h1>
                 <div class="rule"></div>
                 <p class="lede" style="margin-top:1.4rem">
-                    Three minutes to apply. Your Infinite Flight stats are checked automatically
-                    against our requirements, and the Director of Personnel answers inside 72
-                    hours — either way, with a reason.
+                    Three minutes to apply. Your Infinite Flight stats are checked automatically,
+                    and the Director of Personnel answers inside 72 hours — either way, with a
+                    reason.
+                </p>
+                <p style="margin-top:1.6rem;display:flex;gap:.8rem;flex-wrap:wrap">
+                    <a class="btn btn--primary" href="#apply">Start the application <span data-icon="arrow"></span></a>
+                    <a class="btn btn--ghost" href="#involves">What it involves</a>
                 </p>
             </div>
 
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,3.5rem);align-items:start">
-                <div>
-                    <h2 style="font-size:1.5rem;margin-bottom:.4rem">What we ask</h2>
-                    <p class="muted" style="margin-bottom:.9rem;font-size:.92rem">
-                        Checked live against your IF account when you apply.
-                    </p>
-                    <dl class="facts" id="requirements"></dl>
-                </div>
-
-                <div>
-                    <h2 style="font-size:1.5rem;margin-bottom:.4rem">How it goes</h2>
-                    <p class="muted" style="margin-bottom:.9rem;font-size:.92rem">
-                        From application to your first logged sector.
-                    </p>
-                    <div class="timeline">
-                        <div class="timeline__row"><span class="timeline__when">Apply</span>
-                            <p class="timeline__what"><b>Three minutes</b><span>Fill in the form below. Your IF username is verified on the spot.</span></p></div>
-                        <div class="timeline__row"><span class="timeline__when">72 hours</span>
-                            <p class="timeline__what"><b>We review</b><span>The Director of Personnel reads it and answers either way, with a reason.</span></p></div>
-                        <div class="timeline__row"><span class="timeline__when">On acceptance</span>
-                            <p class="timeline__what"><b>Callsign and login</b><span>You join as a Cadet with an Aeromexico callsign and a crew center account.</span></p></div>
-                        <div class="timeline__row"><span class="timeline__when">Seven days</span>
-                            <p class="timeline__what"><b>Your first sector</b><span>Fly any published route inside the three-hour Cadet limit, and file it. That is the whole induction.</span></p></div>
-                    </div>
-                </div>
-            </div>
+            <!-- The checklist, without the reasoning. Filled from data.js, and
+                 the same rows are set out in full with their `why` further down
+                 the page — this is the version you scan, that one is the version
+                 you read. -->
+            <p class="muted" style="margin-bottom:.7rem;font-size:.86rem;font-weight:700;
+                                    letter-spacing:.06em;text-transform:uppercase">What we ask</p>
+            <div class="chips" id="reqChips"></div>
         </div>
     </section>
 
     <!-- The real application form. It's the Inflight Crew Center's join flow,
          framed here so applicants never leave our site — same form, same
          backend, same status link. -->
-    <section class="section section--alt" id="apply">
+    <section class="section" id="apply" style="padding-top:clamp(2rem,4vw,3rem)">
         <div class="wrap">
             <div class="head">
                 <span class="eyebrow">The application</span>
@@ -128,12 +130,70 @@
         </div>
     </section>
 
+    <!-- ==================== THE DETAIL ====================
+         Everything that used to sit ABOVE the form. Same content, one section
+         instead of two columns competing for the opening screen. -->
+    <section class="section section--alt">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Before you send it</span>
+                <h2 style="margin-top:.9rem">What we ask, and how it goes</h2>
+                <p class="lede">
+                    Each requirement is checked live against your Infinite Flight account when you
+                    apply. Nothing here is a judgement call.
+                </p>
+            </div>
+
+            <!-- The sub-brand a cadet actually joins. Every fact here is
+                 already in data.js: the E190's Connect livery, its regional and
+                 feeder operation, the rank it is released at, and the Cadet
+                 block limit off the rank ladder. -->
+            <div class="card" style="margin-bottom:clamp(1.6rem,3.5vw,2.4rem)" data-reveal>
+                <span class="lockup lockup--lg lockup--block" role="img" aria-label="Aeromexico Virtual Connect">
+                    <span class="mark" aria-hidden="true"></span>
+                    <span class="lockup__type"><b>Aeromexico</b><span>Virtual Connect</span></span>
+                </span>
+                <h3 style="margin-top:1.2rem">You start on Connect</h3>
+                <p>
+                    Connect is our regional operation, and it is where every new pilot begins. As a
+                    Cadet you fly the Embraer E190 in Connect livery on regional and feeder sectors
+                    inside a three-hour block limit — real published routes, not a training sandbox.
+                    Each rank above it releases more of the fleet and a longer sector.
+                </p>
+                <div class="card__foot">
+                    <a href="/fleet">See the E190 <span data-icon="arrow"></span></a>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="gap:clamp(2rem,5vw,3.5rem);align-items:start" data-reveal>
+                <div>
+                    <h3 style="margin-bottom:.9rem">Why we ask for each</h3>
+                    <dl class="facts" id="requirements"></dl>
+                </div>
+
+                <div>
+                    <h3 style="margin-bottom:.9rem">From applying to your first sector</h3>
+                    <div class="timeline">
+                        <div class="timeline__row"><span class="timeline__when">Apply</span>
+                            <p class="timeline__what"><b>Three minutes</b><span>Fill in the form above. Your IF username is verified on the spot.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">72 hours</span>
+                            <p class="timeline__what"><b>We review</b><span>The Director of Personnel reads it and answers either way, with a reason.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">On acceptance</span>
+                            <p class="timeline__what"><b>Callsign and login</b><span>You join as a Cadet with an Aeromexico callsign and a crew center account.</span></p></div>
+                        <div class="timeline__row"><span class="timeline__when">Seven days</span>
+                            <p class="timeline__what"><b>Your first sector</b><span>Fly any published route inside the three-hour Cadet limit, and file it. That is the whole induction.</span></p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ==================== AFTER YOU JOIN ====================
          The review's finding on this page was that an applicant could read the
          whole thing and still not know what membership involves past pressing
          send. This section is that: the induction, what keeps you current, and
          what happens when life gets in the way. -->
-    <section class="section">
+    <section class="section" id="involves">
         <div class="wrap">
             <div class="head" data-reveal>
                 <span class="eyebrow">After you join</span>
@@ -249,6 +309,13 @@
     const D = window.AMV_DATA, A = window.AMV;
     const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // Two renderings of one list. The chips are the checklist you scan before
+    // deciding to apply; the rows below carry the `why` for anyone who wants
+    // to argue with a requirement. Both read D.requirements, so a requirement
+    // changed in data.js cannot appear in one and not the other.
+    document.getElementById('reqChips').innerHTML = D.requirements.map(r =>
+        `<span class="chip">${esc(r.req)}</span>`).join('');
 
     document.getElementById('requirements').innerHTML = D.requirements.map(r => `
         <div class="facts__row">
