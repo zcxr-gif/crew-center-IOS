@@ -245,12 +245,28 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
         // test is not "is it small" but "is it spread": a ramp puts only a
         // fraction of the change in the 12px at the join, and a knife edge puts
         // nearly all of it there.
+        //
+        // ONE is enough to judge, not two. The site this threshold was written
+        // for had several dark sections; the brief since then is a white site
+        // where the only dark grounds left are the ones that carry a DEVICE at
+        // their edge — the CTA band and, now, the hero's photography. Asking
+        // for two is asking the design to grow a dark section it does not want.
         const mixed = read.filter(r => dark(r.far) !== dark(r.deep));
-        check(`[${label}] there is a navy changeover to judge`, mixed.length >= 2, String(mixed.length));
+        check(`[${label}] there is a navy changeover to judge`, mixed.length >= 1, String(mixed.length));
         mixed.forEach(r => {
             const total = Math.abs(r.far - r.deep);
             const step = Math.abs(r.above - r.below);
-            if (/\bband\b/.test(r.cls)) {
+            // A dark ground that ENDS ON A DEVICE keeps its edge crisp: the
+            // band wears a marigold greca crown, the hero closes on the
+            // tricolour. Ramping either one would put a sliver of white above
+            // the device and read as a gap, which is the same reasoning the
+            // band was exempted for in the first place. Every other dark/pale
+            // seam still has to spread.
+            //
+            // `hero-under` is matched rather than `hero`: the seam belongs to
+            // the section BELOW the join, and that is the band of counted
+            // figures sitting under the hero's photograph.
+            if (/\b(band|hero-under)\b/.test(r.cls)) {
                 check(`[${label}] the edge into "${r.cls}" is kept crisp (${step.toFixed(0)} of ${total.toFixed(0)})`,
                     total > 100 && step > total * 0.6, JSON.stringify(r.run));
             } else {

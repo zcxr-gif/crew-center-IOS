@@ -55,96 +55,99 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         The aeroplane, and what the airline did with it. No headline.
+         THE FOURTH HERO, and the one the VA chose. It is the arrangement every
+         virtual airline they pointed at is built on — Air France-KLM, flynas,
+         Ryanair, Norwegian — because it is the one that works: a photograph
+         filling the screen, a scrim over it, and the airline saying who it is
+         in type you cannot miss.
 
-         Two things have been thrown out of this section now. The poster — the
-         787-9 drawn in its special livery, ringed by folk art, over the
-         wordmark — because it was a drawing sitting one click from photographs
-         of the same airframe. And then the copy that replaced it, because a
-         tagline and a paragraph laid over a photograph is the same move every
-         airline's homepage makes, and it was covering the picture up.
+         What came before it, and why each went:
+           * a drawn poster of the 787-9, sitting one click from photographs of
+             the same airframe;
+           * the photographs with a marketing tagline laid over them, thrown out
+             for covering up the subject;
+           * the photograph as a panel in the flow with the aircraft naming
+             itself underneath — honest, quiet, and read by the VA as a card
+             dropped into the page rather than as a hero.
 
-         What is left says more than the paragraph did, and none of it is
-         written here. The aircraft names ITSELF: hero.js captions each slide off
-         AMV_DATA.fleet — type, registration, what that type is for, and a sector
-         it actually flies, in cities where the site already names them. Under
-         it, sectors the crew have flown, sampled at random off the crew centre's
-         public flight log. Then the airline in four counted figures.
+         The objection that killed the second one is answered here rather than
+         avoided: nothing over this photograph is marketing copy. The headline
+         is the airline's own line, the sub-line is what it factually is, the
+         strip under the buttons is AMV_DATA.values read out, and the credit at
+         the foot is the aircraft on screen naming ITSELF off AMV_DATA.fleet.
+         Every word is either the airline's own or read from data.
 
-         Every layer is optional and none of it is decoration: no photographs, a
-         quiet backend or scripting off, and this is the airline's navy, the two
-         buttons and the counted facts. Nothing here renders a placeholder. -->
+         ONE THING IS GIVEN UP, deliberately: the photograph is cropped now.
+         `cover` on a full-bleed stage cannot do anything else with a 1920x886
+         frame in a portrait viewport. The uncropped shots are the whole point
+         of /fleet and they are all still there, and the plate at the foot names
+         whichever one you are looking at. See LIVE HERO in brand.css.
+
+         Every layer is still optional: no photographs, a quiet backend or
+         scripting off, and this is the airline's navy, the headline and the two
+         buttons. Nothing here renders a placeholder. -->
     <section class="hero hero--live" data-hero>
-        <!-- The page still has to be NAMED — for a screen reader arriving at it
-             and for a crawler indexing it. It is simply not set in 70px type
-             over the aircraft any more. -->
-        <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual airline
-            flying the Aeroméxico network from Mexico City.</h1>
+        <!-- Empty in the markup on purpose: the slides are the fleet
+             photographs in data.js, so a type gained or lost changes the hero
+             with nothing typed in here. -->
+        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+        <!-- The scrim is its own element rather than a gradient on the stage,
+             because the stage cross-fades and the scrim must not. -->
+        <div class="hero__scrim" aria-hidden="true"></div>
 
-        <!-- The crest. At the top of the page this is the airline's name, set
-             large and centred; as the page scrolls it shrinks and flies into
-             the nav bar, and the nav's own brand fades up underneath it at the
-             moment the two are the same size in the same place.
-
-             aria-hidden because the nav brand is the real one — a screen
-             reader should hear the airline named once, and the .sr-only h1
-             above already names the page. -->
-        <div class="hero__lockup" data-hero-lockup aria-hidden="true">
-            <span class="mark hero__lockup-mark" data-hero-lockup-mark></span>
-            <div class="hero__lockup-word">
-                <b>Aeromexico</b><span>Virtual</span>
-            </div>
-            <p class="hero__lockup-tag">Fly the Eagle Warrior.</p>
-        </div>
-
-        <!-- THE AEROPLANE, THEN ITS NAME. The order was the other way round
-             and it was the wrong way round: the plate announced a type before
-             you had seen it, which is what "777-200 confuses me" was. You now
-             see the aircraft and then read what it is, and the two are one
-             object rather than a caption and a card — the photograph carries
-             no border, no shadow and no corners of its own, and dissolves
-             into the hero's own ground at its foot. See LIVE HERO in
-             brand.css.
-
-             The welcome paragraph that sat here is gone at the VA's direction.
-             "Bienvenido a bordo" below is what is left of it. -->
-        <div class="wrap hero__top">
-            <p class="eyebrow hero__welcome">Bienvenido a bordo</p>
-
-            <!-- Empty in the markup on purpose: the slides are the fleet
-                 photographs in data.js, so a type gained or lost changes the
-                 hero with nothing typed in here. -->
-            <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
-
-            <div class="hero__marque">
-                <!-- Filled by hero.js with whatever is on the stage. The dots
-                     are real buttons: this is the only way to steer the hero
-                     from a keyboard. -->
-                <div class="hero__plate" data-hero-caption aria-live="polite"></div>
-                <div class="hero__controls">
-                    <div class="hero__cta">
-                        <a class="btn btn--primary" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
-                        <a class="btn btn--ghost" href="/network">Route map</a>
-                    </div>
-                    <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Approved sectors off the crew centre's public flight log. Starts
-             [hidden] and is only revealed once real flights arrive — there is no
-             placeholder leg and no invented pilot. -->
-        <div class="wrap hero__log" data-hero-log hidden>
-            <p class="hero__log-head">
-                <i class="dot-live" aria-hidden="true"></i> Flown by the crew
+        <div class="wrap hero__content">
+            <p class="hero__eyebrow">
+                <span class="flag" aria-hidden="true"></span> Bienvenido a bordo
             </p>
-            <ul class="hero__legs" data-hero-legs></ul>
+
+            <!-- The page's real <h1>, visible at last. It was .sr-only for as
+                 long as the hero had no headline to be. -->
+            <h1 class="hero__title">Fly the <em>Eagle&nbsp;Warrior</em>.</h1>
+            <span class="hero__rule" aria-hidden="true"></span>
+
+            <p class="hero__sub">
+                An Infinite Flight virtual airline flying the Aeroméxico network out of
+                Mexico City, on the Expert Server.
+            </p>
+
+            <div class="hero__cta">
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/network">Route map</a>
+            </div>
+
+            <!-- AMV_DATA.values, read out. Four things the airline holds itself
+                 to, stated on the page that asks you to join it. Filled by the
+                 page script so it cannot drift from /about. -->
+            <p class="hero__values" id="heroValues"></p>
         </div>
 
-        <!-- The airline in four counted figures, every one derived from data.js
-             so none of them can drift from what the site lists. -->
+        <!-- The foot of the frame: the aircraft naming itself, and the dots
+             that steer it. A photo credit, in the place a photo credit goes —
+             which is what this always was. The dots are real buttons: the only
+             way to change the aircraft from a keyboard. -->
+        <div class="wrap hero__foot">
+            <div class="hero__plate" data-hero-caption aria-live="polite"></div>
+            <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+        </div>
+    </section>
+
+    <!-- ==================== THE AIRLINE, COUNTED ====================
+         Off the hero and onto the page's own paper, where they read as facts
+         rather than as furniture over a photograph: four figures derived from
+         data.js, and the sectors the crew have actually flown.
+
+         The flown strip starts [hidden] and is revealed only once real flights
+         arrive from the crew centre — there is no placeholder leg and no
+         invented pilot. -->
+    <section class="section section--tight hero-under">
         <div class="wrap">
             <dl class="hero__facts hero__facts--band" id="heroFacts" data-reveal-group data-reveal-step="60"></dl>
+            <div class="hero__log" data-hero-log hidden>
+                <p class="hero__log-head">
+                    <i class="dot-live" aria-hidden="true"></i> Flown by the crew
+                </p>
+                <ul class="hero__legs" data-hero-legs></ul>
+            </div>
         </div>
     </section>
 
@@ -513,6 +516,18 @@
             <dt>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
+
+    // ---- What the airline holds itself to ----
+    // The strip under the hero's buttons. Read out of AMV_DATA.values rather
+    // than typed into the markup, so the four things stated over the
+    // photograph are the same four the about page sets out in full — the one
+    // thing on this hero a reader might take as a promise is the one thing
+    // that cannot drift from where the promise is actually made.
+    const vals = document.getElementById('heroValues');
+    if (vals) {
+        vals.innerHTML = (D.values || [])
+            .map(v => `<span>${esc(v.tag || v.title)}</span>`).join('');
+    }
 
     // ---- Skeletons -----------------------------------------------------
     //

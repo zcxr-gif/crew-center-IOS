@@ -591,12 +591,23 @@ window.AMV_DATA = {
         { q: 'Q4', objective: 'Consolidate — mentoring and the full network', measure: '75 active pilots; line trainers assigned; 80% activity compliance' },
     ],
 
-    /* ---- What the airline holds itself to (plan §1) ----------------------- */
+    /* ---- What the airline holds itself to (plan §1) -----------------------
+       `title` is the plan's own wording and is what /about sets out, with the
+       `note` under it. `tag` is the same commitment in two or three words, for
+       the strip across the home page's hero — four full titles there run to
+       seventy characters of tracked small caps and wrap into a paragraph,
+       which is not what a strip is for. A tag is a compression of its title,
+       never a fifth value: if the two ever say different things, the tag is
+       the one that is wrong. */
     values: [
-        { title: 'Realism first',        note: 'Routes, aircraft and procedures follow the real airline unless the simulator makes that impossible.' },
-        { title: 'Members before numbers', note: 'A roster of active pilots who enjoy flying is the goal. Headcount is a by-product, not the target.' },
-        { title: 'Staff serve the roster', note: 'Every staff role exists to remove work from pilots, not to add rank.' },
-        { title: 'Say what is decided',  note: 'Decisions, rule changes and disciplinary outcomes are communicated in plain terms, promptly.' },
+        { title: 'Realism first', tag: 'Realism first',
+          note: 'Routes, aircraft and procedures follow the real airline unless the simulator makes that impossible.' },
+        { title: 'Members before numbers', tag: 'Members first',
+          note: 'A roster of active pilots who enjoy flying is the goal. Headcount is a by-product, not the target.' },
+        { title: 'Staff serve the roster', tag: 'Staff serve pilots',
+          note: 'Every staff role exists to remove work from pilots, not to add rank.' },
+        { title: 'Say what is decided', tag: 'Said plainly',
+          note: 'Decisions, rule changes and disciplinary outcomes are communicated in plain terms, promptly.' },
     ],
 
     // NO ROSTER FIGURES HERE, DELIBERATELY.
