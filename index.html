@@ -97,35 +97,26 @@
             <p class="hero__lockup-tag">Fly the Eagle Warrior.</p>
         </div>
 
-        <!-- Two columns on a wide screen: the aircraft naming itself on the
-             left, the photograph of it on the right. The stage used to be an
-             absolute layer behind the whole section, which is what made the
-             hero dark; it is a panel in the flow now, so the hero's ground is
-             the page's own white. On a phone the two stack and the stage goes
-             first — see LIVE HERO in brand.css. -->
-        <div class="wrap hero__top">
-            <div class="hero__marque">
-                <!-- THE WELCOME, and it comes before the aeroplane.
-                     Three reviewers landed on the same thing from different
-                     directions: the page opened on a fleet card, the aircraft
-                     type was the first thing read ("777-200 confuses me"), and
-                     there was no sentence anywhere saying what this is. The
-                     hero's argument for having no headline held up right until
-                     somebody arrived who did not already know the airline.
-                     So: who we are, in two sentences, and THEN the aeroplane
-                     naming itself underneath. -->
-                <div class="hero__welcome">
-                    <p class="eyebrow">Bienvenido a bordo</p>
-                    <h2 class="hero__welcome-head">An Infinite Flight virtual airline,
-                        flying the Aeroméxico network.</h2>
-                    <p class="hero__welcome-copy">
-                        We fly the real Aeroméxico route map out of Mexico City on the Expert
-                        Server — domestic, transborder and long-haul. Your hours credit
-                        themselves off your own Infinite Flight history, rank is arithmetic
-                        rather than a favour, and everyone starts flying on the day they join.
-                    </p>
-                </div>
+        <!-- THE AEROPLANE, THEN ITS NAME. The order was the other way round
+             and it was the wrong way round: the plate announced a type before
+             you had seen it, which is what "777-200 confuses me" was. You now
+             see the aircraft and then read what it is, and the two are one
+             object rather than a caption and a card — the photograph carries
+             no border, no shadow and no corners of its own, and dissolves
+             into the hero's own ground at its foot. See LIVE HERO in
+             brand.css.
 
+             The welcome paragraph that sat here is gone at the VA's direction.
+             "Bienvenido a bordo" below is what is left of it. -->
+        <div class="wrap hero__top">
+            <p class="eyebrow hero__welcome">Bienvenido a bordo</p>
+
+            <!-- Empty in the markup on purpose: the slides are the fleet
+                 photographs in data.js, so a type gained or lost changes the
+                 hero with nothing typed in here. -->
+            <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+
+            <div class="hero__marque">
                 <!-- Filled by hero.js with whatever is on the stage. The dots
                      are real buttons: this is the only way to steer the hero
                      from a keyboard. -->
@@ -138,11 +129,6 @@
                     <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
                 </div>
             </div>
-
-            <!-- Empty in the markup on purpose: the slides are the fleet
-                 photographs in data.js, so a type gained or lost changes the
-                 hero with nothing typed in here. -->
-            <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
         </div>
 
         <!-- Approved sectors off the crew centre's public flight log. Starts
@@ -548,10 +534,9 @@
     // No crew centre at all means nothing is in flight, so there is nothing to
     // wait for and no skeleton — those paths go straight to the empty note.
     if (window.AMV_CREW) {
-        // NOT the next event. That one is painted from D.events first and only
-        // then refreshed from the crew centre, so it is never actually waiting
-        // — a skeleton there renders and is overwritten in the same frame,
-        // which is a flash rather than a loading state.
+        // Not the next event: that band now reads the crew centre as its only
+        // source and raises its own waiting state when it asks — see the note
+        // above paintNextEvent.
         skeleton('recentList', skelRows(3));
         skeleton('wallGrid',
             `<div style="display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))">
@@ -676,10 +661,26 @@
 
     // ---- Next event (the soonest one still ahead of us) ----
     //
-    // Reads data.js first and the crew center's calendar second, exactly as the
-    // events page does. Both pages answer to the same feed, so the home page
-    // cannot advertise a departure the calendar has never heard of.
+    // THE CREW CENTRE IS THE ONLY SOURCE. data.js used to carry four events as
+    // "fallback copy" and this band painted them before the network was
+    // involved — which meant the home page advertised a departure, with a date
+    // and a slot count, that nobody had scheduled. A made-up figure is bad; a
+    // made-up event is something a pilot can set an alarm for. Those four are
+    // gone from data.js and nothing replaced them.
+    //
+    // So there are three states and the middle one matters: waiting (the
+    // request is in flight — hold the shape, claim nothing), an event, or
+    // nothing on the calendar. Only the last two are statements about the
+    // airline, and both are true when they are shown.
     const host = document.getElementById('nextEvent');
+
+    function paintWaiting() {
+        host.innerHTML = `<div class="card"><div class="skeleton" aria-hidden="true">
+            <div class="skeleton__row">
+                <div class="skeleton__bar skeleton__bar--sm"></div>
+                <div class="skeleton__bar skeleton__bar--md"></div>
+            </div></div><span class="sr-only">Loading the next event…</span></div>`;
+    }
 
     function paintNextEvent(list) {
         const next = (list || []).filter(e => Date.parse(e.date) > Date.now())
@@ -714,9 +715,17 @@
         A.refresh(host);
     }
 
-    paintNextEvent(D.events);
+    // No crew centre at all is an answer — there is no calendar to read, so the
+    // band says so rather than waiting for ever. `live` is null on any failure
+    // (see the null contract at the top of crew.js), which is the same answer:
+    // nothing we can stand behind, so nothing is claimed.
     if (window.AMV_CREW) {
-        window.AMV_CREW.events({ limit: 4 }).then(live => { if (live) paintNextEvent(live); });
+        paintWaiting();
+        window.AMV_CREW.events({ limit: 4 })
+            .then(live => paintNextEvent(live))
+            .catch(() => paintNextEvent(null));
+    } else {
+        paintNextEvent(null);
     }
 
     // Everything above was injected after site.js exported itself — hand the new

@@ -238,8 +238,21 @@
         return out;
     }
 
+    // Held while the crew centre is still answering. Not the empty note: "there
+    // is nothing on" and "we have not asked yet" are different statements, and
+    // only one of them is true before the request comes back.
+    function renderWaiting() {
+        grid.innerHTML = Array.from({ length: 2 }, () => `
+            <article class="card"><div class="skeleton" aria-hidden="true">
+                <div class="skeleton__row">
+                    <div class="skeleton__bar skeleton__bar--sm"></div>
+                    <div class="skeleton__bar skeleton__bar--md"></div>
+                </div></div></article>`).join('')
+            + '<span class="sr-only">Loading the event calendar…</span>';
+    }
+
     function render(list) {
-        if (!list.length) {
+        if (!list || !list.length) {
             // Says so plainly rather than leaving an empty box under a heading
             // that promises a calendar.
             grid.innerHTML = '<p class="lede" style="grid-column:1/-1">'
@@ -262,16 +275,17 @@
         A.refresh(grid);
     }
 
-    // Correct before the network is involved: the calendar this repo carries,
-    // minus anything already flown.
-    const fallback = (D.events || [])
-        .filter(e => new Date(e.date).getTime() > Date.now() - 6 * 3600e3);
-    render(fallback);
-
-    // …then the airline's real one, when it answers. null means "leave what is
-    // already on the page", which is the point of rendering the fallback first.
+    // THE CREW CENTRE IS THE ONLY SOURCE. This used to paint four events out of
+    // data.js before the network was involved, so that the page was never
+    // empty — and every one of them was invented. A calendar is the one thing
+    // on this site a reader might act on: turn up, load the route, block out
+    // the evening. It is read from where staff actually publish it, or it is
+    // not shown. See the note against `events` in data.js.
     if (window.AMV_CREW) {
-        window.AMV_CREW.events().then(live => { if (live) render(live); });
+        renderWaiting();
+        window.AMV_CREW.events()
+            .then(live => render(live))
+            .catch(() => render(null));
 
         window.AMV_CREW.pastEvents().then(flown => {
             const host = document.getElementById('flownSection');

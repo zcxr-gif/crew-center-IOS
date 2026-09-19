@@ -43,7 +43,10 @@ const server = http.createServer((req, res) => {
     fs.createReadStream(file).pipe(res);
 });
 
-const PAGES = ['index', 'network', 'fleet', 'ranks', 'events', 'staff', 'join', 'about'];
+// 'join' became 'apply' in the round-2 review. The old path still resolves on
+// the deployed site through _redirects, but this harness serves files off disk
+// with no redirect table, so the name here has to be the real one.
+const PAGES = ['index', 'network', 'fleet', 'ranks', 'events', 'staff', 'apply', 'about'];
 
 // Every page is checked with the crew centre unreachable AND answering, because
 // the two produce different markup — a live answer injects cards that have to

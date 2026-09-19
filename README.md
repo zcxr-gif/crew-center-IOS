@@ -260,9 +260,24 @@ already on the page". `data.js` stays the fallback rather than becoming dead
 weight. Never build a section that only exists once a fetch resolves; a visitor
 on hotel wifi gets an empty page instead of a slow one.
 
-An **empty** answer is treated the same as no answer, deliberately. A crew
-center whose route list has not been filled in yet would otherwise blank a
-network page that this repo already knows 23 sectors for.
+**Two feeds are exempt, and the exemption is the point.** The route network and
+the events calendar are read from the crew center or not shown at all. They
+hold a waiting state while the request is in flight and say plainly that there
+is nothing when it answers with nothing.
+
+The reason is that both are things a reader can *act* on — book the sector,
+turn up for the departure — so a plausible placeholder is not a graceful
+degradation, it is a false statement with a date on it. `data.js` carried four
+invented events for exactly this purpose and the home page advertised them
+under the heading "The next departure". They are gone, `events: []` is
+deliberate, and `tools/test-events-page.js` fails if anything like them comes
+back. Everything else in `data.js` — the fleet, the ranks, the hubs — is a
+description of the airline that is true whether or not a server answers, which
+is why those still make good fallbacks.
+
+For every other feed an **empty** answer is treated the same as no answer,
+deliberately. A crew center whose roster figures have not been filled in yet
+would otherwise blank a section this repo can already describe.
 
 The two record shapes do not match, and that is the interesting part. The crew
 center knows the sector and the aircraft; `data.js` knows the things a reader
@@ -513,6 +528,28 @@ does. The page is still named for a screen reader and a crawler by an `.sr-only`
 `plane-logo.webp` and `tools/crop-hero.py` went with the poster, and the share
 card on every page is a real photograph now.
 
+A fourth hero was tried and taken off: the round-2 reviewers all found that the
+page opened on an aircraft type with nothing saying what this is, so a heading
+and a paragraph of positioning copy went in above the plate. Live, it was two
+centred blocks of reading copy between the crest and the aeroplane, and it
+pushed the photograph below the fold. What answers the reviewers instead costs
+no vertical space at all:
+
+- **The order.** The photograph comes first and the plate names it underneath.
+  "777-200 confuses me" was a caption arriving before its subject; you now see
+  the aeroplane and then read what it is.
+- **One line.** `.hero__welcome` is an eyebrow — *Bienvenido a bordo* — not a
+  heading. If you are tempted to grow it back into a paragraph, read this
+  section again first.
+- **The stage is not a card.** It had the page's radius, shadow and a tinted
+  ground, which made it read as an image dropped *into* the hero rather than as
+  the hero. Those came off; it runs to the edges of the screen on a phone and
+  is masked to dissolve into the hero's own ground at its foot, so the naming
+  emerges from the picture. The mask fades the **foot only** — fading all four
+  edges frames a bright photograph in its own light and the card comes back as
+  a glow. There is a note in `brand.css` saying so; it is there because both
+  wrong versions looked plausible in the editor.
+
 Four things about the stage are deliberate:
 
 - **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
@@ -654,12 +691,21 @@ A sector whose airports are not in `AMV_DATA.airports` is listed by the network
 page and left off the map, and the legend says how many. Do not add coordinates
 you have not looked up.
 
-**The home page and the calendar now read the same feed.** Both paint from
-`data.js` first and upgrade to `AMV_CREW.events()` when it answers, so the home
-page can no longer advertise a departure the calendar has never heard of — which
-it could for as long as that card was hand-typed only.
+**The home page and the calendar read the same feed, and only that feed.** Both
+call `AMV_CREW.events()` and render what it returns: a waiting state while the
+request is in flight, the soonest published event if there is one, and an empty
+note if there is not.
 
-`data.js` events stay as the fallback, and they earn their place: a visitor who
-is offline, blocked or on a slow connection gets a calendar rather than a
-spinner. Keep them roughly true. Entries carry ISO-8601 dates with an explicit
-UTC offset and past ones age out on their own — nothing needs deleting.
+`data.js` used to carry four events as a fallback so neither page was ever
+empty, and every one of them was invented — Valle de México Fly-In, Connect
+Regional Rush, Águila Transatlántica, Pacífico Nocturno, each with a date, a
+route and a slot count. A visitor on a slow connection was shown four
+departures that did not exist, under a heading promising the next one. That is
+worse than a blank card: an invented statistic is something nobody can turn up
+for, and an invented event is not.
+
+So `events: []` in `data.js` is deliberate and should stay that way. Publish
+events in the crew center, which is where sign-ups are counted anyway. Do not
+put a specimen event in `data.js` to see what the card looks like —
+`tools/test-events-page.js` checks for those four titles by name and fails if
+they reappear.

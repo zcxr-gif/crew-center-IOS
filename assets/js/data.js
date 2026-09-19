@@ -559,38 +559,29 @@ window.AMV_DATA = {
         { when: 'Within a week', what: 'Attendance, what worked and what did not are written up for the staff channel.' },
     ],
 
-    // Dates are ISO-8601 with an explicit UTC offset so they render correctly
-    // in every pilot's local time.
-    events: [
-        {
-            title: 'Valle de México Fly-In',
-            date: '2026-09-19T21:00:00Z',
-            from: 'Anywhere', to: 'MMMX', ac: 'Any Aeromexico fleet type',
-            server: 'Expert', slots: 0, kind: 'Fly-in',
-            blurb: 'Bring anything in our fleet into MMMX. Arrival slots are first-come; ATC staffed for three hours.',
-        },
-        {
-            title: 'Connect Regional Rush',
-            date: '2026-09-26T20:00:00Z',
-            from: 'MMGL', to: 'MMMY', ac: 'Embraer E190',
-            server: 'Expert', slots: 24, kind: 'Group flight',
-            blurb: 'A short, sharp Connect sector for newer pilots — inside the Cadet limit, and perfect for a first logged event flight.',
-        },
-        {
-            title: 'Águila Transatlántica',
-            date: '2026-10-10T19:00:00Z',
-            from: 'MMMX', to: 'LEMD', ac: 'Boeing 787-9 Dreamliner',
-            server: 'Expert', slots: 40, kind: 'Group flight',
-            blurb: 'The full flagship run to Madrid, flown as a group departure out of Mexico City with staffed ATC on the ground.',
-        },
-        {
-            title: 'Pacífico Nocturno',
-            date: '2026-10-24T04:00:00Z',
-            from: 'MMMX', to: 'RJAA', ac: 'Boeing 787-9 Dreamliner',
-            server: 'Expert', slots: 30, kind: 'Group flight',
-            blurb: 'Our longest sector, overnight into Narita. Senior Captains only — it is past every other rank’s sector limit.',
-        },
-    ],
+    /* ---- Events -----------------------------------------------------------
+       EMPTY, AND IT STAYS EMPTY. This array used to carry four events —
+       Valle de México Fly-In, Connect Regional Rush, Águila Transatlántica,
+       Pacífico Nocturno — each with a date, a route, an aircraft, a server and
+       a slot count. None of them was real. They were written here as "fallback
+       copy" so the events page and the home page's next-departure band would
+       have something to show before the crew centre answered.
+
+       That is the same mistake as the roster figures at the foot of this file,
+       and worse in one way: a made-up hours total is a number nobody can turn
+       up for. An invented event has a date on it. The home page was
+       advertising a departure to pilots who could have set an alarm for it.
+
+       The calendar lives in the crew centre, which is where staff actually
+       publish events and where sign-ups are counted. Both pages read it
+       directly now: they hold a waiting state while the request is in flight
+       and say plainly that nothing is scheduled if it answers with nothing.
+       An empty calendar is a true statement about the airline and takes one
+       event in the crew centre to stop being true.
+
+       Do not put a specimen event in here to see what the card looks like.
+       Publish it in the crew centre. */
+    events: [],
 
     /* ---- The first twelve months (plan §12) ------------------------------- */
     roadmap: [
