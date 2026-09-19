@@ -119,8 +119,12 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
             const g = document.querySelector('.grid.grid-3[data-reveal-group]');
             return [...g.children].map(c => parseInt(getComputedStyle(c).getPropertyValue('--reveal-delay'), 10));
         });
+        // Not "=== 6". That was the six-card WHY grid, and asserting a card
+        // COUNT makes this a snapshot of the page's shape rather than a test
+        // of the cascade — it failed the day the home page was cut back to
+        // glimpses, for a reason that had nothing to do with reveals.
         check('every card in the grid is a reveal with its own delay',
-            delays.length === 6 && delays.every(Number.isFinite), JSON.stringify(delays));
+            delays.length >= 2 && delays.every(Number.isFinite), JSON.stringify(delays));
         check('the run counts up and never restarts halfway down',
             delays.every((d, i) => i === 0 || d > delays[i - 1]), JSON.stringify(delays));
 
@@ -138,8 +142,10 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
 
         const groups = await page.evaluate(() =>
             [...document.querySelectorAll('[data-reveal-group]')].map(g => g.children.length));
+        // Likewise: what matters is that no group is left with nothing to
+        // stagger, not how many groups the page happens to have.
         check('every group on the home page actually has children to stagger',
-            groups.length >= 3 && groups.every(n => n > 1), JSON.stringify(groups));
+            groups.length >= 1 && groups.every(n => n > 1), JSON.stringify(groups));
         await page.close();
     }
 

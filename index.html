@@ -142,221 +142,55 @@
         </div>
     </section>
 
-    <!-- ==================== THE AIRLINE IN NUMBERS ====================
-         Moved directly under the hero. The review's finding was that the
-         opening screen said nothing about the airline's operational scale, and
-         these are the only figures on this site that state it — every one read
-         live from the crew center's own database.
+    <!-- ==================== WHERE TO GO NEXT ====================
+         A GLIMPSE, NOT THE WHOLE THING. The VA's note was that the home page
+         showed all the information rather than a taste of it, and it did: a
+         live figures band, three "why fly with us" cards, the full interactive
+         route map, two photo essays, the live roster, the activity feed, the
+         CEO's message and an Instagram grid — every one a preview of a page
+         that already exists in the nav, stacked into a scroll nobody finishes.
 
-         Starts [hidden]. crew.js reveals it only when real figures arrive and
-         deletes any figure it could not fill, so a slow backend costs the page
-         a section rather than filling it with zeroes. -->
-    <section class="section section--ink" id="ops" hidden data-va-when="pilots">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="eyebrow">The airline in numbers</span>
-                <h2 style="margin-top:.9rem">Every hour on this page was flown.</h2>
-                <p class="lede">
-                    Read live from our crew center. Hours are credited from flight reports
-                    captured automatically off each pilot's real Infinite Flight history —
-                    nothing here is self-reported, and nothing here is decoration.
-                </p>
-            </div>
+         Three cards replaced all of it. Each carries a real counted figure off
+         data.js and a way through to the page that holds the rest, which is
+         the whole job of a home page on a site with eight of them.
 
-            <div class="ops__grid" data-reveal-group data-reveal-delay="90">
-                <div class="stat" data-va-figure>
-                    <span class="stat__num" data-va-stat="pilots" data-count="0">0</span>
-                    <span class="stat__label">Pilots on the roster</span>
-                    <span class="stat__note">Everyone currently flying for the airline.</span>
-                </div>
-                <div class="stat" data-va-figure>
-                    <span class="stat__num" data-va-stat="hours" data-count="0">0</span>
-                    <span class="stat__label">Hours logged</span>
-                    <span class="stat__note">Credited across the roster since day one.</span>
-                </div>
-                <div class="stat" data-va-figure>
-                    <span class="stat__num" data-va-stat="pireps" data-count="0">0</span>
-                    <span class="stat__label">Flight reports filed</span>
-                    <span class="stat__note">Approved sectors, each checked against our network.</span>
-                </div>
-                <div class="stat" data-va-figure>
-                    <span class="stat__num" data-va-stat="landings" data-count="0">0</span>
-                    <span class="stat__label">Landings</span>
-                    <span class="stat__note">Counted from the sim, not from the logbook.</span>
-                </div>
-            </div>
-
-            <!-- The 30-day clause is its own [data-va-figure]: if that single
-                 field is missing the sentence loses the clause and still reads. -->
-            <p class="ops__asof">
-                <i class="dot-live" aria-hidden="true"></i>
-                <span>Live from the Aeromexico Virtual crew center.</span>
-                <span data-va-figure><b class="num" data-va-stat="flights30d">0</b>
-                    sectors flown in the last 30 days.</span>
-            </p>
-        </div>
-    </section>
-
-    <!-- ==================== WHY ==================== -->
+         Nothing was deleted from the SITE: the map is /network, the roster and
+         the activity feed are the crew centre's and are on /network, the CEO's
+         message is /about in full, and the fleet essays are /fleet. -->
     <section class="section section--alt">
         <div class="wrap">
             <div class="head" data-reveal>
-                <span class="eyebrow">Why fly with us</span>
-                <h2>An airline, not a spreadsheet</h2>
+                <span class="eyebrow">Have a look round</span>
+                <h2>There is more of it than this</h2>
                 <p class="lede">
-                    Everything a pilot needs sits in one crew center — logbook, roster, route
-                    network and events. You fly; the paperwork files itself.
+                    The fleet, the network, and the ladder you climb through them — each one
+                    a page of its own.
                 </p>
             </div>
-            <div class="grid grid-3" data-reveal-group data-reveal-delay="90">
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="radio"></div>
-                    <h3>Flights log themselves</h3>
-                    <p>Fly under an Aeromexico callsign on the Expert Server and the crew center
-                       captures the leg, matches it to the fleet and route network, and credits the
-                       hours. No forms unless something needs fixing.</p>
-                    <div class="card__foot">
-                        <a href="/crew">See the crew center <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="route"></div>
-                    <h3>A network worth flying</h3>
-                    <p>The real Aeroméxico map, published in five tiers — regional Connect hops on
-                       the E190, transborder sectors on the MAX, and 787 flagship runs to Europe
-                       and the Pacific.</p>
-                    <div class="card__foot">
-                        <a href="/network">View the route map <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="award"></div>
-                    <h3>Rank that means something</h3>
-                    <p>Each rank releases more of the fleet <em>and</em> raises the longest sector
-                       you may file — three hours at Cadet, no limit at Senior Captain. Promotions
-                       come off validated hours, not vibes.</p>
-                    <div class="card__foot">
-                        <a href="/ranks">See the rank ladder <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="calendar"></div>
-                    <h3>Events with ATC</h3>
-                    <p>At least two a month, published a fortnight ahead, run with staffed
-                       controllers, published slots and a proper briefing — not a Discord message
-                       and a hope.</p>
-                    <div class="card__foot">
-                        <a href="/events">What's on the calendar <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="users"></div>
-                    <h3>Staffed by people who fly</h3>
-                    <p>Our staff are line pilots first, and every one of them is named on the staff
-                       page. Applications get a human answer inside 72 hours, and every decision is
-                       explained.</p>
-                    <div class="card__foot">
-                        <a href="/staff">Meet the staff <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-                <article class="card card--hover">
-                    <div class="card__icon" data-icon="shield"></div>
-                    <h3>Run to a written plan</h3>
-                    <p>How the airline is governed, what is expected of a pilot and how flights are
-                       validated are all written down, published, and reviewed every quarter. We
-                       operate in compliance with the IFVARB.</p>
-                    <div class="card__foot">
-                        <a href="/about">How the airline is run <span data-icon="arrow"></span></a>
-                    </div>
-                </article>
-            </div>
+            <div class="grid grid-3" id="glimpse" data-reveal-group data-reveal-delay="90"></div>
         </div>
     </section>
 
-    <!-- ==================== NETWORK ====================
-         One map instead of the six-row route table and the three hub cards that
-         used to sit here. The review found the home page was a scroll through
-         previews of pages that already exist; this is the network at a glance,
-         and the page it belongs to is one tap away. -->
+    <!-- ==================== NEXT EVENT ==================== -->
     <section class="section">
         <div class="wrap">
             <div class="head" data-reveal>
-                <span class="eyebrow">The network</span>
-                <h2>Out of the Valley of Mexico</h2>
-                <p class="lede" id="networkLede">
-                    One hub, three bases, and the whole thing flown on the Expert Server.
-                </p>
+                <span class="eyebrow">Next up</span>
+                <h2>The next departure</h2>
             </div>
-            <div class="map-host" id="mapHost" data-reveal="fade"></div>
-            <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
-            <p style="margin-top:1.6rem" data-reveal>
-                <a class="btn btn--ghost" href="/network">Every sector, by tier <span data-icon="arrow"></span></a>
+            <div id="nextEvent" data-reveal></div>
+            <p style="margin-top:2rem" data-reveal>
+                <a class="btn btn--ghost" href="/events">Full event calendar <span data-icon="arrow"></span></a>
             </p>
         </div>
     </section>
 
-    <!-- ==================== LIVE NOW ==================== -->
-    <!-- ==================== TWO-UPS ====================
-         The shape aeromexico.com is mostly built from: a photograph on one
-         side, a four-word title and one sentence on the other, alternating
-         side, one on white and one on the tint. Their component, our words and
-         our photographs — see TWO-UP in brand.css for why none of their copy
-         came with it. The images are filled from AMV_DATA.fleet by type code
-         at the foot of this file, so no URL is written here. -->
-    <section class="twoup twoup--square" data-reveal>
-        <div class="twoup__media">
-            <img data-fleet-photo="789" alt="" loading="lazy" decoding="async">
-        </div>
-        <div class="twoup__text">
-            <span class="eyebrow">The fleet</span>
-            <h2 class="twoup__title">Six types, and you unlock them</h2>
-            <p class="twoup__intro">
-                From thirty-minute Connect hops on the E190 to the 787-9 on the Europe and
-                Pacific runs. Each type is released at a rank, so the fleet opens up as you
-                fly rather than sitting there as a catalogue.
-            </p>
-            <a class="btn btn--primary" href="/fleet">See the fleet <span data-icon="arrow"></span></a>
-        </div>
-    </section>
-
-    <section class="twoup twoup--square twoup--right twoup--tint" data-reveal>
-        <div class="twoup__media">
-            <img data-fleet-photo="E90" alt="" loading="lazy" decoding="async">
-        </div>
-        <div class="twoup__text">
-            <span class="eyebrow">Where a cadet starts</span>
-            <span class="lockup lockup--lg lockup--block" role="img" aria-label="Aeromexico Virtual Connect">
-                <span class="mark" aria-hidden="true"></span>
-                <span class="lockup__type"><b>Aeromexico</b><span>Virtual Connect</span></span>
-            </span>
-            <h2 class="twoup__title">The regional operation</h2>
-            <p class="twoup__intro">
-                Every pilot starts at Cadet on the E190, in Connect livery, flying the regional
-                and feeder sectors inside a three-hour limit. It is the network a Cadet already
-                has on day one — and the rest of the fleet opens up from there.
-            </p>
-            <a class="btn btn--primary" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
-        </div>
-    </section>
-
-    <section class="section section--alt">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="chip chip--live"><i class="dot-live" aria-hidden="true"></i> Live now</span>
-                <h2 style="margin-top:.9rem">Who's airborne right now</h2>
-                <p class="lede">
-                    Straight from Infinite Flight's live traffic — every Aeromexico Virtual pilot
-                    currently in the air on the Expert Server.
-                </p>
-            </div>
-            <div data-live-roster data-reveal>
-                <div class="frame-host muted" style="padding:3rem;text-align:center">
-                    Loading live traffic…
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <!-- These two stay. The trim took out everything that was a PREVIEW of a
+         page already in the nav — the map, the CEO's message, the photo
+         essays, the live roster. These are the opposite: the crew centre's own
+         automatic rows, and the photographs staff hang on it. Neither has a
+         page of its own anywhere on the site, so cutting them would have
+         deleted them rather than moved them, and both are already glimpses. -->
     <!-- ==================== WHAT THE AIRLINE DID ====================
          The crew center's own record of what happened — a pilot joined,
          somebody made Captain, an event went up. Written by the crew center,
@@ -382,60 +216,6 @@
             <div class="timeline" id="recentList" data-reveal></div>
             <p style="margin-top:2rem" data-reveal>
                 <a class="btn btn--ghost" href="/crew">Sign in to the crew center <span data-icon="arrow"></span></a>
-            </p>
-        </div>
-    </section>
-
-    <!-- ==================== FROM THE CEO ==================== -->
-    <section class="section">
-        <div class="wrap">
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:center"
-                 data-reveal-group data-reveal-step="90">
-                <div class="quote">
-                    <p>
-                        Most virtual airlines are a spreadsheet with a logo on it. We wanted the
-                        opposite: an operation you could actually join, fly, and get somewhere in.
-                    </p>
-                    <div class="quote__by">
-                        <span class="staff__av" aria-hidden="true" id="ceoAvatar"><b id="ceoInitials">SN</b></span>
-                        <span>
-                            <b id="ceoName">_ServerNoob</b>
-                            <span>Chief Executive Officer</span>
-                        </span>
-                        <!-- The review asked for a way through to the CEO's IFC
-                             profile from here. Hidden until the script finds one
-                             on the staff record, so it can never be a dead link
-                             to a name that has changed. -->
-                        <a class="btn btn--ghost btn--sm quote__ifc" id="ceoIfc" hidden
-                           rel="noopener" target="_blank" href="#"></a>
-                    </div>
-                </div>
-                <div>
-                    <p class="lede">
-                        Aeromexico Virtual is run by an executive team of two and five departmental
-                        directors, to a written Operations Plan that is reviewed every quarter.
-                        Everything the airline expects of you is in it, and so is everything you can
-                        expect back.
-                    </p>
-                    <p style="margin-top:1.6rem;display:flex;gap:.8rem;flex-wrap:wrap">
-                        <a class="btn btn--ghost" href="/about">About the airline <span data-icon="arrow"></span></a>
-                        <a class="btn btn--ghost" href="/staff">Meet the staff</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ==================== NEXT EVENT ==================== -->
-    <section class="section section--alt">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="eyebrow">Next up</span>
-                <h2>The next departure</h2>
-            </div>
-            <div id="nextEvent" data-reveal></div>
-            <p style="margin-top:2rem" data-reveal>
-                <a class="btn btn--ghost" href="/events">Full event calendar <span data-icon="arrow"></span></a>
             </p>
         </div>
     </section>
@@ -478,15 +258,16 @@
 
 <div data-site-footer></div>
 
+<!-- world.js, map.js and live.js came off this page with the route map and the
+     live roster. world.js alone is the generated Natural Earth coastline; it is
+     the largest script on the site and the home page no longer draws anything
+     with it. They are still loaded by /network, which does. -->
 <script src="/assets/js/data.js?v=3"></script>
-<script src="/assets/js/world.js?v=3"></script>
 <script src="/assets/js/site.js?v=3"></script>
-<script src="/assets/js/map.js?v=3"></script>
 <script src="/assets/js/crew.js?v=3"></script>
 <!-- After crew.js: the hero's flight strip reads the crew centre's flight log
      through it. Home page only — nothing else on the site has a stage. -->
 <script src="/assets/js/hero.js?v=3"></script>
-<script src="/assets/js/live.js?v=3"></script>
 <script>
 (function () {
     const D = window.AMV_DATA, A = window.AMV;
@@ -499,12 +280,12 @@
     const dests = new Set(D.routes.map(r => r.to)).size;
     document.getElementById('heroFacts').innerHTML = [
         [D.hubs.length,   'Bases',          'Mexico City, Monterrey, Guadalajara, Cancún'],
-        [dests,           'Destinations',   'Across five regions'],
+        [dests,           'Destinations',   'Across five regions', 'dest'],
         [D.fleet.length,  'Aircraft types', 'Every one flyable in the sim'],
         [D.ranks.length,  'Ranks',          'Cadet to Aeroméxico Airman'],
-    ].map(([n, label, note]) => `
+    ].map(([n, label, note, hook]) => `
         <div>
-            <dt>${n}</dt>
+            <dt${hook ? ` data-count-${hook}` : ''}>${n}</dt>
             <dd><b>${esc(label)}</b><span>${esc(note)}</span></dd>
         </div>`).join('');
 
@@ -521,11 +302,9 @@
     }
 
     // ---- Skeletons -----------------------------------------------------
-    //
     // Shown ONLY where the section is already in the layout and a request is
     // actually in flight. A skeleton for something that may not exist is worse
-    // than showing nothing, because it promises. Each of these resolves to the
-    // real content or to the .empty note — never to a number.
+    // than showing nothing, because it promises.
     const skelRows = (n) => Array.from({ length: n },
         () => `<div class="skeleton__row">
                    <div class="skeleton__bar skeleton__bar--sm"></div>
@@ -537,12 +316,7 @@
         if (host) host.innerHTML = `<div class="skeleton" aria-hidden="true">${html}</div>`;
     }
 
-    // No crew centre at all means nothing is in flight, so there is nothing to
-    // wait for and no skeleton — those paths go straight to the empty note.
     if (window.AMV_CREW) {
-        // Not the next event: that band now reads the crew centre as its only
-        // source and raises its own waiting state when it asks — see the note
-        // above paintNextEvent.
         skeleton('recentList', skelRows(3));
         skeleton('wallGrid',
             `<div style="display:grid;gap:.8rem;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))">
@@ -550,119 +324,59 @@
              </div>`);
     }
 
-    // ---- The two-up photographs ----
+    // ---- Where to go next ----
     //
-    // Addressed by TYPE CODE rather than by URL. A photograph swapped in
-    // data.js follows the site everywhere it is used; a URL pasted into the
-    // markup is a second copy that goes stale silently.
-    document.querySelectorAll('[data-fleet-photo]').forEach(img => {
-        const a = D.fleet.find(f => f.short === img.dataset.fleetPhoto);
-        if (!a || !a.photo || !a.photo.src) { img.closest('.twoup').hidden = true; return; }
-        img.src = a.photo.src;
-        img.width = a.photo.w || 1920;
-        img.height = a.photo.h || 886;
-        img.alt = `${a.livery || 'Aeromexico'} ${a.type}${a.photo.reg ? ' ' + a.photo.reg : ''}`;
-    });
-
-    // ---- The CEO, read off the staff list ----
-    const ceo = D.staff.find(s => s.short === 'CEO');
-    if (ceo && ceo.name) {
-        document.getElementById('ceoName').textContent = ceo.name;
-        document.getElementById('ceoInitials').textContent = A.monogram(ceo.name);
-        // The same crest plate the staff cards carry, rather than a grey disc.
-        const av = document.getElementById('ceoAvatar');
-        if (av) av.insertAdjacentHTML('afterbegin',
-            `<span class="staff__av-crest">${A.MARK}</span>`);
-        const link = document.getElementById('ceoIfc');
-        if (link && ceo.ifc) {
-            link.href = 'https://community.infiniteflight.com/u/'
-                + encodeURIComponent(ceo.ifc) + '/summary';
-            link.innerHTML = `${A.icon('external')} ${esc(ceo.name)} on the IFC`;
-            link.hidden = false;
-        }
-    }
-
-    // ---- The network, at a glance ----
+    // Three cards, each a real counted figure off data.js and a way through to
+    // the page that holds the rest. This is what is left of the map, the two
+    // photo essays, the "why fly with us" cards and the CEO's message that sat
+    // between the hero and the calendar: the home page shows a glimpse, the
+    // page in the nav shows the thing.
     //
-    // Painted from data.js so the section is complete on first paint, then
-    // repainted from the crew centre — which is where sectors are actually
-    // added, and therefore what the airline's network IS. The network page has
-    // worked this way for a while; the home page did not, so the two could sit
-    // one click apart quoting different sizes of the same airline.
-    const hub = D.hubs.find(h => h.role === 'Primary hub') || D.hubs[0];
-
-    // The city a destination is in, where this repo knows it. Only ever used to
-    // name an airport more readably than its ICAO — never to claim a sector.
-    const cityOf = Object.fromEntries(D.routes.filter(r => r.city).map(r => [r.to, r.city]));
-
-    function paintNetwork(rows, coords) {
-        const tiers = new Set(rows.map(r => r.tier).filter(Boolean));
-        // The shortest and longest are READ OFF the list rather than written
-        // down. The sentence used to end "an hour on the E190, fourteen to
-        // Seoul", which was true of the network in this repo and would have
-        // gone on being said about whatever network the crew centre held.
-        const byDist = rows.filter(r => r.dist > 0).sort((a, b) => a.dist - b.dist);
-        const name = (r) => cityOf[r.to] || r.to;
-        const spread = byDist.length >= 2
-            ? ` — the shortest is ${byDist[0].dist.toLocaleString()} nm to ${name(byDist[0])}, `
-              + `the longest ${byDist[byDist.length - 1].dist.toLocaleString()} nm to ${name(byDist[byDist.length - 1])}.`
-            : '.';
-
-        document.getElementById('networkLede').textContent =
-            `${rows.length} published sector${rows.length === 1 ? '' : 's'} from ${hub.city} `
-            + `and our bases, in ${tiers.size} tier${tiers.size === 1 ? '' : 's'}${spread}`;
-        if (window.AMV_MAP) {
-            window.AMV_MAP.draw(document.getElementById('mapHost'), rows,
-                                { hubs: D.hubs, airports: coords });
-        }
+    // Counted, not typed. A type added to the fleet or a sector opened in the
+    // crew centre changes these with nothing edited here — the same contract
+    // the hero's own figures keep.
+    const glimpse = document.getElementById('glimpse');
+    if (glimpse) {
+        glimpse.innerHTML = [
+            ['plane', D.fleet.length, 'aircraft types', '/fleet', 'The fleet',
+             'Every type the airline operates, what each one is for, and the rank that releases it.'],
+            ['route', dests, 'destinations', '/network', 'The network',
+             'One hub, three bases, and every published sector on a map you can drag.'],
+            ['award', D.ranks.length, 'ranks', '/ranks', 'The ladder',
+             'What each rank flies, the longest sector it may file, and what it gets you.'],
+        ].map(([ico, n, unit, href, title, blurb]) => `
+            <a class="card card--hover glimpse" href="${href}">
+                <div class="card__icon">${A.icon(ico)}</div>
+                <span class="glimpse__count"><b${unit === 'destinations' ? ' data-count-dest' : ''}>${n}</b> ${esc(unit)}</span>
+                <h3>${esc(title)}</h3>
+                <p>${esc(blurb)}</p>
+                <span class="glimpse__go">Have a look ${A.icon('arrow')}</span>
+            </a>`).join('');
     }
 
-    // NOT painted from data.js first. The map used to draw this repo's route
-    // table and then visibly redraw the crew centre's a moment later — two
-    // different networks, one after the other, on the same screen. The local
-    // table stays as a LOOKUP (cityOf, above, names an airport more readably)
-    // but it is no longer a source of sectors. Until the crew centre answers
-    // the map holds its shape; if it answers with nothing, the section says so.
+    // ---- The network is the crew centre's, here as everywhere ----
+    //
+    // The home page used to say this through the route map's lede, which
+    // counted the sectors the crew centre answered with. The map went when the
+    // page was cut back to glimpses, and for a moment the two destination
+    // figures left behind — the hero's counted band and the network card —
+    // were reading data.js and nothing else. That is the one thing this site
+    // does not do: the crew centre is where sectors are opened and closed, so
+    // a figure this page prints about the network has to come from there the
+    // moment it answers.
+    //
+    // Both figures carry [data-count-dest] and both are rewritten together,
+    // so they cannot end up disagreeing with each other on one screen.
     if (window.AMV_CREW) {
-        document.getElementById('mapHost').innerHTML =
-            '<div class="skeleton" aria-hidden="true"><div class="skeleton__block"' +
-            ' style="aspect-ratio:16/9;border-radius:var(--radius)"></div></div>';
-    } else {
-        emptyNetwork();
-    }
-
-    function emptyNetwork() {
-        document.getElementById('mapHost').innerHTML = `<div class="empty">
-            <b>The route map is not available</b>
-            <p>Sectors are published in the crew centre and drawn here. Nothing has come back
-               from it just now.</p>
-        </div>`;
-        document.getElementById('networkLede').textContent =
-            'The published network is read live from our crew centre.';
-    }
-
-    if (window.AMV_CREW) {
-        const key = r => `${r.from}-${r.to}`;
-        const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
-        Promise.all([window.AMV_CREW.routes(), window.AMV_CREW.airports()])
-          .catch(() => [null, null])
-          .then(([live, pos]) => {
-            if (!live || !live.length) { emptyNetwork(); return; }
-            // Tier comes from the sector's twin in data.js, or from the plan's
-            // own Codeshare tier when the crew centre says it is one. A sector
-            // we have never seen still counts towards the total; it just has no
-            // tier of ours to be counted under.
-            const rows = live.map(r => {
-                const m = local[key(r)] || {};
-                return {
-                    from: r.from, to: r.to, ac: r.ac || m.ac || '', dist: r.dist || m.dist || 0,
-                    tier: r.codeshare ? 'Codeshare' : (m.tier || 'Network'),
-                };  // city is looked up by ICAO, so a sector we have never seen still reads
+        window.AMV_CREW.routes().then(live => {
+            if (!live || !live.length) return;      // null is "we could not ask"
+            const n = new Set(live.map(r => r.to).filter(Boolean)).size;
+            if (!n) return;
+            document.querySelectorAll('[data-count-dest]').forEach(el => {
+                el.textContent = n;
+                el.removeAttribute('data-count');    // stop the counter re-animating
             });
-            // The repo's coordinates win on a clash — those are checked — and
-            // the crew centre fills in the destinations it has that we do not.
-            paintNetwork(rows, pos ? Object.assign({}, pos, D.airports) : D.airports);
-        });
+        }).catch(() => {});
     }
 
     // ---- Next event (the soonest one still ahead of us) ----
@@ -738,13 +452,9 @@
     // nodes back so their reveals, counters and icons get wired.
     A.refresh();
 
-    // ---- The airline in numbers ----
-    // The only figures on this page that are not derived from data.js. They come
-    // from the crew center's database over the network, so they arrive after
-    // everything else and the section stays hidden until they do. Nothing to
-    // handle on failure: crew.js removes what it cannot fill, and the section is
-    // gated on `pilots`, so a dead backend simply costs us this band.
-    if (window.AMV_CREW) window.AMV_CREW.mountStats();
+    // The live operating figures went with the #ops band. crew.js still
+    // exposes stats() and nothing on the site calls it — a section away from
+    // being used again, not deleted.
 
     // ---- What the airline has been doing ----
     //

@@ -302,6 +302,18 @@
         // 1. Groups: give every child its place in the run and wire it to the
         //    group, not to the observer.
         document.querySelectorAll('[data-reveal-group]:not([data-reveal-staged])').forEach(g => {
+            // AN EMPTY GROUP IS NOT A STAGED GROUP. Marking it anyway is a bug
+            // with a long fuse: every group on the home page is filled by the
+            // page's own script, and hero.js calls refresh() — which runs this
+            // pass over the whole document — BEFORE that script runs. The
+            // group got stamped while it had no children, the :not() above
+            // skipped it ever after, and its cards ended up with no stagger at
+            // all. They were visible, so nothing looked broken; they simply
+            // never animated while everything around them did.
+            //
+            // Leaving it unstamped costs one more querySelectorAll on the next
+            // refresh and is the whole fix.
+            if (!g.children.length) return;
             g.dataset.revealStaged = '1';
             const step = +(g.dataset.revealStep || REVEAL_STEP);
             const base = +(g.dataset.revealDelay || 0);

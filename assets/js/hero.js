@@ -105,9 +105,60 @@
         return stills.concat(fleet);
     }
 
+    /* ---- The video ----------------------------------------------------------
+       AMV_DATA.video, when it is filled in, IS the stage: one clip from the
+       cabin, full bleed behind the headline, and the fleet rotation below
+       never runs. Empty — which is how it ships — and everything carries on
+       exactly as it did, so this is a swap the VA can make by adding a file
+       and one object to data.js.
+
+       Muted, looped, inline and autoplaying, which is the only combination a
+       browser will start without a click. `playsinline` is what stops iOS
+       taking the clip fullscreen the moment it plays.
+
+       ASKED FOR LESS MOTION, IT DOES NOT PLAY. The poster stands in, which is
+       why the note in data.js says the poster is not optional: without one,
+       reduced motion gets a black rectangle. A hero that ignores that setting
+       is worse than a hero with no video in it.
+
+       No `.hero__foot`: the plate names the AIRCRAFT IN THE PHOTOGRAPH off the
+       fleet, and a video has no slide for it to read. It collapses on its own
+       (`.hero__plate:empty`), and the dots are simply never built. */
+    const stage = root.querySelector('[data-hero-stage]');
+    const film = D.video;
+    if (stage && film && film.src) {
+        stage.classList.add('hero__stage--video');
+        const v = document.createElement('video');
+        v.className = 'hero__film';
+        v.muted = true;            // property, not attribute: Safari reads this
+        v.defaultMuted = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.setAttribute('playsinline', '');
+        v.setAttribute('aria-hidden', 'true');
+        v.setAttribute('preload', calm.matches ? 'none' : 'metadata');
+        if (film.poster) v.setAttribute('poster', film.poster);
+        if (film.w) v.setAttribute('width', film.w);
+        if (film.h) v.setAttribute('height', film.h);
+        v.src = film.src;
+        if (!calm.matches) {
+            v.autoplay = true;
+            // A rejected play() is not an error worth surfacing: some browsers
+            // refuse it on a metered connection or a data-saver setting, and
+            // the poster is a perfectly good hero.
+            const go = v.play();
+            if (go && go.catch) go.catch(() => {});
+        }
+        stage.appendChild(v);
+        // Nothing below this line applies: no slides, no plate, no dots, no
+        // rotation, no IntersectionObserver.
+        if (A && A.refresh) A.refresh(root);
+        return;
+    }
+
     const slides = buildSlides();
-    // No photographs at all: leave the navy wash, the buttons and the counted
-    // facts standing. There is no copy to fall back to and none is invented.
+    // No photographs at all: leave the page's paper, the headline and the
+    // buttons standing. There is no copy to fall back to and none is invented.
     if (!slides.length) return;
 
     /* ---- The stage ----------------------------------------------------------
@@ -118,7 +169,6 @@
 
        width/height are on every tag because these are hosted off-site — without
        them the stage has no intrinsic ratio while a photo is in flight. */
-    const stage = root.querySelector('[data-hero-stage]');
     const frames = slides.map((s, i) => {
         const fig = document.createElement('div');
         fig.className = 'hero__slide';

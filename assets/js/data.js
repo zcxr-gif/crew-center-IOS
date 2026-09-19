@@ -300,6 +300,40 @@ window.AMV_DATA = {
         },
     ],
 
+    /* ---- The hero: a video from the cabin ---------------------------------
+       THE HOME PAGE OPENS ON MOTION when this is filled in. Point `src` at a
+       clip and hero.js plays it full-bleed behind the headline instead of
+       rotating the fleet photographs — the photographs stay exactly where they
+       are and become the fallback, so an empty `src` here changes nothing.
+
+       It is EMPTY on purpose, and it is the VA's to fill. The clip wanted is
+       the view from the cabin at cruise, captured in Infinite Flight: the
+       airline's own footage of its own aeroplane, on the same terms as every
+       photograph in `fleet` below. A stock cabin clip off the internet is the
+       "invented artwork standing in for a real airline" the header of
+       brand.css exists to keep out, with a licensing problem on top.
+
+       To fill it:
+
+           video: {
+               src:    '/assets/video/cabin-cruise.mp4',   // H.264 MP4
+               poster: '/assets/video/cabin-cruise.jpg',   // first frame
+               w: 1920, h: 1080,
+               alt: 'The view from the cabin at cruise, over the Gulf.',
+           },
+
+       `poster` is not optional in practice: it is what shows while the video
+       loads, what stands in on a slow connection, and what a visitor who asked
+       for reduced motion sees instead of the clip, because hero.js does not
+       autoplay for them. Without it the hero is a black rectangle until the
+       first frame decodes.
+
+       Keep it short, silent and gentle — it loops, it is muted (a hero that
+       makes noise is a hero people leave), and it sits behind type. Twenty
+       seconds under about 4 MB is the budget; this is the largest thing on the
+       page and it downloads before anyone has decided to stay. */
+    video: null,
+
     /* ---- The hero stage: hub stills (optional) ----------------------------
        Photographs that lead the home page's rotation, ahead of the fleet.
        Meant for the airline's HUBS — Benito Juárez first, then the bases —

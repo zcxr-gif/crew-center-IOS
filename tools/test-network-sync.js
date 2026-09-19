@@ -167,11 +167,19 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.goto(`http://127.0.0.1:${port}/index.html`);
         await page.waitForTimeout(1600);
 
-        const lede = (await page.textContent('#networkLede')).trim();
-        check('the home page counts the crew centre’s sectors, not this repo’s',
-            /^3 published sectors from Mexico City/.test(lede), lede);
-        check('the shortest and longest are read off the list, not written down',
-            /245 nm to Guadalajara/.test(lede) && /5,010 nm to LEBL/.test(lede), lede);
+        // This used to read #networkLede, the route map's own sentence. The map
+        // came off the home page when it was cut back to glimpses; what states
+        // the network there now is a destination count, in two places — the
+        // hero's counted band and the network card — both marked
+        // [data-count-dest] and both rewritten from the same answer.
+        //
+        // LIVE_ROUTES is three sectors to three different airports, so a home
+        // page reading data.js instead would say 23 here.
+        const counts = await page.$$eval('[data-count-dest]', els => els.map(e => e.textContent.trim()));
+        check('the home page counts the crew centre’s destinations, not this repo’s',
+            counts.length >= 1 && counts.every(c => c === '3'), JSON.stringify(counts));
+        check('every figure on the page agrees with the others',
+            new Set(counts).size === 1, JSON.stringify(counts));
         check('no page errors', errors.filter(e => !/Failed to load/.test(e)).length === 0, errors.join(' | '));
         await page.close();
     }
@@ -182,9 +190,12 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.route('**/api/crew/**', r => r.abort());
         await page.goto(`http://127.0.0.1:${port}/index.html`);
         await page.waitForTimeout(1400);
-        const lede = (await page.textContent('#networkLede')).trim();
+        // With nothing to ask, the page keeps the figure it can derive from
+        // data.js rather than blanking — the same contract as every other
+        // counted figure on it.
+        const counts = await page.$$eval('[data-count-dest]', els => els.map(e => e.textContent.trim()));
         check('with the backend down the home page states this repo’s network',
-            /^23 published sectors from Mexico City/.test(lede), lede);
+            counts.length >= 1 && counts.every(c => c === '23'), JSON.stringify(counts));
         await page.close();
     }
 

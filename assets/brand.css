@@ -2403,7 +2403,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     position: relative; isolation: isolate;
     display: grid; align-content: start;
     row-gap: clamp(1.6rem, 3.6vw, 2.6rem);
-    padding-block: clamp(2.5rem, 6vw, 4rem) 0;
+    /* Air under the credit. With no bottom padding the aircraft's name ran
+       straight into the counted figures below it, which reads as one block
+       rather than as the end of the hero — and puts ink hard against the next
+       section's edge, where this site's seam rule wants paper. */
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 3.5vw, 2.5rem);
     /* The page's own paper, in whichever theme is on. The `background` and
        `color` this used to state in --am-navy and #FFF are gone; stating them
        is what made light mode dark. */
@@ -2500,6 +2504,25 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .hero__slide.is-on { opacity: 1; }
 .hero__slide img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 
+/* ---- The video ------------------------------------------------------------
+   When AMV_DATA.video is filled in, hero.js puts one clip here instead of the
+   fleet rotation and flags the stage. The band takes a video ratio rather than
+   the photographs' 1920x886: 16/9 on a phone, wider on a desktop, because a
+   cabin clip is AMBIENT — it is the view out of a window, not a portrait of an
+   aeroplane, so cropping it costs nothing. That is the one place this file
+   allows a crop, and it is allowed for that reason and no other.
+
+   Black underneath, not the page's paper: the first frame of a video arrives
+   after its poster, and a light gap between the two flashes. */
+.hero__stage--video { aspect-ratio: 16 / 9; background: #000; }
+@media (min-width: 48rem) { .hero__stage--video { aspect-ratio: 21 / 9; } }
+.hero__film {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: 50% 50%;
+    display: block;
+}
+
 /* ---- The credit -----------------------------------------------------------
    The aircraft naming itself, under its own photograph, with the dots that
    steer it. A caption row, set like a caption. */
@@ -2556,6 +2579,33 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .hero__plate { justify-items: center; }
     .hero__plate-name { justify-content: center; }
     .hero__dots { display: none; }
+}
+
+/* ---- The glimpse cards ----------------------------------------------------
+   Three links out of the home page, each carrying a counted figure. The whole
+   card is the anchor rather than a "read more" at the foot of it: a card that
+   goes somewhere should be the thing you press, and a 3px text link inside a
+   200px box is a target designed to be missed. */
+.glimpse { display: grid; align-content: start; gap: .2rem; color: inherit; }
+.glimpse:hover h3 { color: var(--accent); }
+.glimpse__count {
+    font-family: var(--font-mono); font-size: .78rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--faint);
+}
+.glimpse__count b {
+    font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+    letter-spacing: -.02em; color: var(--accent); margin-right: .15rem;
+}
+.glimpse h3 { margin: .45rem 0 0; transition: color .2s var(--ease); }
+.glimpse p { margin: .5rem 0 0; }
+.glimpse__go {
+    display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem;
+    font-size: .82rem; font-weight: 700; color: var(--accent);
+}
+.glimpse__go svg { width: .9rem; height: .9rem; transition: transform .25s var(--ease); }
+.glimpse:hover .glimpse__go svg { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+    .glimpse:hover .glimpse__go svg { transform: none; }
 }
 
 /* The band under the hero carries the counted figures and the flown strip. */
