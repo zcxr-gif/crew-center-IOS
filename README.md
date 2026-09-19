@@ -539,58 +539,52 @@ island's top edge, and it carries a hairline underneath: the flag's middle
 third is white, and without that line it disappears into a light island and the
 flag reads as two disconnected bars.
 
-**The hero is a photograph filling the screen, with the airline's own line over
-it.** Five heroes have now been thrown out of this repo, and the list is worth
-keeping because the instinct that produced each one comes back:
+**The hero says who the airline is, then shows you the aeroplane.** Six heroes
+have now been thrown out of this repo, and the list is worth keeping because
+the instinct that produced each one comes back:
 
 1. A two-column white header. Fine, and in the VA's words not memorable.
 2. A poster — the 787-9 drawn in its special livery, ringed by folk art — which
-   was memorable and was a *drawing*, sitting one click from photographs of the
-   same airframe.
+   was memorable and was a *drawing*, one click from photographs of the same
+   airframe.
 3. Those photographs with the usual furniture on top: eyebrow, 70px tagline, a
-   paragraph of positioning copy. Thrown out for covering up the subject, and
-   because unlike the rest of this site that copy was written once and would
-   have gone on being said.
-4. The photograph as a panel in the flow, the aircraft naming itself underneath
-   and no headline at all. Honest, quiet, and read by the VA as a card dropped
-   into the page rather than as a hero.
-5. This one.
+   paragraph of positioning copy. Thrown out for covering up the subject.
+4. The photograph as a panel in the flow with the aircraft naming itself
+   underneath and no headline at all. Read as a card dropped into the page.
+5. The photograph full-bleed and full-height with the headline over it. The
+   headline was right. Two things it cost were not.
 
-The objection that killed #3 is answered here rather than dodged: **nothing over
-this photograph is marketing copy.** `.hero__title` is the airline's own line,
-already on its lockup. `.hero__sub` is what it factually is — network, base,
-server. `.hero__values` is `AMV_DATA.values` read out, so the four commitments
-stated over the picture are the four `/about` sets out in full. `.hero__plate`,
-at the foot where a photo credit goes, is the aircraft on screen **naming
-itself** off `AMV_DATA.fleet` — type, registration, what the type is for, and a
-sector it flies.
+**The two things it cost were the same thing.** The hero was navy in *both*
+themes — pick light mode and the opening screen is still dark — and the
+photograph was cropped to its middle third on a phone, because `cover` on a
+full-bleed stage cannot do anything else with a 1920×886 frame in a portrait
+viewport. Both were the price of putting the words *on* the picture: type over
+a photograph needs one ground to be legible against whatever the theme is
+doing, and a full-height stage has to crop.
 
-The page is named by that `<h1>` now, visibly. It was `.sr-only` for as long as
-the hero had no headline to be.
+Taking the words off the picture refunds both. The hero takes the page's own
+paper and follows the theme like every other section, and the stage is a band
+at the photograph's **own** aspect ratio, so `cover` fits it exactly and
+nothing is cropped at any width. The no-crop rule is back where it belongs
+rather than exiled to `/fleet`.
 
-Three things about it are deliberate and easy to undo by accident:
+What made hero #5 honest is unchanged, and none of it is marketing copy:
+`.hero__title` is the airline's own line, `.hero__sub` is what it factually is,
+`.hero__values` is `AMV_DATA.values` read out, and the credit under the
+photograph is the aircraft **naming itself** off `AMV_DATA.fleet`.
 
-- **It is dark in both themes.** A photograph has no light mode, and white type
-  over one needs a single ground to be legible against. This is the only
-  section on the site that does not follow the page's paper. The scrim is what
-  makes that safe rather than a gamble on which photograph is loaded, and it is
-  its own element because the stage cross-fades and the scrim must not.
-- **Its buttons are scoped to `.hero--live`.** `.hero__cta` is not the hero's
-  alone — the closing CTA band on seven other pages reuses it, and `.band` is
-  *pale*. A white-on-navy pair applied to the bare class paints a white button
-  on a pale band.
-- **It closes on the tricolour, with a crisp edge.** Everywhere else a dark
-  ground ramps into a pale one; a dark ground that ends on a *device* keeps its
-  edge, because ramping puts a sliver of white above the device and reads as a
-  gap. That is the rule the CTA band was already exempted under, and
-  `tools/test-motion.js` enforces both halves of it.
+Two things are easy to undo by accident:
 
-**The crop is the price.** `cover` on a full-bleed stage cannot do anything else
-with a 1920x886 frame in a portrait viewport — at 390px wide it shows the middle
-third. The rule this repo held, that nothing is ever cropped, now lives on
-`/fleet`, where the same shots are published whole, and the plate names whichever
-one is on screen. Do not try to win the crop back with `contain`: it pillarboxes
-the airline's navy down both sides of a phone, which is how hero #1 looked.
+- **Nothing restates a colour.** Hero #5 had to override `.btn--primary`,
+  `.btn--ghost` and every text colour because it was navy in both themes and no
+  theme token was safe on it. On the page's paper those overrides would paint
+  white on white. The only colour rules left are the red/marigold swap for the
+  title's accent and the registration, which is the same dance the rest of the
+  file does.
+- **The island does not float over it any more.** The rule that pulled the hero
+  up by `--header-h` worked while the first thing in the hero was a
+  photograph; the hero leads with its headline now, so the same rule would
+  slide the `h1` under a floating bar.
 
 **The crest that flew into the nav is gone**, and that is the one real loss.
 The home page used to open on the airline's name set large and centred, which
@@ -603,8 +597,8 @@ came out and `--morph` went with it. The reasoning is in `hero.js` against
 Four more things about the stage are deliberate:
 
 - **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
-  failed image fetch or scripting off, and the hero is the airline's navy, the
-  headline, the sub-line and the two buttons — a working hero. A photo that
+  failed image fetch or scripting off, and the hero is the headline, the
+  sub-line and the two buttons on the page's own paper — a working hero. A photo that
   404s drops out of the rotation; the flight strip, which sits under the hero
   now rather than in it, stays `[hidden]` until real sectors arrive. There is
   no skeleton and no placeholder leg anywhere in it.
@@ -618,10 +612,10 @@ Four more things about the stage are deliberate:
   photographs fetched to show one is the whole of an opening screen's budget.
 - **The drift is gone.** It was written in `object-position`, which panned
   through the letterbox slack a *contained* image leaves, so it could never
-  reach the picture's edges. The stage covers now — there is no slack, so the
-  same animation would only move the image inside a box that exactly fits it,
-  which is a second crop on top of the one `cover` already makes. The
-  cross-fade between aircraft stays; it never cropped anything.
+  reach the picture's edges. The band is the photograph's own ratio now, so
+  there is no slack at all: the same animation could only move the image
+  inside a box that exactly fits it, which is a crop. The cross-fade between
+  aircraft stays; it never cropped anything.
 - **Hub photography slots in through `AMV_DATA.heroStills`.** Entries there
   lead the rotation, ahead of the fleet, and the plate renders an ICAO in the
   marigold slot where an airframe puts its tail number — so a hub still reads

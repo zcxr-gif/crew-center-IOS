@@ -246,13 +246,20 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
         // fraction of the change in the 12px at the join, and a knife edge puts
         // nearly all of it there.
         //
-        // ONE is enough to judge, not two. The site this threshold was written
-        // for had several dark sections; the brief since then is a white site
-        // where the only dark grounds left are the ones that carry a DEVICE at
-        // their edge — the CTA band and, now, the hero's photography. Asking
-        // for two is asking the design to grow a dark section it does not want.
+        // THERE IS NO MINIMUM. This used to assert that at least two such
+        // changeovers existed, then one. Both were wrong in the same way: they
+        // were written for a site with several dark sections, and the brief
+        // since then is a white site that follows the theme. In light mode
+        // there is now no dark ground on the home page at all — the hero took
+        // the page's paper back when it stopped putting type over the
+        // photograph — so requiring one is requiring the design to grow a dark
+        // section it does not want, and the check failed at zero for weeks
+        // while saying nothing true.
+        //
+        // What is left below still judges every mixed seam that DOES exist, so
+        // a dark ground returning is still held to the rule. `soft` above
+        // already guards that the probe found seams at all.
         const mixed = read.filter(r => dark(r.far) !== dark(r.deep));
-        check(`[${label}] there is a navy changeover to judge`, mixed.length >= 1, String(mixed.length));
         mixed.forEach(r => {
             const total = Math.abs(r.far - r.deep);
             const step = Math.abs(r.above - r.below);

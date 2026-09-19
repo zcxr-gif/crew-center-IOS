@@ -55,53 +55,39 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         THE FOURTH HERO, and the one the VA chose. It is the arrangement every
-         virtual airline they pointed at is built on — Air France-KLM, flynas,
-         Ryanair, Norwegian — because it is the one that works: a photograph
-         filling the screen, a scrim over it, and the airline saying who it is
-         in type you cannot miss.
+         THE SIXTH, and the one that stops fighting the two things that were
+         costing it. It keeps the big headline of the fifth and gives up the
+         thing that made that headline expensive: type laid over the picture.
 
-         What came before it, and why each went:
-           * a drawn poster of the 787-9, sitting one click from photographs of
-             the same airframe;
-           * the photographs with a marketing tagline laid over them, thrown out
-             for covering up the subject;
-           * the photograph as a panel in the flow with the aircraft naming
-             itself underneath — honest, quiet, and read by the VA as a card
-             dropped into the page rather than as a hero.
+         Two findings from the VA, and they turn out to be the same finding.
+         The hero was navy in BOTH themes, which is wrong on a light site — you
+         pick light mode and the first screen is still dark. And the photograph
+         was cropped to the middle third on a phone, because a full-bleed stage
+         in a portrait viewport cannot do anything else with a 1920x886 frame.
 
-         The objection that killed the second one is answered here rather than
-         avoided: nothing over this photograph is marketing copy. The headline
-         is the airline's own line, the sub-line is what it factually is, the
-         strip under the buttons is AMV_DATA.values read out, and the credit at
-         the foot is the aircraft on screen naming ITSELF off AMV_DATA.fleet.
-         Every word is either the airline's own or read from data.
+         Both were the price of putting the words on the picture. Take the
+         words off it and both are refunded: the hero takes the page's own
+         paper and follows the theme like every other section, and the stage
+         becomes a band at the photograph's OWN ratio, so nothing is cropped at
+         any width. This is the flynas arrangement out of the VA's own
+         references — the airline says who it is, then shows you the aeroplane.
 
-         ONE THING IS GIVEN UP, deliberately: the photograph is cropped now.
-         `cover` on a full-bleed stage cannot do anything else with a 1920x886
-         frame in a portrait viewport. The uncropped shots are the whole point
-         of /fleet and they are all still there, and the plate at the foot names
-         whichever one you are looking at. See LIVE HERO in brand.css.
+         Everything that made the fifth hero honest is unchanged. The headline
+         is the airline's own line; the sub-line is what it factually is; the
+         strip is AMV_DATA.values read out; the credit under the photograph is
+         the aircraft naming ITSELF off AMV_DATA.fleet. No marketing copy.
 
          Every layer is still optional: no photographs, a quiet backend or
-         scripting off, and this is the airline's navy, the headline and the two
-         buttons. Nothing here renders a placeholder. -->
+         scripting off, and this is the headline, the sub-line and the two
+         buttons on the page's paper. Nothing here renders a placeholder. -->
     <section class="hero hero--live" data-hero>
-        <!-- Empty in the markup on purpose: the slides are the fleet
-             photographs in data.js, so a type gained or lost changes the hero
-             with nothing typed in here. -->
-        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
-        <!-- The scrim is its own element rather than a gradient on the stage,
-             because the stage cross-fades and the scrim must not. -->
-        <div class="hero__scrim" aria-hidden="true"></div>
-
         <div class="wrap hero__content">
             <p class="hero__eyebrow">
                 <span class="flag" aria-hidden="true"></span> Bienvenido a bordo
             </p>
 
-            <!-- The page's real <h1>, visible at last. It was .sr-only for as
-                 long as the hero had no headline to be. -->
+            <!-- The page's real <h1>. It was .sr-only for as long as the hero
+                 had no headline to be. -->
             <h1 class="hero__title">Fly the <em>Eagle&nbsp;Warrior</em>.</h1>
             <span class="hero__rule" aria-hidden="true"></span>
 
@@ -111,8 +97,8 @@
             </p>
 
             <div class="hero__cta">
-                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
-                <a class="btn btn--onink" href="/network">Route map</a>
+                <a class="btn btn--primary" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--ghost" href="/network">Route map</a>
             </div>
 
             <!-- AMV_DATA.values, read out. Four things the airline holds itself
@@ -121,10 +107,15 @@
             <p class="hero__values" id="heroValues"></p>
         </div>
 
-        <!-- The foot of the frame: the aircraft naming itself, and the dots
-             that steer it. A photo credit, in the place a photo credit goes —
-             which is what this always was. The dots are real buttons: the only
-             way to change the aircraft from a keyboard. -->
+        <!-- Empty in the markup on purpose: the slides are the fleet
+             photographs in data.js, so a type gained or lost changes the hero
+             with nothing typed in here. Full-bleed, at the photograph's own
+             aspect ratio — WHOLE at every width, which is the point. -->
+        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+
+        <!-- The credit: the aircraft naming itself, and the dots that steer it.
+             Under the photograph, where a credit goes. The dots are real
+             buttons — the only way to change the aircraft from a keyboard. -->
         <div class="wrap hero__foot">
             <div class="hero__plate" data-hero-caption aria-live="polite"></div>
             <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
