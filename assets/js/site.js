@@ -51,13 +51,25 @@
     }
 
     // ---- Site map -----------------------------------------------------------
+    // Home is listed first and named, rather than being the brand lockup only:
+    // the review's finding was that there was no Home entry and no obvious way
+    // back to it, and a wordmark is a way back only to somebody who already
+    // knows that. /about and /staff are both here now too — the About us page
+    // was buried under "Airline" and the Staff page was reachable from the
+    // footer alone, which is the second half of the same finding.
+    //
+    // "Join" is "Apply", which is what the page actually is and what the review
+    // asked it be called. /join still resolves (see _redirects) so nothing
+    // already linked to it breaks.
     const LINKS = [
+        { href: '/',          label: 'Home' },
         { href: '/fleet',     label: 'Fleet' },
         { href: '/network',   label: 'Network' },
         { href: '/ranks',     label: 'Ranks' },
         { href: '/events',    label: 'Events' },
-        { href: '/about',     label: 'Airline' },
-        { href: '/join',      label: 'Join' },
+        { href: '/about',     label: 'About us' },
+        { href: '/staff',     label: 'Staff' },
+        { href: '/apply',     label: 'Apply' },
     ];
     // /crew is our own page, which frames the Inflight crew center in this
     // site's chrome. CREW_DIRECT is the same crew center without the frame —
@@ -65,10 +77,20 @@
     const CREW_URL = '/crew';
     const CREW_DIRECT = 'https://inflight.info/crew/aeromexico-virtual';
 
-    // Match "/fleet", "/fleet.html" and "/fleet/" to the same nav entry.
+    // Match "/fleet", "/fleet.html" and "/fleet/" to the same nav entry. The
+    // aliases in _redirects serve one page from several paths, so they collapse
+    // here too or the nav marks nothing as current when a visitor arrives on
+    // one of them.
+    // "/index" is the home page served by its own filename, which is how it is
+    // reached from a plain file server and from any link written to
+    // /index.html — without this the new Home entry is the one nav item that
+    // never marks itself current.
+    const ALIAS = { '/index': '/', '/join': '/apply', '/routes': '/network',
+                    '/airline': '/about', '/team': '/staff' };
     function normalize(path) {
         let p = (path || '/').replace(/\.html$/, '').replace(/\/+$/, '');
-        return p === '' ? '/' : p.toLowerCase();
+        p = p === '' ? '/' : p.toLowerCase();
+        return ALIAS[p] || p;
     }
     const HERE = normalize(location.pathname);
 
@@ -171,7 +193,7 @@
                             <ul>
                                 <li><a href="/ranks">Ranks &amp; progression</a></li>
                                 <li><a href="/events">Events</a></li>
-                                <li><a href="/join">Join the crew</a></li>
+                                <li><a href="/apply">Apply to fly</a></li>
                                 <li><a href="${CREW_DIRECT}/status">Application status</a></li>
                             </ul>
                         </div>
@@ -433,6 +455,85 @@
         return i < 0 ? null : ladder[i];
     }
 
+    /* Initials for a portrait plate. "_ServerNoob" is SN, not SE: an IFC handle
+       is usually camel-cased or underscore-separated, so its word starts and
+       its internal capitals are the initials a person would actually write.
+       Digits are not initials, so they are only ever picked up by the
+       first-two-characters fallback ("Randomaviator2" → RA). */
+    function monogram(name) {
+        const parts = String(name || '').split(/[^A-Za-z0-9]+/).filter(Boolean);
+        const caps = parts.length > 1
+            ? parts.slice(0, 2).map(w => w[0])
+            : (parts[0] || '').match(/[A-Z]/g) || [];
+        const from = caps.length >= 2 ? caps : (parts[0] || '').split('');
+        return from.slice(0, 2).join('').toUpperCase() || '—';
+    }
+
+    /* ---- Naming and timing a sector ---------------------------------------
+       The review found LIRF and KSFO on the map carrying nothing but their own
+       ICAO code, and no duration against either. Both are the same bug: the
+       network page takes a destination's city and its scheduled block time from
+       its record in data.js, and a sector opened in the crew centre has no
+       record in data.js to take them from.
+
+       These three fill the gap without inventing anything.
+
+       placeOf   — the airport's real city, from AMV_DATA.places. A code with no
+                   entry stays a code: a guessed place name is a wrong one.
+       distanceNm— the great-circle distance, from the two aerodrome reference
+                   points. This is arithmetic on published coordinates, not an
+                   estimate, so it is returned plain.
+       estBlock  — a block time worked out from that distance. This one IS an
+                   estimate and is never returned as though it were scheduled:
+                   it comes back flagged, and every caller prints it with a "≈"
+                   and says so in the tooltip. A route with a real block time in
+                   data.js keeps it; this only ever fills an empty field.
+
+       The estimate is 50 minutes plus distance ÷ 490 kt. It is not a guess at
+       what those numbers ought to be: it is the least-squares fit of the
+       twenty-three scheduled block times already in data.js against their own
+       distances, so it reproduces this airline's published schedule rather than
+       a generic one. It is within 10 minutes on every sector to 4,000 nm and
+       within 40 on the two 6,000-nm Pacific runs. Re-fit it if the schedule
+       changes shape. */
+    function placeOf(icao) {
+        const P = (window.AMV_DATA || {}).places || {};
+        return P[String(icao || '').toUpperCase()] || '';
+    }
+
+    function distanceNm(a, b) {
+        if (!a || !b) return 0;
+        const rad = Math.PI / 180, R = 3440.065;
+        const dLat = (b[0] - a[0]) * rad, dLon = (b[1] - a[1]) * rad;
+        const h = Math.sin(dLat / 2) ** 2
+                + Math.cos(a[0] * rad) * Math.cos(b[0] * rad) * Math.sin(dLon / 2) ** 2;
+        return Math.round(2 * R * Math.asin(Math.min(1, Math.sqrt(h))));
+    }
+
+    function estBlock(nm) {
+        const d = Number(nm) || 0;
+        if (d <= 0) return '';
+        const mins = Math.round(50 + (d / 490) * 60);
+        const h = Math.floor(mins / 60), m = mins % 60;
+        return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
+    }
+
+    /* Fill in what a sector is missing, and SAY which fields were filled.
+       Returns a new object — the caller's row is never mutated, because the
+       same row is handed to the map and to the list and a silent mutation in
+       one would surface in the other. `estimated` is true when the block time
+       on the way out is this file's arithmetic rather than a published
+       schedule; nothing prints it without that qualifier. */
+    function enrichRoute(r, coords) {
+        const pos = coords || (window.AMV_DATA || {}).airports || {};
+        const out = Object.assign({}, r);
+        if (!out.city) out.city = placeOf(out.to);
+        if (!out.fromCity) out.fromCity = placeOf(out.from);
+        if (!out.dist) out.dist = distanceNm(pos[out.from], pos[out.to]);
+        if (!out.block && out.dist) { out.block = estBlock(out.dist); out.estimated = true; }
+        return out;
+    }
+
     // ---- Boot ---------------------------------------------------------------
     // refresh() is the same pass boot() runs, minus the chrome. Page scripts that
     // inject markup call AMV.refresh() afterwards so their [data-reveal] /
@@ -462,5 +563,6 @@
 
     // Exported for live.js and page-level scripts.
     window.AMV = { MARK, icon, refresh, fleetMedia, blockHours, earnedRanks, minRankFor,
+                   monogram, placeOf, distanceNm, estBlock, enrichRoute,
                    CREW_URL, CREW_DIRECT, THEME_KEY, currentTheme };
 })();

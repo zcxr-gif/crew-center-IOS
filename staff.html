@@ -48,7 +48,7 @@
 <noscript>
     <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
     <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
-    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="/about">About us</a> · <a href="/staff">Staff</a> · <a href="/apply">Apply</a> ·
     <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
 </noscript>
 
@@ -132,7 +132,7 @@
             <h2>Some of these seats are empty.</h2>
             <p>If you want one of them, fly with us first — every director we appoint is a line pilot who was already doing the work.</p>
             <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/about">About the airline</a>
             </div>
         </div>
@@ -151,29 +151,62 @@
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     const IFC = 'https://community.infiniteflight.com/u/';
+    const profile = ifc => `${IFC}${encodeURIComponent(ifc)}/summary`;
+
+    const monogram = A.monogram;
 
     // A role with nobody in it says so. Filling the grid with invented names
     // would be the same mistake the fabricated roster figures were, and a
     // vacancy is genuinely useful to a reader — it is a job going.
+    //
+    // THE PORTRAIT. The mobile review reported the staff images as blank, and
+    // they were: a grey disc with two letters in it, which reads as a picture
+    // that failed to load rather than as a choice. It is now the airline's own
+    // crest behind the monogram, on the livery — so a card with nobody's
+    // photograph in it still looks finished, and a vacancy is visibly a
+    // different thing from a broken image.
+    //
+    // No IFC avatar is fetched. Discourse serves those from a per-upload URL
+    // this repo has no way to know, and guessing one gives every card a 404 —
+    // which is the reported bug again, with a network request attached.
     function card(s, cls) {
-        const initials = s.name
-            ? s.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase()
-            : '—';
+        const initials = s.name ? monogram(s.name) : '';
         const who = s.name
             ? (s.ifc
-                ? `<a href="${IFC}${encodeURIComponent(s.ifc)}/summary" rel="noopener"
-                     target="_blank">${esc(s.name)}</a>`
+                ? `<a href="${profile(s.ifc)}" rel="noopener" target="_blank">${esc(s.name)}</a>`
                 : esc(s.name))
             : `<span class="staff__vacant">${s.team ? 'Recruiting' : 'Vacant'}</span>`;
+        const av = s.name
+            ? `<span class="staff__av" aria-hidden="true">
+                   <span class="staff__av-crest">${A.MARK}</span>
+                   <b>${esc(initials)}</b>
+               </span>`
+            : `<span class="staff__av staff__av--vacant" aria-hidden="true">
+                   <span class="staff__av-crest">${A.MARK}</span>
+               </span>`;
+        // Every named staff member gets a button to their IFC profile, which is
+        // the review's other staff finding. The name itself is still a link —
+        // this is the same destination said plainly, for anyone who did not
+        // read an underlined name as "there is a profile behind this".
+        const contact = s.name && s.ifc
+            ? `<a class="btn btn--ghost btn--sm staff__ifc" href="${profile(s.ifc)}"
+                  rel="noopener" target="_blank">
+                   ${A.icon('external')} IFC profile
+                   <span class="sr-only"> for ${esc(s.name)}</span>
+               </a>`
+            : '';
         return `
         <article class="staff ${cls || ''}" data-reveal>
             <span class="staff__role">${esc(s.short)}</span>
             <div class="staff__id">
-                <span class="staff__av${s.name ? '' : ' staff__av--vacant'}" aria-hidden="true">${esc(initials)}</span>
+                ${av}
                 <span class="staff__name">${who}</span>
             </div>
             <p class="staff__owns">${esc(s.owns)}</p>
-            <span class="staff__reports">${s.reports ? 'Reports to ' + esc(s.reports) : esc(s.role)}</span>
+            <div class="staff__foot">
+                <span class="staff__reports">${s.reports ? 'Reports to ' + esc(s.reports) : esc(s.role)}</span>
+                ${contact}
+            </div>
         </article>`;
     }
 

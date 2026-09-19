@@ -96,6 +96,13 @@
         const hubs = (opts && opts.hubs) || D.hubs || [];
         if (!host || !world) return 0;
 
+        const A = window.AMV || {};
+        // The fleet's own short code is what a route carries ('789'); the
+        // tooltip should say what a person would recognise.
+        const typeBy = {};
+        (D.fleet || []).forEach(a => { if (a.short) typeBy[a.short] = a.type; });
+        const acName = c => typeBy[c] || (c || '');
+
         const W = world.w, H = world.h;
         const plotted = routes.filter(r => pos[r.from] && pos[r.to]);
 
@@ -233,10 +240,42 @@
             const cx = px.toFixed(1), cy = py.toFixed(1);
             const isHub = hubSet.has(icao);
             const hub = hubs.find(h => h.icao === icao);
-            const label = (isHub ? (hub ? hub.city : icao) : (r ? r.city : icao)) || icao;
+            // The city, in order of how much we trust it: the base's own name,
+            // the sector's, then the ICAO→city table for a destination the crew
+            // centre opened and data.js has never seen. That last one is the
+            // review's LIRF and KSFO — they had no route record here, so they
+            // fell through to their own code and the map labelled them with it.
+            // (named `cityName`, not `place` — `place()` above is the label
+            // placer, and shadowing it here turned every label into a crash.)
+            const cityName = (isHub && hub && hub.city) || (r && r.city)
+                || (A.placeOf ? A.placeOf(icao) : '') || '';
+            const label = cityName || icao;
+            // "Rome (LIRF)", never "LIRF (LIRF)": a code repeated after itself
+            // reads as a bug, which is how it read to the reviewer.
+            const named = cityName ? `${cityName} (${icao})` : icao;
+
+            // Every route gets its duration and its aircraft, which is the rest
+            // of that finding. A sector with no scheduled block time in data.js
+            // is given the distance-derived one and MARKED as derived — "≈ 2h
+            // 30m (estimated)" is useful; the same figure stated flat would be
+            // the site making something up.
+            const bits = [];
+            if (!isHub && r) {
+                const type = acName(r.ac);
+                if (type) bits.push(type);
+                // `estimated` is set by AMV.enrichRoute when the block time
+                // it filled in was worked out from the distance. The caller
+                // may already have enriched the row, so the flag is checked
+                // before the fallback rather than only in it — otherwise a
+                // derived figure arrives here indistinguishable from a
+                // scheduled one, which is the whole thing this avoids.
+                if (r.block) bits.push(r.estimated ? `≈ ${r.block} (estimated)` : r.block);
+                else if (r.dist && A.estBlock) bits.push(`≈ ${A.estBlock(r.dist)} (estimated)`);
+                if (r.dist) bits.push(`${r.dist.toLocaleString()} nm`);
+            }
             const title = isHub
-                ? `${label} (${icao}) — ${hub ? hub.role.toLowerCase() : 'base'}`
-                : `${label} (${icao})${r && r.block ? ' · ' + r.block : ''}`;
+                ? `${named} — ${hub ? hub.role.toLowerCase() : 'base'}`
+                : [named, ...bits].join(' · ');
             const show = isHub || (!smallMap && flagship.has(icao));
             const spot = show ? place(px, py, label, (px - box[0]) / box[2] > 0.78, isHub) : null;
             return `<g class="map__pt${isHub ? ' is-hub' : ''}${show ? ' is-named' : ''}"

@@ -48,7 +48,7 @@
 <noscript>
     <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
     <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
-    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="/about">About us</a> · <a href="/staff">Staff</a> · <a href="/apply">Apply</a> ·
     <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
 </noscript>
 
@@ -94,11 +94,17 @@
                         takes about three minutes. I read them.
                     </p>
                     <div class="quote__by">
-                        <span class="staff__av" aria-hidden="true" id="ceoInitials">RA</span>
+                        <span class="staff__av" aria-hidden="true" id="ceoAvatar"><b id="ceoInitials">SN</b></span>
                         <span>
-                            <b id="ceoName">Randomaviator2</b>
+                            <b id="ceoName">_ServerNoob</b>
                             <span>Chief Executive Officer, Aeromexico Virtual</span>
                         </span>
+                        <!-- The review asked for a way through to the CEO's IFC
+                             profile from here. Hidden until the script finds one
+                             on the staff record, so it can never be a dead link
+                             to a name that has changed. -->
+                        <a class="btn btn--ghost btn--sm quote__ifc" id="ceoIfc" hidden
+                           rel="noopener" target="_blank" href="#"></a>
                     </div>
                 </div>
                 <div data-reveal data-reveal-delay="80">
@@ -268,7 +274,7 @@
             <h2>Regulated, and glad to be.</h2>
             <p>Aeromexico Virtual operates in compliance with the IFVARB. Where anything in our plan conflicts with a Board requirement, the Board's requirement wins and our plan is amended to match.</p>
             <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/ranks">See the rank ladder</a>
             </div>
         </div>
@@ -292,8 +298,18 @@
     const ceo = D.staff.find(s => s.short === 'CEO');
     if (ceo && ceo.name) {
         document.getElementById('ceoName').textContent = ceo.name;
-        document.getElementById('ceoInitials').textContent =
-            ceo.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase();
+        document.getElementById('ceoInitials').textContent = A.monogram(ceo.name);
+        // The same crest plate the staff cards carry, rather than a grey disc.
+        const av = document.getElementById('ceoAvatar');
+        if (av) av.insertAdjacentHTML('afterbegin',
+            `<span class="staff__av-crest">${A.MARK}</span>`);
+        const link = document.getElementById('ceoIfc');
+        if (link && ceo.ifc) {
+            link.href = 'https://community.infiniteflight.com/u/'
+                + encodeURIComponent(ceo.ifc) + '/summary';
+            link.innerHTML = `${A.icon('external')} ${esc(ceo.name)} on the IFC`;
+            link.hidden = false;
+        }
     }
 
     const a = D.airline, hubs = D.hubs;

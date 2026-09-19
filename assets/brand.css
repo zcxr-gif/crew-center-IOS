@@ -210,7 +210,12 @@
        under it. Named because crew.html sizes the framed crew centre against
        them — a viewport-height stage has to subtract the whole header, not
        just the bar, or the page gains five pixels of scroll it never uses. */
-    --flagline-h: 5px;
+    /* Eight, not five. The review read the five-pixel line as a loading bar,
+       which is exactly what a thin coloured strip pinned to the top of a page
+       looks like while anything on the page is still moving. At eight it reads
+       as the flag it is. crew.html sizes the framed crew centre off
+       --header-h, so it follows this on its own. */
+    --flagline-h: 8px;
     --nav-h:      4.5rem;
     --header-h:   calc(var(--flagline-h) + var(--nav-h));
 
@@ -1033,7 +1038,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     font-size: .6rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .22em; color: var(--muted);
 }
-.nav__links { display: none; align-items: center; gap: 1.9rem; }
+/* The site map gained Home, About us and Staff in the round-2 review, so there
+   are eight entries here where there were six. At a fixed 1.9rem gap that
+   overran the bar between 992px (where the desktop nav appears) and about
+   1150px, pushing the Crew Center button off the end. The gap now scales with
+   the viewport and only reaches its old value on a wide screen. */
+.nav__links { display: none; align-items: center; gap: clamp(1rem, 1.7vw, 1.9rem); }
 .nav__links a {
     font-size: .95rem; font-weight: 600; color: var(--muted);
     transition: color .2s var(--ease); position: relative; padding-block: .35rem;
@@ -1888,6 +1898,63 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .route-card__meta .rank-chip { margin-left: auto; }
 
+/* ---- Flagship destinations -----------------------------------------------
+   Six cards above the full sector list. The mobile review's finding was that
+   landing on twenty-three routes is not an invitation, and it is right — but
+   the answer is to LEAD with a few, not to hide the rest. The list is still
+   directly below, filtered and searchable. */
+.highlight { display: grid; align-content: start; gap: .2rem; }
+.highlight__region {
+    font-size: .7rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+}
+.highlight__city {
+    margin: .5rem 0 0; font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    letter-spacing: -.02em; line-height: 1.15;
+}
+.highlight__pair {
+    margin: .35rem 0 0; font-size: .92rem; font-weight: 700; color: var(--muted);
+    letter-spacing: .04em;
+}
+.highlight__pair i { font-style: normal; color: var(--am-red); padding-inline: .25rem; }
+
+/* ---- The bases -----------------------------------------------------------
+   Two reviewers said these cards looked plain. They now open on a plate — a
+   photograph when the VA has one of its own in data.js, otherwise the crest on
+   the livery with the IATA code set into it — and carry the aerodrome's own
+   runway count, elevation and terminals under the sector count. */
+.hub-card { display: grid; align-content: start; }
+.hub-card__plate {
+    position: relative; aspect-ratio: 16 / 9; margin: -.4rem 0 1rem;
+    border-radius: calc(var(--radius) - .35rem); overflow: hidden;
+    background: linear-gradient(145deg, var(--am-blue-600) 0%, var(--am-navy) 68%);
+    display: grid; place-items: center;
+}
+/* The serape weave, at the foot of the plate: the same three stops as the
+   flagline, so the base card is tied to the airline's own flag rather than to
+   a stock gradient. */
+.hub-card__plate::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+}
+.hub-card__crest {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    color: #FFF; opacity: .26;
+}
+.hub-card__crest .mark { width: 46%; }
+.hub-card__iata {
+    position: relative; z-index: 1; color: #FFF;
+    font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 700; letter-spacing: .12em;
+    text-shadow: 0 2px 12px rgba(7, 20, 38, .55);
+}
+.hub-card__plate.has-photo { background: var(--surface-2); }
+.hub-card__plate img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hub-card__note {
+    margin: .6rem 0 0; font-size: .88rem; line-height: 1.55;
+    color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
 /* ============================ RANK LADDER ================================
    The ranks page. The old ladder was seven rows of name-and-hours, which is
    what the review called "numerical rather than developmental" — it said what
@@ -1905,6 +1972,10 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .ladder__row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
 }
 .ladder__lead { display: grid; gap: .35rem; align-content: start; }
+.ladder__insignia-note {
+    font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--faint); font-weight: 700;
+}
 .ladder__name {
     font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
     font-size: clamp(1.15rem, 2.2vw, 1.4rem); line-height: 1.15;
@@ -1912,8 +1983,40 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .ladder__hours {
     font-family: var(--font-mono); font-size: .95rem; font-weight: 600; color: var(--accent);
 }
-.ladder__body { display: grid; gap: .8rem; }
+.ladder__body { display: grid; gap: .9rem; }
 .ladder__body p { margin: 0; color: var(--muted); }
+/* "The font size is a bit small, making it a bit hard to read." It was .92rem
+   for the duty line and body size for the note, on a page whose whole job is
+   to be read carefully. The lead line is now set at reading size in the ink,
+   and the duty line stays quiet but no longer shrinks. */
+.ladder__note { font-size: 1.06rem; line-height: 1.6; color: var(--ink) !important; }
+.ladder__duty { font-size: .98rem; line-height: 1.6; }
+
+/* ---- What a rank gets you ------------------------------------------------
+   The review asked for privileges against each rank, and a list of them under
+   the rank's own description is where a pilot looks for them. Ruled rather
+   than boxed, like everything else here that is information. */
+.ladder__perks { display: grid; gap: .5rem; }
+.ladder__perks h3 {
+    margin: 0; font-family: var(--font-text);
+    font-size: .72rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+}
+.ladder__perks ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.ladder__perks li {
+    position: relative; padding: .5rem 0 .5rem 1.5rem;
+    font-size: .98rem; line-height: 1.55; color: var(--muted);
+    border-top: 1px solid var(--line-soft);
+}
+.ladder__perks li:first-child { border-top: 0; }
+/* The tick is the airline's, not a bullet: this is a list of things you HAVE
+   at this rank, which is what a check mark says and a disc does not. */
+.ladder__perks li::before {
+    content: ""; position: absolute; left: 0; top: .82em;
+    width: .7rem; height: .38rem; border: 2px solid var(--accent);
+    border-top: 0; border-right: 0; transform: rotate(-45deg);
+}
+.ladder__perks li b { color: var(--ink); font-weight: 700; }
 .ladder__facts {
     display: flex; flex-wrap: wrap; gap: .5rem 1.6rem;
     padding-top: .3rem;
@@ -1930,6 +2033,49 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* The bars are a rank insignia, not a chart: one more bar per rung. */
 .ladder__bars { display: flex; gap: 3px; align-items: flex-end; height: 1.1rem; }
 .ladder__bars i { width: 4px; border-radius: 2px; background: var(--accent); display: block; }
+
+/* ---- Rank insignia --------------------------------------------------------
+   The epaulette, drawn rather than fetched. A navy board with one to four gold
+   bars across it — the flight deck's own grammar, which a pilot reads without
+   being told what it means, and which the ascending bar chart that used to sit
+   here did not. The two senior grades add the wing; the appointed rank wears
+   the crest in place of bars, because it is not a step on the same ladder.
+
+   Kept at a size that works beside the rank name at every width: the board is
+   sized in ems off the row, so it scales with the type rather than against it. */
+.insignia {
+    display: flex; flex-direction: column; justify-content: center; gap: .26em;
+    width: 3.4rem; height: 2.2rem; padding: .3em .42em; border-radius: .28rem;
+    background: linear-gradient(160deg, var(--am-navy), var(--am-blue-600));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+                0 1px 3px rgba(15, 27, 46, .3);
+    position: relative; overflow: hidden;
+}
+.insignia i {
+    display: block; height: .2rem; border-radius: 1px;
+    background: linear-gradient(90deg,
+        var(--am-marigold), color-mix(in srgb, var(--am-marigold) 62%, #FFF), var(--am-marigold));
+}
+/* The wing: a single gold chevron across the top corner of the board, which is
+   how the senior grades are marked without adding a fifth bar that would read
+   as a rank that does not exist. */
+.insignia--wing::after {
+    content: ""; position: absolute; top: -.42rem; right: -.62rem;
+    width: 1.5rem; height: 1.5rem; transform: rotate(45deg);
+    background: color-mix(in srgb, var(--am-marigold) 88%, transparent);
+}
+.insignia--crest {
+    display: grid; place-items: center; padding: .24rem;
+    background: linear-gradient(160deg, var(--am-red), var(--am-navy));
+}
+/* `.mark` is a masked box that takes its size from a width and its colour from
+   currentColor, so a height here would fight its own aspect-ratio. */
+.insignia--crest { color: #FFF; }
+.insignia--crest .mark { width: 1.6rem; }
+@media (prefers-reduced-motion: no-preference) {
+    .insignia { transition: transform .3s var(--ease); }
+    .ladder__row:hover .insignia { transform: translateY(-2px) rotate(-2deg); }
+}
 
 /* ============================ STAFF ======================================
    Four reviewers asked for this page. A role with nobody in it says so — the
@@ -1960,14 +2106,60 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     color: var(--accent);
 }
 .staff__id { display: flex; align-items: center; gap: .9rem; }
+
+/* THE PORTRAIT PLATE. The mobile review reported the staff images as blank,
+   and the grey disc with two letters in it deserved that: it reads as a
+   photograph that failed to load. It is now the airline's own crest on the
+   livery, with the monogram set over it — a designed plate rather than an
+   empty slot, so a card with no photograph still looks finished. When the VA
+   has real portraits, an <img> dropped inside this same box replaces the
+   crest with no other change.
+
+   The IFC avatar is deliberately NOT fetched: Discourse serves those from a
+   per-upload URL this repo cannot know, so guessing one would give every card
+   a 404 — the reported bug again, with a network request attached. */
 .staff__av {
     width: 3rem; height: 3rem; border-radius: 50%; flex: none;
-    display: grid; place-items: center;
-    background: var(--surface-2); color: var(--accent);
-    font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
-    border: 1px solid var(--line);
+    display: grid; place-items: center; position: relative; overflow: hidden;
+    background: linear-gradient(150deg, var(--am-blue-600), var(--am-navy));
+    color: #FFF;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--am-navy) 40%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2);
 }
-.staff__av--vacant { color: var(--faint); }
+.staff__av > b { position: relative; z-index: 1; letter-spacing: .02em; }
+.staff__av img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 2;
+}
+/* The crest sits behind the monogram at low contrast — present enough to be
+   the airline's plate, quiet enough that two letters still read over it. */
+.staff__av-crest {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    opacity: .3; color: #FFF;
+}
+.staff__av-crest .mark { width: 78%; }
+/* A vacancy is a DIFFERENT thing from a missing picture, and has to look it:
+   no monogram, the crest alone, and the livery drained out of the plate. */
+.staff__av--vacant {
+    background: var(--surface-2); border-color: var(--line); color: var(--faint);
+    box-shadow: none;
+}
+.staff__av--vacant .staff__av-crest { opacity: .38; color: var(--faint); }
+
+/* The foot of the card: who the role answers to on the left, the way through
+   to their IFC profile on the right. The review asked for a profile button on
+   every staff member, and a name with an underline was not reading as one. */
+.staff__foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: .8rem; flex-wrap: wrap; margin-top: .3rem; padding-top: .9rem;
+    border-top: 1px solid var(--line-soft);
+}
+.staff__ifc { flex: none; }
+.staff__ifc svg { width: .85rem; height: .85rem; }
+/* The signature block on /about and / carries the same button. */
+.quote__ifc { margin-top: 1rem; }
+.quote__ifc svg { width: .85rem; height: .85rem; }
 .staff__name {
     font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
     font-size: 1.22rem; line-height: 1.2;
@@ -2013,9 +2205,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     max-width: 46ch; margin: 0; color: var(--ink);
 }
 .quote p + p { font-size: clamp(1.02rem, 1.6vw, 1.14rem); font-family: var(--font-body); color: var(--muted); }
-.quote__by { display: flex; align-items: center; gap: .9rem; }
+/* Wraps because the signature gained an IFC profile button beside the name in
+   the round-2 review, and three items on one line do not fit a narrow column. */
+.quote__by { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
 .quote__by b { font-family: var(--font-display); font-weight: 800; }
 .quote__by span { font-size: .82rem; color: var(--muted); display: block; font-weight: 500; font-family: var(--font-body); }
+/* The signature's avatar is a <span> too, so the rule above was recolouring
+   the portrait plate and its crest to the muted grey and shrinking the
+   monogram to caption size — which is what made the initials invisible on the
+   navy plate. Restated at matching specificity rather than by reordering, so
+   an edit to either rule cannot quietly bring it back. */
+.quote__by span.staff__av {
+    display: grid; color: #FFF;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+}
+.quote__by span.staff__av-crest { display: grid; color: #FFF; }
 
 /* ============================ FACT ROWS ==================================
    A definition list set as ruled rows. Used for the identity table on /about
@@ -2339,6 +2543,30 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
    for; in here the row-gap above is already doing that job. */
 .hero--live .hero__facts--band { margin-top: .4rem; }
 
+/* ---- The welcome ---------------------------------------------------------
+   Added in the round-2 review, and it goes ABOVE the aircraft plate. Three
+   reviewers arrived at the same finding from different directions: the page
+   opened on a fleet card, the first thing read was an aircraft type ("777-200
+   confuses me"), and nothing on the opening screen said what this is. The
+   hero's case for having no headline was sound right up until somebody looked
+   at it who did not already know the airline.
+
+   It is set as reading copy, not as a slogan laid over a photograph — the
+   thing the original hero was written to avoid. The aeroplane still names
+   itself directly underneath. */
+.hero__welcome { display: grid; gap: .7rem; justify-items: center; max-width: 60ch; margin-inline: auto; }
+.hero__welcome-head {
+    margin: 0; font-size: clamp(1.45rem, 3.4vw, 2.3rem);
+    line-height: 1.15; letter-spacing: -.02em; text-wrap: balance;
+}
+.hero__welcome-copy {
+    margin: 0; color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.08rem);
+    line-height: 1.65; max-width: 58ch; text-wrap: pretty;
+}
+/* A rule between the welcome and the aeroplane, so the two read as two things
+   rather than as one long column of centred text. */
+.hero__welcome + .hero__plate { padding-top: clamp(1rem, 2.4vw, 1.6rem); border-top: 1px solid var(--line); }
+
 /* ---- The plate -----------------------------------------------------------
    What the headline used to be, and set as display type because it IS the
    headline now. The difference is that every word of it is read off the fleet
@@ -2477,14 +2705,16 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     display: grid; gap: .18rem;
     padding-top: .7rem; border-top: 1px solid var(--line);
 }
-.hero__leg-route { font-size: .95rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+.hero__leg-route { font-size: 1rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
 .hero__leg-route i { font-style: normal; color: var(--am-red); padding-inline: .1rem; }
-.hero__leg-who { font-size: .85rem; color: var(--muted); }
-.hero__leg-meta {
-    display: flex; flex-wrap: wrap; gap: .2rem .7rem;
-    font-size: .74rem; color: var(--faint);
-}
-.hero__leg-meta b { color: var(--muted); font-weight: 700; }
+/* "Flown by _ServerNoob", which is the whole of the review's note about this
+   strip. The four columns of 11px grey that used to sit under each sector —
+   flight number, type, block time, how long ago — are gone: a reader skipping
+   between them could not see what they came for, and every one of them is a
+   click away in the crew centre. */
+.hero__leg-who { font-size: .88rem; color: var(--muted); }
+.hero__leg-who b { color: var(--ink); font-weight: 700; }
+.hero__leg-meta { font-size: .74rem; color: var(--faint); }
 /* One leg on a phone, two on a large one, three from tablet up. The strip is
    context, not a list to read — three sectors stacked on a 375px screen would
    push the counted facts off the opening screen entirely. */

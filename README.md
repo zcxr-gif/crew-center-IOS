@@ -9,12 +9,13 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 ```
 index.html         Home — hero, live figures, why, the route map, next event
 fleet.html         The six operated types, what each one flies, and what is planned
-network.html       The route map, then every published sector grouped by tier
-ranks.html         The ladder: hours, aircraft released, sector limits
+network.html       The route map, the flagship destinations, then every published sector
+ranks.html         The ladder: insignia, hours, aircraft released, sector limits, privileges
 events.html        The calendar, the programme, and what has been flown
 about.html         Mission, the CEO's message, standards, the first twelve months
 staff.html         Who runs the airline, and what each of them owns
-join.html          Requirements, the real application form (framed), and life after joining
+apply.html         Requirements, the real application form (framed), and life after joining
+                   (served at /apply; /join is kept as a permanent alias)
 crew.html          The Crew Center, framed in our own chrome
 
 brand.json         ← the brand contract. See "One brand, two products" below.

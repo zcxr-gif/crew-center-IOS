@@ -254,26 +254,25 @@
             .format(new Date(t));
     }
 
-    // The aircraft as the sim names it is long ("Boeing 787-9 Dreamliner");
-    // the fleet's own short code is what a crew room would say.
-    const SHORT = {};
-    (D.fleet || []).forEach(a => { if (a.type && a.short) SHORT[a.type] = a.short; });
-    const acShort = name => SHORT[name] || String(name || '').replace(/\s*Dreamliner$/i, '');
+    /* THE SHORT FORM. This used to print the flight number, the type, the
+       block time and how long ago it landed, in four columns of 11px grey,
+       beside an aircraft plate doing the same job. The review's note was that
+       it should "simply say Flown by _ServerNoob below the flight information",
+       and the VA's own reading was sharper: a reader skipping between a flight
+       number, a type code and a duration cannot see what they came for.
 
+       So it is the sector, and who flew it. The one piece of context kept is
+       when — "3h ago" is what makes this the airline running TODAY rather than
+       a list of routes, which is the only reason the strip exists. Everything
+       else is a click away in the crew centre, where it belongs. */
     function card(f) {
-        const id = f.flight || f.callsign;
-        const dur = f.min >= 60 ? `${Math.floor(f.min / 60)}h ${String(f.min % 60).padStart(2, '0')}m`
-                  : f.min > 0   ? `${f.min}m` : '';
+        const who = f.pilot || f.flight || f.callsign || 'a crew pilot';
+        const ago = when(f.at);
         return `
             <li class="hero__leg">
                 <span class="hero__leg-route mono">${esc(f.from)} <i>→</i> ${esc(f.to)}</span>
-                <span class="hero__leg-who">${esc(f.pilot || id || 'A crew pilot')}</span>
-                <span class="hero__leg-meta">
-                    ${id ? `<b class="mono">${esc(id)}</b>` : ''}
-                    ${f.ac ? `<span>${esc(acShort(f.ac))}</span>` : ''}
-                    ${dur ? `<span>${esc(dur)}</span>` : ''}
-                    ${when(f.at) ? `<span>${esc(when(f.at))}</span>` : ''}
-                </span>
+                <span class="hero__leg-who">Flown by <b>${esc(who)}</b></span>
+                ${ago ? `<span class="hero__leg-meta">${esc(ago)}</span>` : ''}
             </li>`;
     }
 

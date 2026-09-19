@@ -5,8 +5,10 @@
 /network    /network.html   200
 /routes     /network.html   200
 /events     /events.html    200
-/join       /join.html      200
-/apply      /join.html      200
+/apply      /apply.html     200
+# /join was renamed to /apply in the round-2 review. Kept as a permanent
+# alias so every link already published to it still lands.
+/join       /apply.html     200
 /crew       /crew.html      200
 /ranks      /ranks.html     200
 /about      /about.html     200
