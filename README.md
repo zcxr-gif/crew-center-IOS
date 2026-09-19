@@ -509,6 +509,36 @@ of approved sectors sampled at random off the crew centre's public flight log
 (`AMV_CREW.pireps()`): real pilots, real routes, filed by flying them. Then the
 airline in four counted figures.
 
+**The header is an island.** A rounded bar floating with air on all four sides
+rather than a full-width strip ruled off from the page, and on the home page it
+floats *over* the hero's photograph.
+
+Three things about it are load-bearing:
+
+- **The host is what is pinned, not `.nav`.** A sticky element can only travel
+  inside its own parent's border box, and the host is exactly as tall as the
+  bar plus its gap — sticky on `.nav` has nowhere to go and the header scrolls
+  away with the page. The host also supplies the gap, as *padding*, so the
+  bar's own box is exactly the island and `overflow: hidden` clips the
+  tricolour and the open mobile menu to its corner radius. The menu expanding
+  the island into a rounded panel is that clip, not a separate treatment.
+- **`--header-h` is the bar plus the gap twice**, because the tricolour lives
+  inside the bar now and no longer adds height. `scroll-padding-top`, the
+  mobile menu's `max-height` and the hero's `min-height` all read it.
+- **The hero floats under it** via `main > .hero--live:first-child`, which pulls
+  the hero up by `--header-h` and gives it back as padding — nothing inside the
+  hero moves, only the picture grows upward. Scoped to a `.hero--live` that is
+  the *first* thing in `main`, so every other page keeps the island on its own
+  ground with a white edge to float against.
+
+What went when the island came in: the scrim under the bar (an island has
+nothing to dissolve into), the full-width navy-to-red edge beneath it (a ruled
+line across the page is the opposite of floating), and the flagline as a
+separate strip above it. The tricolour is drawn along the *inside* of the
+island's top edge, and it carries a hairline underneath: the flag's middle
+third is white, and without that line it disappears into a light island and the
+flag reads as two disconnected bars.
+
 **The hero is a photograph filling the screen, with the airline's own line over
 it.** Five heroes have now been thrown out of this repo, and the list is worth
 keeping because the instinct that produced each one comes back:

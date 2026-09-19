@@ -210,14 +210,19 @@
        under it. Named because crew.html sizes the framed crew centre against
        them — a viewport-height stage has to subtract the whole header, not
        just the bar, or the page gains five pixels of scroll it never uses. */
-    /* Eight, not five. The review read the five-pixel line as a loading bar,
-       which is exactly what a thin coloured strip pinned to the top of a page
-       looks like while anything on the page is still moving. At eight it reads
-       as the flag it is. crew.html sizes the framed crew centre off
-       --header-h, so it follows this on its own. */
-    --flagline-h: 8px;
-    --nav-h:      4.5rem;
-    --header-h:   calc(var(--flagline-h) + var(--nav-h));
+    /* The tricolour is INSIDE the bar now — see .flagline and NAV below — so
+       it no longer adds to the header's height. What does is the gap around
+       the island: the bar floats with air on all four sides, and the sticky
+       block it occupies is the bar plus that gap twice.
+
+       Five pixels again rather than eight. The review read a five-pixel strip
+       pinned across the top of the page as a loading bar, which it was; drawn
+       inside a rounded bar, clipped by its corners, it reads as the header's
+       own flag and eight is heavy-handed. */
+    --flagline-h: 5px;
+    --nav-h:      4.25rem;
+    --nav-gap:    clamp(.5rem, 1.3vw, .85rem);
+    --header-h:   calc(var(--nav-h) + var(--nav-gap) * 2);
 
     --maxw: 1180px;
     color-scheme: light dark;
@@ -370,12 +375,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
    ========================================================================= */
 
 /* La bandera. Hard stops at the thirds — this is a flag, and a flag does not
-   have a gradient in it. Runs full-bleed across the top of every page. */
+   have a gradient in it.
+
+   It used to run full-bleed across the top of every page, above the bar. It is
+   drawn along the top edge of the bar itself now, inside the island's overflow
+   so its own corner radius clips it. Positioned rather than in flow, so it
+   sits over the bar's blur instead of being a row above it. */
 .flagline {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 2;
     height: var(--flagline-h);
     background: linear-gradient(90deg,
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
-    box-shadow: inset 0 -1px 0 rgba(15, 27, 46, .10);
+    /* A hairline under the whole strip. Without it the flag's middle third —
+       which IS white — disappears into a light island and the tricolour reads
+       as two disconnected bars with a gap between them. */
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--am-navy) 16%, transparent);
 }
 /* ---- The lockup, and the Connect sub-brand --------------------------------
    Aeroméxico runs its regional operation as Aeroméxico Connect — a second
@@ -930,88 +944,98 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================ NAV ========================================
-   THE HEADER IS PINNED FROM THE HOST, NOT FROM `.nav`. READ THIS BEFORE
-   MOVING `position: sticky` BACK DOWN A LEVEL.
+   THE HEADER IS AN ISLAND: a rounded bar floating with air on all four sides,
+   rather than a full-width strip ruled off from the page.
 
-   site.js injects the flagline and the bar together into `<div data-site-nav>`.
-   A sticky element can only travel inside its own parent's border box, and
-   that host is exactly as tall as the two things in it — so `position: sticky`
-   on `.nav` had nowhere to go and the header scrolled off the top of the page
-   with everything else. Pinning the HOST puts the tricolour and the bar in the
-   viewport's frame instead, where they stay for the whole scroll.
+   THE HOST IS WHAT IS PINNED, NOT `.nav`. Read this before moving
+   `position: sticky` back down a level. A sticky element can only travel
+   inside its own parent's border box, and the host is exactly as tall as the
+   bar plus its gap — so sticky on `.nav` has nowhere to go and the header
+   scrolls off the top of the page with everything else. Pinning the HOST puts
+   the island in the viewport's frame, where it stays for the whole scroll.
 
-   The host is also what carries the scrim (::after, below): a fade drawn on
-   `.nav` would sit inside the blurred, semi-opaque bar rather than under it. */
+   The host is also what supplies the gap: padding on the host, not margin on
+   the bar, so the bar's own box is exactly the island and `overflow: hidden`
+   on it clips the tricolour and the open menu to the corner radius.
+
+   What went when the island came in:
+     * the scrim under the bar — an island has nothing to dissolve into, and a
+       fade hanging off a rounded thing reads as a shadow it does not cast;
+     * the full-width navy-to-red edge under the bar — a ruled line across the
+       page is the opposite of floating;
+     * the flagline as a separate strip above the bar — it is drawn inside the
+       island's top edge now, clipped by its own radius. */
 [data-site-nav] {
     position: sticky; top: 0; z-index: 60;
-    /* The scrim hangs below the bar and must not swallow clicks on the content
-       it fades over. Restored on the bar itself. */
+    padding: var(--nav-gap) clamp(.55rem, 2.2vw, 1.1rem);
+    /* The host spans the page and must not swallow clicks either side of the
+       island. Restored on the bar itself. */
     pointer-events: none;
 }
 [data-site-nav] > * { pointer-events: auto; }
 
-/* The scrim: content dissolving INTO the bar rather than sliding under a hard
-   edge. Sized off the bar so it reads as part of the header, and tinted with
-   the navy so the page does not simply go pale — on the dark theme the same
-   ramp reads as depth instead of as haze. It only exists once the page has
-   moved; over a hero at rest there is nothing to separate. */
-[data-site-nav]::after {
-    content: ""; position: absolute; left: 0; right: 0; top: 100%;
-    height: 1.6rem; pointer-events: none;
-    background: linear-gradient(to bottom,
-        color-mix(in srgb, var(--bg) 92%, var(--am-navy)) 0%,
-        color-mix(in srgb, var(--bg) 55%, transparent) 55%,
-        transparent 100%);
-    opacity: 0; transition: opacity .35s var(--ease);
-}
-/* site.js flags the host as well as the bar. `:has()` would express this
-   without the second class, but the scrim is the whole point of the change and
-   it should not be the one part of it that a older browser drops. */
-[data-site-nav].is-stuck::after { opacity: 1; }
-
 .nav {
     position: relative; z-index: 1;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid transparent;
-    transition: background .3s var(--ease), box-shadow .35s var(--ease);
+    max-width: var(--maxw); margin-inline: auto;
+    border-radius: clamp(14px, 1.5vw, 20px);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+    box-shadow: 0 6px 22px -14px color-mix(in srgb, var(--am-navy) 55%, transparent),
+                0 1px 3px -1px color-mix(in srgb, var(--am-navy) 18%, transparent);
+    transition: background .3s var(--ease), box-shadow .35s var(--ease),
+                border-color .3s var(--ease);
 }
-/* Once the page has moved the bar takes on its own weight: near-opaque so the
-   content running under it stops showing through as texture, and a navy cast
-   below it so the separation is felt before it is seen. */
+/* Once the page has moved the island takes on its own weight: near-opaque, so
+   the content running under it stops showing through as texture, and lifted
+   further off the page. */
 .nav.is-stuck {
-    background: color-mix(in srgb, var(--bg) 96%, transparent);
-    box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--am-navy) 62%, transparent),
-                0 2px 10px -6px color-mix(in srgb, var(--am-navy) 26%, transparent);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    border-color: var(--line);
+    box-shadow: 0 16px 40px -20px color-mix(in srgb, var(--am-navy) 70%, transparent),
+                0 3px 12px -6px color-mix(in srgb, var(--am-navy) 28%, transparent);
+}
+:root[data-theme="dark"] .nav {
+    border-color: color-mix(in srgb, #FFF 12%, transparent);
+    box-shadow: 0 8px 26px -16px rgba(0, 0, 0, .8);
 }
 :root[data-theme="dark"] .nav.is-stuck {
-    box-shadow: 0 12px 34px -18px rgba(0, 0, 0, .85), 0 2px 10px -6px rgba(0, 0, 0, .5);
+    border-color: color-mix(in srgb, #FFF 18%, transparent);
+    box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .9), 0 3px 12px -6px rgba(0, 0, 0, .5);
 }
 @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .nav {
+        border-color: color-mix(in srgb, #FFF 12%, transparent);
+        box-shadow: 0 8px 26px -16px rgba(0, 0, 0, .8);
+    }
     :root:not([data-theme="light"]) .nav.is-stuck {
-        box-shadow: 0 12px 34px -18px rgba(0, 0, 0, .85), 0 2px 10px -6px rgba(0, 0, 0, .5);
+        border-color: color-mix(in srgb, #FFF 18%, transparent);
+        box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .9), 0 3px 12px -6px rgba(0, 0, 0, .5);
     }
 }
 
-/* The edge itself, in the livery: navy at the hinge, red at the swoosh. This
-   is the line the border-bottom used to draw in flat grey — a hairline that
-   was there in principle and invisible in practice. It is a ramp rather than
-   the flag's hard stops on purpose: the flagline five pixels above is the
-   tricolour, and two hard-stopped bars stacked read as a mistake. */
-.nav::after {
-    content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 2px;
-    background: linear-gradient(90deg,
-        var(--am-navy) 0%, var(--am-blue) 26%, var(--am-blue-600) 48%,
-        color-mix(in srgb, var(--am-red) 70%, var(--am-blue-600)) 72%, var(--am-red) 100%);
-    opacity: 0; transform: scaleX(.35); transform-origin: left center;
-    transition: opacity .35s var(--ease), transform .5s var(--ease-rise);
-}
-.nav.is-stuck::after { opacity: 1; transform: scaleX(1); }
-@media (prefers-reduced-motion: reduce) {
-    .nav::after { transform: none; transition: opacity .01s linear; }
+/* The island floats OVER the home page's photograph rather than sitting on a
+   strip of page above it — which is the whole reason to make it an island.
+   The hero is pulled up by the height of the sticky block and given it back as
+   padding, so nothing inside it moves; only the picture grows upward.
+
+   Scoped to .hero--live, and to a hero that is the FIRST thing in the page's
+   main content. Every other page keeps the island on its own ground, where it
+   has a white edge to float against. */
+main > .hero--live:first-child {
+    margin-top: calc(var(--header-h) * -1);
+    padding-top: calc(var(--header-h) + clamp(3rem, 8vw, 5rem));
 }
 
-.nav__inner { display: flex; align-items: center; gap: 1.5rem; height: var(--nav-h); }
+/* The island supplies its own gutter, and it is tighter than the page's: the
+   bar is already inset from the viewport by the host's padding, so the full
+   page gutter on top of that leaves the brand marooned in the middle. */
+.nav__inner {
+    display: flex; align-items: center; gap: 1.5rem; height: var(--nav-h);
+    padding-inline: clamp(.9rem, 2.4vw, 1.5rem);
+}
 .nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
 /* The Caballero Águila, painted through assets/img/mark.svg as a mask so one
    file serves every placement and both themes. The ratio is the traced

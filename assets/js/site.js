@@ -100,9 +100,13 @@
             `<a href="${l.href}"${normalize(l.href) === HERE ? ' aria-current="page"' : ''}>${l.label}</a>`
         ).join('');
 
+        // The flagline is INSIDE the bar now. The nav is a floating island with
+        // rounded corners, and the tricolour is drawn along its top edge where
+        // the island's own radius clips it — a flag that belongs to the header
+        // rather than a separate strip pinned above it. See NAV in brand.css.
         host.innerHTML = `
-        <div class="flagline" aria-hidden="true"></div>
         <nav class="nav" id="siteNav">
+            <div class="flagline" aria-hidden="true"></div>
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" data-nav-brand aria-label="Aeromexico Virtual — home">
                     ${MARK}
