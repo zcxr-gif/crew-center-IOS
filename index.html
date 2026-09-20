@@ -81,15 +81,28 @@
          scripting off, and this is the headline, the sub-line and the two
          buttons on the page's paper. Nothing here renders a placeholder. -->
     <section class="hero hero--live" data-hero>
-        <div class="wrap hero__content">
-            <p class="hero__eyebrow">
-                <span class="flag" aria-hidden="true"></span> Bienvenido a bordo
-            </p>
+        <!-- THE PHOTOGRAPH IS THE SCREEN. Empty in the markup on purpose: the
+             slides are the fleet photographs in data.js, so a type gained or
+             lost changes the hero with nothing typed in here. Absolute and
+             full bleed, so it runs under the floating nav as well — which is
+             why the bar goes to glass while you are on it. -->
+        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
+        <!-- Its own element, not a gradient on the stage: the stage cross-fades
+             between aircraft and the scrim has to hold still through that or
+             the type flickers every seven seconds. -->
+        <div class="hero__scrim" aria-hidden="true"></div>
 
-            <!-- The page's real <h1>. It was .sr-only for as long as the hero
-                 had no headline to be. -->
+        <div class="wrap hero__content">
+            <!-- The airline's own lockup, at the size it deserves, arriving
+                 after the photograph rather than with it. Everything below it
+                 follows on the same stagger — see LIVE HERO in brand.css. -->
+            <span class="brandmark hero__logo" aria-hidden="true"></span>
+
+            <!-- The page's real <h1>. The lockup above carries the name; this
+                 carries what the airline says about itself, and a page with no
+                 heading is broken for a screen reader and invisible to a
+                 crawler however good the picture is. -->
             <h1 class="hero__title">Fly the <em>Eagle&nbsp;Warrior</em>.</h1>
-            <span class="hero__rule" aria-hidden="true"></span>
 
             <p class="hero__sub">
                 An Infinite Flight virtual airline flying the Aeroméxico network out of
@@ -97,8 +110,8 @@
             </p>
 
             <div class="hero__cta">
-                <a class="btn btn--primary" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
-                <a class="btn btn--ghost" href="/network">Route map</a>
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--onink" href="/network">Route map</a>
             </div>
 
             <!-- AMV_DATA.values, read out. Four things the airline holds itself
@@ -107,14 +120,8 @@
             <p class="hero__values" id="heroValues"></p>
         </div>
 
-        <!-- Empty in the markup on purpose: the slides are the fleet
-             photographs in data.js, so a type gained or lost changes the hero
-             with nothing typed in here. Full-bleed, at the photograph's own
-             aspect ratio — WHOLE at every width, which is the point. -->
-        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
-
         <!-- The credit: the aircraft naming itself, and the dots that steer it.
-             Under the photograph, where a credit goes. The dots are real
+             At the foot of the frame, where a credit goes. The dots are real
              buttons — the only way to change the aircraft from a keyboard. -->
         <div class="wrap hero__foot">
             <div class="hero__plate" data-hero-caption aria-live="polite"></div>

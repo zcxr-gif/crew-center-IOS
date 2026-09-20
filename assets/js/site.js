@@ -168,10 +168,24 @@
         // fade drawn inside the bar would sit above the blur instead of below
         // the bar. Both get the flag so neither needs `:has()` to find the
         // other. See the NAV block in brand.css.
+        // The bar goes to GLASS while the home page's photograph is behind it,
+        // and back to paper the moment you scroll past it. Measured against
+        // the hero's own height rather than a fixed number, so a short phone
+        // and a tall desktop hand over at the same point in the picture.
+        //
+        // offsetHeight is read once per scroll and only while a hero exists —
+        // on every other page `hero` is null and this costs one null check.
+        const hero = document.querySelector('.hero--live');
         const onScroll = () => {
             const stuck = scrollY > 8;
             nav.classList.toggle('is-stuck', stuck);
             host.classList.toggle('is-stuck', stuck);
+            if (hero) {
+                // The hero is pulled up under the bar, so its foot sits at
+                // offsetHeight minus the header it was pulled up by.
+                const over = scrollY < hero.offsetHeight - host.offsetHeight;
+                host.classList.toggle('is-over-hero', over);
+            }
         };
         addEventListener('scroll', onScroll, { passive: true });
         onScroll();

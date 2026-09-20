@@ -587,60 +587,50 @@ island's top edge, and it carries a hairline underneath: the flag's middle
 third is white, and without that line it disappears into a light island and the
 flag reads as two disconnected bars.
 
-**The hero says who the airline is, then shows you the aeroplane.** Six heroes
-have now been thrown out of this repo, and the list is worth keeping because
-the instinct that produced each one comes back:
+**The photograph is the screen, and the logo arrives on it.** Seven heroes have
+been thrown out of this repo; the list and the reasoning are in `brand.css`,
+because the instinct that produced each one comes back. This one takes back the
+shape of #5 — full bleed, full height, type over the picture — at the VA's
+direction, with what #6 was built to fix stated rather than forgotten:
 
-1. A two-column white header. Fine, and in the VA's words not memorable.
-2. A poster — the 787-9 drawn in its special livery, ringed by folk art — which
-   was memorable and was a *drawing*, one click from photographs of the same
-   airframe.
-3. Those photographs with the usual furniture on top: eyebrow, 70px tagline, a
-   paragraph of positioning copy. Thrown out for covering up the subject.
-4. The photograph as a panel in the flow with the aircraft naming itself
-   underneath and no headline at all. Read as a card dropped into the page.
-5. The photograph full-bleed and full-height with the headline over it. The
-   headline was right. Two things it cost were not.
+- **It is dark in both themes.** A photograph has no light mode, and white type
+  over one needs a single ground to be legible against whatever the theme is
+  doing. The rest of the page still follows the theme; the hero is the
+  exception, and the scrim is what makes that safe rather than a gamble on
+  which photograph happened to load.
+- **The aeroplane is cropped**, on a phone severely. `cover` on a full-bleed
+  stage cannot do anything else with a 1920×886 frame in a portrait viewport.
+  `object-position` holds the upper-middle where these airframes sit, the
+  uncropped shots are the whole point of `/fleet`, and the plate at the foot
+  names whichever one is on screen. Do not reach for `contain` to win it back:
+  that pillarboxes the airline's navy down both sides of a phone.
 
-**The two things it cost were the same thing.** The hero was navy in *both*
-themes — pick light mode and the opening screen is still dark — and the
-photograph was cropped to its middle third on a phone, because `cover` on a
-full-bleed stage cannot do anything else with a 1920×886 frame in a portrait
-viewport. Both were the price of putting the words *on* the picture: type over
-a photograph needs one ground to be legible against whatever the theme is
-doing, and a full-height stage has to crop.
+**What arrives, and in what order.** The photograph is already there; then the
+lockup, the line under it, the buttons, the strip. One stagger, about half a
+second. It runs **once on load and never again** — a hero that re-animates
+every time you scroll back to the top is one you learn to scroll past — which
+is why it is a plain CSS animation and not `[data-reveal]`, which is
+scroll-driven and re-arms. Reduced motion gets no entrance at all.
 
-Taking the words off the picture refunds both. The hero takes the page's own
-paper and follows the theme like every other section, and the stage is a band
-at the photograph's **own** aspect ratio, so `cover` fits it exactly and
-nothing is cropped at any width. The no-crop rule is back where it belongs
-rather than exiled to `/fleet`.
+**Any animated element carrying a transform of its own has to carry it through
+the keyframes.** `.hero__foot` is centred with `translateX(-50%)`, and the
+shared `heroIn` ends on `transform: none`, which with `fill-mode: both`
+persists and wipes the centring — the credit lands half a screen to the right.
+It has its own keyframes for exactly that reason.
 
-What made hero #5 honest is unchanged, and none of it is marketing copy:
-`.hero__title` is the airline's own line, `.hero__sub` is what it factually is,
-`.hero__values` is `AMV_DATA.values` read out, and the credit under the
-photograph is the aircraft **naming itself** off `AMV_DATA.fleet`.
+**The bar goes to glass while it is on the photograph.** `site.js` adds
+`.is-over-hero` to the nav host while the hero is still behind it, measured
+against the hero's own height so a short phone and a tall desktop hand over at
+the same point in the picture. Every colour in that state is **stated**: the
+bar normally takes theme tokens, and over a photograph in light mode those are
+near-black text on a dark picture. The open mobile menu keeps the page's paper
+rather than going glass with the bar, because a translucent panel of links is
+not readable.
 
-Two things are easy to undo by accident:
-
-- **Nothing restates a colour.** Hero #5 had to override `.btn--primary`,
-  `.btn--ghost` and every text colour because it was navy in both themes and no
-  theme token was safe on it. On the page's paper those overrides would paint
-  white on white. The only colour rules left are the red/marigold swap for the
-  title's accent and the registration, which is the same dance the rest of the
-  file does.
-- **The island does not float over it any more.** The rule that pulled the hero
-  up by `--header-h` worked while the first thing in the hero was a
-  photograph; the hero leads with its headline now, so the same rule would
-  slide the `h1` under a floating bar.
-
-**The crest that flew into the nav is gone**, and that is the one real loss.
-The home page used to open on the airline's name set large and centred, which
-shrank and flew into the nav bar as you scrolled — one custom property driven
-off a single measured distance. It existed because the crest was *in* the hero.
-A second giant crest above a headline is the logo printed twice, so the lockup
-came out and `--morph` went with it. The reasoning is in `hero.js` against
-`mountCrest`, in the history.
+Nothing over the photograph is marketing copy: the lockup is the airline's own
+artwork, `.hero__title` is its own line, `.hero__sub` is what it factually is,
+`.hero__values` is `AMV_DATA.values` read out, and the credit at the foot is
+the aircraft **naming itself** off `AMV_DATA.fleet`.
 
 Four more things about the stage are deliberate:
 
