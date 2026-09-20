@@ -210,9 +210,19 @@
        under it. Named because crew.html sizes the framed crew centre against
        them — a viewport-height stage has to subtract the whole header, not
        just the bar, or the page gains five pixels of scroll it never uses. */
+    /* The tricolour is INSIDE the bar now — see .flagline and NAV below — so
+       it no longer adds to the header's height. What does is the gap around
+       the island: the bar floats with air on all four sides, and the sticky
+       block it occupies is the bar plus that gap twice.
+
+       Five pixels again rather than eight. The review read a five-pixel strip
+       pinned across the top of the page as a loading bar, which it was; drawn
+       inside a rounded bar, clipped by its corners, it reads as the header's
+       own flag and eight is heavy-handed. */
     --flagline-h: 5px;
-    --nav-h:      4.5rem;
-    --header-h:   calc(var(--flagline-h) + var(--nav-h));
+    --nav-h:      4.25rem;
+    --nav-gap:    clamp(.5rem, 1.3vw, .85rem);
+    --header-h:   calc(var(--nav-h) + var(--nav-gap) * 2);
 
     --maxw: 1180px;
     color-scheme: light dark;
@@ -365,12 +375,21 @@ button, input, select, textarea { font: inherit; color: inherit; }
    ========================================================================= */
 
 /* La bandera. Hard stops at the thirds — this is a flag, and a flag does not
-   have a gradient in it. Runs full-bleed across the top of every page. */
+   have a gradient in it.
+
+   It used to run full-bleed across the top of every page, above the bar. It is
+   drawn along the top edge of the bar itself now, inside the island's overflow
+   so its own corner radius clips it. Positioned rather than in flow, so it
+   sits over the bar's blur instead of being a row above it. */
 .flagline {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 2;
     height: var(--flagline-h);
     background: linear-gradient(90deg,
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
-    box-shadow: inset 0 -1px 0 rgba(15, 27, 46, .10);
+    /* A hairline under the whole strip. Without it the flag's middle third —
+       which IS white — disappears into a light island and the tricolour reads
+       as two disconnected bars with a gap between them. */
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--am-navy) 16%, transparent);
 }
 /* ---- The lockup, and the Connect sub-brand --------------------------------
    Aeroméxico runs its regional operation as Aeroméxico Connect — a second
@@ -924,93 +943,282 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
        `align-items: center` on the section centres the picture against it. */
 }
 
+/* ========================= THE APPLY TAB =================================
+   A tab down the right edge that opens a drawer along the foot of the screen.
+   The one piece of furniture on this site that follows you between pages, so
+   it carries the single action the whole site is asking for and nothing else.
+
+   A DISCLOSURE, NOT A DIALOGUE. No overlay, no focus trap, nothing underneath
+   goes inert: you can ignore it and keep reading. That is the difference
+   between this and the pop-up the same shape is usually used for.
+
+   Sits under the header (z-index 60) and over the page. The drawer is pinned
+   to the bottom so it never covers the thing you are reading, which is at the
+   top of the viewport. */
+.applytab { position: fixed; inset: 0; z-index: 55; pointer-events: none; }
+.applytab > * { pointer-events: auto; }
+
+/* ---- The tab --------------------------------------------------------------
+   Vertical, on the right, in the livery red. `writing-mode` rather than a
+   rotate: the text stays selectable and the box sizes itself to the words, so
+   a longer label does not need the height recalculating by hand. */
+.applytab__tab {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    display: flex; align-items: center; gap: .55rem;
+    writing-mode: vertical-rl;
+    padding: 1.1rem .5rem;
+    border: 0; border-radius: .6rem 0 0 .6rem;
+    background: var(--am-red); color: #FFF; cursor: pointer;
+    font-family: var(--font-text); font-size: .72rem; font-weight: 800;
+    letter-spacing: .14em; text-transform: uppercase;
+    box-shadow: -4px 0 18px -8px color-mix(in srgb, var(--am-navy) 70%, transparent);
+    transition: padding-right .25s var(--ease), background .25s var(--ease);
+}
+.applytab__tab:hover { padding-right: .8rem; background: var(--am-navy); }
+.applytab__tab:focus-visible { outline: 2px solid var(--am-marigold); outline-offset: 3px; }
+/* The arrow points the way the drawer will come from: up, out of the foot. */
+.applytab__tab svg { width: .9rem; height: .9rem; transform: rotate(-90deg); }
+.applytab.is-open .applytab__tab { display: none; }
+
+/* ---- The drawer -----------------------------------------------------------
+   Full width along the foot. The tricolour along its top edge is the same
+   device the header wears, so the two read as the same airline's furniture. */
+.applytab__drawer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -18px 50px -24px color-mix(in srgb, var(--am-navy) 70%, transparent);
+    animation: applyUp .32s var(--ease-rise) both;
+}
+.applytab__drawer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--am-navy) 16%, transparent);
+}
+@keyframes applyUp { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+    .applytab__drawer { animation: none; }
+    .applytab__tab { transition: none; }
+}
+
+.applytab__inner {
+    display: flex; align-items: center; gap: clamp(1rem, 3vw, 2.5rem);
+    flex-wrap: wrap;
+    padding-block: clamp(1.1rem, 2.6vw, 1.6rem);
+}
+.applytab__say { flex: 1 1 22rem; min-width: 0; }
+.applytab__head {
+    margin: 0; font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(1.15rem, 2.6vw, 1.6rem); letter-spacing: -.02em; color: var(--ink);
+}
+.applytab__sub {
+    margin: .35rem 0 0; font-size: .92rem; line-height: 1.55;
+    color: var(--muted); max-width: 52ch;
+}
+.applytab__do { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+/* The close sits in the corner of the drawer rather than in the flow, so the
+   sentence and the buttons keep the width they would have had without it. */
+.applytab__close {
+    position: absolute; top: .7rem; right: .7rem;
+    width: 2.1rem; height: 2.1rem;
+}
+.applytab__close svg { width: .9rem; height: .9rem; }
+
+@media (max-width: 47.99rem) {
+    /* Low, and lower than it was. A phone's thumb lives at the bottom, and the
+       middle of the right edge is where a scrollbar and a browser's own
+       back-swipe gesture both are — but 22% put the tab across the home page's
+       CTA row once the hero went full-screen and centred its content. At 10%
+       it sits below the buttons and above the photo credit. */
+    .applytab__tab { top: auto; bottom: 10%; transform: none; }
+    .applytab__inner { padding-right: 2.6rem; }
+    .applytab__do { width: 100%; }
+    .applytab__do .btn { flex: 1 1 auto; justify-content: center; }
+}
+
 /* ============================ NAV ========================================
-   THE HEADER IS PINNED FROM THE HOST, NOT FROM `.nav`. READ THIS BEFORE
-   MOVING `position: sticky` BACK DOWN A LEVEL.
+   THE HEADER IS AN ISLAND: a rounded bar floating with air on all four sides,
+   rather than a full-width strip ruled off from the page.
 
-   site.js injects the flagline and the bar together into `<div data-site-nav>`.
-   A sticky element can only travel inside its own parent's border box, and
-   that host is exactly as tall as the two things in it — so `position: sticky`
-   on `.nav` had nowhere to go and the header scrolled off the top of the page
-   with everything else. Pinning the HOST puts the tricolour and the bar in the
-   viewport's frame instead, where they stay for the whole scroll.
+   THE HOST IS WHAT IS PINNED, NOT `.nav`. Read this before moving
+   `position: sticky` back down a level. A sticky element can only travel
+   inside its own parent's border box, and the host is exactly as tall as the
+   bar plus its gap — so sticky on `.nav` has nowhere to go and the header
+   scrolls off the top of the page with everything else. Pinning the HOST puts
+   the island in the viewport's frame, where it stays for the whole scroll.
 
-   The host is also what carries the scrim (::after, below): a fade drawn on
-   `.nav` would sit inside the blurred, semi-opaque bar rather than under it. */
+   The host is also what supplies the gap: padding on the host, not margin on
+   the bar, so the bar's own box is exactly the island and `overflow: hidden`
+   on it clips the tricolour and the open menu to the corner radius.
+
+   What went when the island came in:
+     * the scrim under the bar — an island has nothing to dissolve into, and a
+       fade hanging off a rounded thing reads as a shadow it does not cast;
+     * the full-width navy-to-red edge under the bar — a ruled line across the
+       page is the opposite of floating;
+     * the flagline as a separate strip above the bar — it is drawn inside the
+       island's top edge now, clipped by its own radius. */
 [data-site-nav] {
     position: sticky; top: 0; z-index: 60;
-    /* The scrim hangs below the bar and must not swallow clicks on the content
-       it fades over. Restored on the bar itself. */
+    padding: var(--nav-gap) clamp(.55rem, 2.2vw, 1.1rem);
+    /* The host spans the page and must not swallow clicks either side of the
+       island. Restored on the bar itself. */
     pointer-events: none;
 }
 [data-site-nav] > * { pointer-events: auto; }
 
-/* The scrim: content dissolving INTO the bar rather than sliding under a hard
-   edge. Sized off the bar so it reads as part of the header, and tinted with
-   the navy so the page does not simply go pale — on the dark theme the same
-   ramp reads as depth instead of as haze. It only exists once the page has
-   moved; over a hero at rest there is nothing to separate. */
-[data-site-nav]::after {
-    content: ""; position: absolute; left: 0; right: 0; top: 100%;
-    height: 1.6rem; pointer-events: none;
-    background: linear-gradient(to bottom,
-        color-mix(in srgb, var(--bg) 92%, var(--am-navy)) 0%,
-        color-mix(in srgb, var(--bg) 55%, transparent) 55%,
-        transparent 100%);
-    opacity: 0; transition: opacity .35s var(--ease);
-}
-/* site.js flags the host as well as the bar. `:has()` would express this
-   without the second class, but the scrim is the whole point of the change and
-   it should not be the one part of it that a older browser drops. */
-[data-site-nav].is-stuck::after { opacity: 1; }
-
 .nav {
     position: relative; z-index: 1;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
-    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid transparent;
-    transition: background .3s var(--ease), box-shadow .35s var(--ease);
+    max-width: var(--maxw); margin-inline: auto;
+    border-radius: clamp(14px, 1.5vw, 20px);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+    box-shadow: 0 6px 22px -14px color-mix(in srgb, var(--am-navy) 55%, transparent),
+                0 1px 3px -1px color-mix(in srgb, var(--am-navy) 18%, transparent);
+    transition: background .3s var(--ease), box-shadow .35s var(--ease),
+                border-color .3s var(--ease);
 }
-/* Once the page has moved the bar takes on its own weight: near-opaque so the
-   content running under it stops showing through as texture, and a navy cast
-   below it so the separation is felt before it is seen. */
+/* Once the page has moved the island takes on its own weight: near-opaque, so
+   the content running under it stops showing through as texture, and lifted
+   further off the page. */
 .nav.is-stuck {
-    background: color-mix(in srgb, var(--bg) 96%, transparent);
-    box-shadow: 0 10px 30px -18px color-mix(in srgb, var(--am-navy) 62%, transparent),
-                0 2px 10px -6px color-mix(in srgb, var(--am-navy) 26%, transparent);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
+    border-color: var(--line);
+    box-shadow: 0 16px 40px -20px color-mix(in srgb, var(--am-navy) 70%, transparent),
+                0 3px 12px -6px color-mix(in srgb, var(--am-navy) 28%, transparent);
+}
+:root[data-theme="dark"] .nav {
+    border-color: color-mix(in srgb, #FFF 12%, transparent);
+    box-shadow: 0 8px 26px -16px rgba(0, 0, 0, .8);
 }
 :root[data-theme="dark"] .nav.is-stuck {
-    box-shadow: 0 12px 34px -18px rgba(0, 0, 0, .85), 0 2px 10px -6px rgba(0, 0, 0, .5);
+    border-color: color-mix(in srgb, #FFF 18%, transparent);
+    box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .9), 0 3px 12px -6px rgba(0, 0, 0, .5);
 }
 @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .nav {
+        border-color: color-mix(in srgb, #FFF 12%, transparent);
+        box-shadow: 0 8px 26px -16px rgba(0, 0, 0, .8);
+    }
     :root:not([data-theme="light"]) .nav.is-stuck {
-        box-shadow: 0 12px 34px -18px rgba(0, 0, 0, .85), 0 2px 10px -6px rgba(0, 0, 0, .5);
+        border-color: color-mix(in srgb, #FFF 18%, transparent);
+        box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .9), 0 3px 12px -6px rgba(0, 0, 0, .5);
     }
 }
 
-/* The edge itself, in the livery: navy at the hinge, red at the swoosh. This
-   is the line the border-bottom used to draw in flat grey — a hairline that
-   was there in principle and invisible in practice. It is a ramp rather than
-   the flag's hard stops on purpose: the flagline five pixels above is the
-   tricolour, and two hard-stopped bars stacked read as a mistake. */
-.nav::after {
-    content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 2px;
-    background: linear-gradient(90deg,
-        var(--am-navy) 0%, var(--am-blue) 26%, var(--am-blue-600) 48%,
-        color-mix(in srgb, var(--am-red) 70%, var(--am-blue-600)) 72%, var(--am-red) 100%);
-    opacity: 0; transform: scaleX(.35); transform-origin: left center;
-    transition: opacity .35s var(--ease), transform .5s var(--ease-rise);
-}
-.nav.is-stuck::after { opacity: 1; transform: scaleX(1); }
-@media (prefers-reduced-motion: reduce) {
-    .nav::after { transform: none; transition: opacity .01s linear; }
+/* THE ISLAND FLOATS OVER THE PHOTOGRAPH. The hero is pulled up by the height
+   of the sticky block and given it back as padding, so nothing inside the hero
+   moves — only the picture grows upward, under the bar.
+
+   Scoped to a .hero--live that is the FIRST thing in main. Every other page
+   keeps the island on its own ground, where its border and shadow have a white
+   edge to read against. */
+main > .hero--live:first-child {
+    margin-top: calc(var(--header-h) * -1);
+    padding-top: calc(var(--header-h) + clamp(4rem, 9vw, 6rem));
 }
 
-.nav__inner { display: flex; align-items: center; gap: 1.5rem; height: var(--nav-h); }
-.nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
+/* ---- The bar, while it is ON the photograph -------------------------------
+   Glass rather than paper: barely there, so the aeroplane runs behind it, and
+   lit for a dark ground because that is what it is standing on — whatever the
+   theme is doing to the rest of the page.
+
+   EVERY COLOUR HERE IS STATED. The bar normally takes theme tokens, which is
+   right everywhere it sits on the page's own paper; over a photograph in light
+   mode those tokens are near-black text on a dark picture. Declared after the
+   .is-stuck block so it wins for as long as the hero is under the bar, and
+   dropped the moment you scroll past the hero — at which point the ordinary
+   stuck treatment takes over and the bar becomes paper again.
+
+   site.js adds .is-over-hero; the class only ever appears on the home page. */
+[data-site-nav].is-over-hero .nav {
+    background: color-mix(in srgb, #FFF 9%, transparent);
+    border-color: color-mix(in srgb, #FFF 26%, transparent);
+    box-shadow: 0 10px 34px -22px rgba(7, 20, 38, .75);
+}
+[data-site-nav].is-over-hero .nav__brand { color: #FFF; }
+[data-site-nav].is-over-hero .nav__links a { color: color-mix(in srgb, #FFF 76%, transparent); }
+[data-site-nav].is-over-hero .nav__links a:hover,
+[data-site-nav].is-over-hero .nav__links a[aria-current="page"] { color: #FFF; }
+[data-site-nav].is-over-hero .icon-btn {
+    color: color-mix(in srgb, #FFF 80%, transparent);
+    border-color: color-mix(in srgb, #FFF 30%, transparent);
+}
+[data-site-nav].is-over-hero .icon-btn:hover { color: #FFF; border-color: #FFF; }
+/* The Crew Center pill is navy, which is invisible against a night approach.
+   On the photograph it goes white. */
+[data-site-nav].is-over-hero .nav__actions .btn--primary {
+    background: #FFF; color: var(--am-navy); border-color: #FFF;
+}
+[data-site-nav].is-over-hero .nav__actions .btn--primary:hover {
+    background: var(--am-marigold); color: var(--am-navy); border-color: var(--am-marigold);
+}
+/* The open menu is a panel of its own and has to stay readable, so it keeps
+   the page's paper rather than going glass with the bar. */
+[data-site-nav].is-over-hero .nav__menu { background: var(--bg); }
+[data-site-nav].is-over-hero .nav__menu a { color: var(--ink); }
+.nav { transition: background .3s var(--ease), box-shadow .35s var(--ease),
+                   border-color .3s var(--ease), color .3s var(--ease); }
+
+/* The island supplies its own gutter, and it is tighter than the page's: the
+   bar is already inset from the viewport by the host's padding, so the full
+   page gutter on top of that leaves the brand marooned in the middle. */
+.nav__inner {
+    display: flex; align-items: center; gap: 1.5rem; height: var(--nav-h);
+    padding-inline: clamp(.9rem, 2.4vw, 1.5rem);
+}
+/* `color` is stated because the lockup inside is painted with currentColor and
+   this is an <a>, which would otherwise take a link colour. --ink is the
+   theme's own text colour, so the mark is near-black on paper and near-white
+   on navy without a second rule for the dark theme. */
+.nav__brand {
+    display: flex; align-items: center; gap: .7rem; margin-right: auto;
+    min-width: 0; color: var(--ink);
+}
 /* The Caballero Águila, painted through assets/img/mark.svg as a mask so one
    file serves every placement and both themes. The ratio is the traced
    artwork's own — re-trace and this must move with it. */
+/* ---- The lockup -----------------------------------------------------------
+   THE AIRLINE'S OWN LOGO, crest and wordmark as one piece of artwork, supplied
+   by the VA. It replaces the nav's old assembly of .mark plus two lines of
+   type, which was an approximation of this.
+
+   Painted through a MASK, exactly as .mark is: the file is white on
+   transparent, so its alpha channel is the shape and `currentColor` is the
+   ink. One file serves both themes and every placement, and there is no second
+   copy of the artwork to keep in step.
+
+   SIZED BY HEIGHT. The ratio is the cropped file's own, so setting a height is
+   enough and the width falls out of it — which is what a lockup in a bar wants,
+   since the bar is what fixes the height.
+
+   The two files are the supplied PNGs cropped to their ink and flattened to
+   white, because everything but the alpha is thrown away by the mask anyway.
+
+   On whether this may ship at all, since the Connect note below argues the
+   opposite: that note refuses to ship the real AEROMÉXICO CONNECT lockup
+   because it is Aeroméxico's own registered sub-brand wordmark. This is not
+   that. It is Aeromexico Virtual's lockup for Aeromexico Virtual's own name,
+   handed over by the VA that owns it. */
+.brandmark {
+    display: block; flex: none;
+    aspect-ratio: 938 / 225;
+    background: currentColor;
+    -webkit-mask: url('/assets/img/lockup.png') no-repeat left center / contain;
+            mask: url('/assets/img/lockup.png') no-repeat left center / contain;
+}
+/* The VA supplied a STACKED lockup too — crest over the name, in a near
+   square. It is not shipped, because nothing on the site wants that shape: the
+   two places the lockup appears are both horizontal (a bar and a footer
+   column already fighting to stay short on a phone), and the favicon has to
+   read at 16px, where a wordmark is a smudge and the crest alone is the right
+   answer. A 70 KB asset nothing references is weight for nothing. If a
+   placement for it turns up, crop it the same way and add the variant here. */
+
 .mark {
     display: block; flex: none;
     aspect-ratio: var(--mark-ratio, 2778 / 2118);
@@ -1018,22 +1226,17 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     -webkit-mask: url('/assets/img/mark.svg') no-repeat center / contain;
             mask: url('/assets/img/mark.svg') no-repeat center / contain;
 }
-.nav__brand .mark { width: 3rem; color: var(--am-blue); }
-:root[data-theme="dark"] .nav__brand .mark { color: var(--am-blue-300); }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .nav__brand .mark { color: var(--am-blue-300); }
-}
-.nav__brand .wordmark { display: flex; flex-direction: column; line-height: 1.08; min-width: 0; }
-.nav__brand .wordmark b {
-    font-family: var(--font-display); font-weight: 800;
-    font-variation-settings: 'SOFT' 50, 'WONK' 1;
-    font-size: 1.06rem; letter-spacing: -.02em; white-space: nowrap;
-}
-.nav__brand .wordmark span {
-    font-size: .6rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .22em; color: var(--muted);
-}
-.nav__links { display: none; align-items: center; gap: 1.9rem; }
+.nav__brand .brandmark { height: clamp(1.55rem, 3.6vw, 1.95rem); }
+/* The .wordmark rules that were here are gone with the thing they styled: the
+   nav used to assemble the airline's name out of the crest plus two lines of
+   type, which was always an approximation of the lockup the VA actually owns.
+   That lockup is a file now — see .brandmark, above the NAV block. */
+/* The site map gained Home, About us and Staff in the round-2 review, so there
+   are eight entries here where there were six. At a fixed 1.9rem gap that
+   overran the bar between 992px (where the desktop nav appears) and about
+   1150px, pushing the Crew Center button off the end. The gap now scales with
+   the viewport and only reaches its old value on a wide screen. */
+.nav__links { display: none; align-items: center; gap: clamp(1rem, 1.7vw, 1.9rem); }
 .nav__links a {
     font-size: .95rem; font-weight: 600; color: var(--muted);
     transition: color .2s var(--ease); position: relative; padding-block: .35rem;
@@ -1412,6 +1615,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .footer ul { list-style: none; padding: 0; display: grid; gap: .6rem; font-size: .92rem; }
 .footer__brand .mark { width: 4rem; margin-bottom: 1.05rem; color: var(--am-blue); }
+.footer__brand .brandmark { height: 2.5rem; margin-bottom: 1.05rem; color: var(--ink); }
 .footer__wordmark {
     font-family: var(--font-display); font-weight: 800;
     font-variation-settings: 'SOFT' 50, 'WONK' 1;
@@ -1888,6 +2092,63 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .route-card__meta .rank-chip { margin-left: auto; }
 
+/* ---- Flagship destinations -----------------------------------------------
+   Six cards above the full sector list. The mobile review's finding was that
+   landing on twenty-three routes is not an invitation, and it is right — but
+   the answer is to LEAD with a few, not to hide the rest. The list is still
+   directly below, filtered and searchable. */
+.highlight { display: grid; align-content: start; gap: .2rem; }
+.highlight__region {
+    font-size: .7rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+}
+.highlight__city {
+    margin: .5rem 0 0; font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+    letter-spacing: -.02em; line-height: 1.15;
+}
+.highlight__pair {
+    margin: .35rem 0 0; font-size: .92rem; font-weight: 700; color: var(--muted);
+    letter-spacing: .04em;
+}
+.highlight__pair i { font-style: normal; color: var(--am-red); padding-inline: .25rem; }
+
+/* ---- The bases -----------------------------------------------------------
+   Two reviewers said these cards looked plain. They now open on a plate — a
+   photograph when the VA has one of its own in data.js, otherwise the crest on
+   the livery with the IATA code set into it — and carry the aerodrome's own
+   runway count, elevation and terminals under the sector count. */
+.hub-card { display: grid; align-content: start; }
+.hub-card__plate {
+    position: relative; aspect-ratio: 16 / 9; margin: -.4rem 0 1rem;
+    border-radius: calc(var(--radius) - .35rem); overflow: hidden;
+    background: linear-gradient(145deg, var(--am-blue-600) 0%, var(--am-navy) 68%);
+    display: grid; place-items: center;
+}
+/* The serape weave, at the foot of the plate: the same three stops as the
+   flagline, so the base card is tied to the airline's own flag rather than to
+   a stock gradient. */
+.hub-card__plate::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+}
+.hub-card__crest {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    color: #FFF; opacity: .26;
+}
+.hub-card__crest .mark { width: 46%; }
+.hub-card__iata {
+    position: relative; z-index: 1; color: #FFF;
+    font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 700; letter-spacing: .12em;
+    text-shadow: 0 2px 12px rgba(7, 20, 38, .55);
+}
+.hub-card__plate.has-photo { background: var(--surface-2); }
+.hub-card__plate img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hub-card__note {
+    margin: .6rem 0 0; font-size: .88rem; line-height: 1.55;
+    color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
 /* ============================ RANK LADDER ================================
    The ranks page. The old ladder was seven rows of name-and-hours, which is
    what the review called "numerical rather than developmental" — it said what
@@ -1905,6 +2166,10 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .ladder__row { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
 }
 .ladder__lead { display: grid; gap: .35rem; align-content: start; }
+.ladder__insignia-note {
+    font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--faint); font-weight: 700;
+}
 .ladder__name {
     font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
     font-size: clamp(1.15rem, 2.2vw, 1.4rem); line-height: 1.15;
@@ -1912,8 +2177,40 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 .ladder__hours {
     font-family: var(--font-mono); font-size: .95rem; font-weight: 600; color: var(--accent);
 }
-.ladder__body { display: grid; gap: .8rem; }
+.ladder__body { display: grid; gap: .9rem; }
 .ladder__body p { margin: 0; color: var(--muted); }
+/* "The font size is a bit small, making it a bit hard to read." It was .92rem
+   for the duty line and body size for the note, on a page whose whole job is
+   to be read carefully. The lead line is now set at reading size in the ink,
+   and the duty line stays quiet but no longer shrinks. */
+.ladder__note { font-size: 1.06rem; line-height: 1.6; color: var(--ink) !important; }
+.ladder__duty { font-size: .98rem; line-height: 1.6; }
+
+/* ---- What a rank gets you ------------------------------------------------
+   The review asked for privileges against each rank, and a list of them under
+   the rank's own description is where a pilot looks for them. Ruled rather
+   than boxed, like everything else here that is information. */
+.ladder__perks { display: grid; gap: .5rem; }
+.ladder__perks h3 {
+    margin: 0; font-family: var(--font-text);
+    font-size: .72rem; font-weight: 800; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+}
+.ladder__perks ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.ladder__perks li {
+    position: relative; padding: .5rem 0 .5rem 1.5rem;
+    font-size: .98rem; line-height: 1.55; color: var(--muted);
+    border-top: 1px solid var(--line-soft);
+}
+.ladder__perks li:first-child { border-top: 0; }
+/* The tick is the airline's, not a bullet: this is a list of things you HAVE
+   at this rank, which is what a check mark says and a disc does not. */
+.ladder__perks li::before {
+    content: ""; position: absolute; left: 0; top: .82em;
+    width: .7rem; height: .38rem; border: 2px solid var(--accent);
+    border-top: 0; border-right: 0; transform: rotate(-45deg);
+}
+.ladder__perks li b { color: var(--ink); font-weight: 700; }
 .ladder__facts {
     display: flex; flex-wrap: wrap; gap: .5rem 1.6rem;
     padding-top: .3rem;
@@ -1930,6 +2227,49 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 /* The bars are a rank insignia, not a chart: one more bar per rung. */
 .ladder__bars { display: flex; gap: 3px; align-items: flex-end; height: 1.1rem; }
 .ladder__bars i { width: 4px; border-radius: 2px; background: var(--accent); display: block; }
+
+/* ---- Rank insignia --------------------------------------------------------
+   The epaulette, drawn rather than fetched. A navy board with one to four gold
+   bars across it — the flight deck's own grammar, which a pilot reads without
+   being told what it means, and which the ascending bar chart that used to sit
+   here did not. The two senior grades add the wing; the appointed rank wears
+   the crest in place of bars, because it is not a step on the same ladder.
+
+   Kept at a size that works beside the rank name at every width: the board is
+   sized in ems off the row, so it scales with the type rather than against it. */
+.insignia {
+    display: flex; flex-direction: column; justify-content: center; gap: .26em;
+    width: 3.4rem; height: 2.2rem; padding: .3em .42em; border-radius: .28rem;
+    background: linear-gradient(160deg, var(--am-navy), var(--am-blue-600));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+                0 1px 3px rgba(15, 27, 46, .3);
+    position: relative; overflow: hidden;
+}
+.insignia i {
+    display: block; height: .2rem; border-radius: 1px;
+    background: linear-gradient(90deg,
+        var(--am-marigold), color-mix(in srgb, var(--am-marigold) 62%, #FFF), var(--am-marigold));
+}
+/* The wing: a single gold chevron across the top corner of the board, which is
+   how the senior grades are marked without adding a fifth bar that would read
+   as a rank that does not exist. */
+.insignia--wing::after {
+    content: ""; position: absolute; top: -.42rem; right: -.62rem;
+    width: 1.5rem; height: 1.5rem; transform: rotate(45deg);
+    background: color-mix(in srgb, var(--am-marigold) 88%, transparent);
+}
+.insignia--crest {
+    display: grid; place-items: center; padding: .24rem;
+    background: linear-gradient(160deg, var(--am-red), var(--am-navy));
+}
+/* `.mark` is a masked box that takes its size from a width and its colour from
+   currentColor, so a height here would fight its own aspect-ratio. */
+.insignia--crest { color: #FFF; }
+.insignia--crest .mark { width: 1.6rem; }
+@media (prefers-reduced-motion: no-preference) {
+    .insignia { transition: transform .3s var(--ease); }
+    .ladder__row:hover .insignia { transform: translateY(-2px) rotate(-2deg); }
+}
 
 /* ============================ STAFF ======================================
    Four reviewers asked for this page. A role with nobody in it says so — the
@@ -1960,14 +2300,60 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     color: var(--accent);
 }
 .staff__id { display: flex; align-items: center; gap: .9rem; }
+
+/* THE PORTRAIT PLATE. The mobile review reported the staff images as blank,
+   and the grey disc with two letters in it deserved that: it reads as a
+   photograph that failed to load. It is now the airline's own crest on the
+   livery, with the monogram set over it — a designed plate rather than an
+   empty slot, so a card with no photograph still looks finished. When the VA
+   has real portraits, an <img> dropped inside this same box replaces the
+   crest with no other change.
+
+   The IFC avatar is deliberately NOT fetched: Discourse serves those from a
+   per-upload URL this repo cannot know, so guessing one would give every card
+   a 404 — the reported bug again, with a network request attached. */
 .staff__av {
     width: 3rem; height: 3rem; border-radius: 50%; flex: none;
-    display: grid; place-items: center;
-    background: var(--surface-2); color: var(--accent);
-    font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
-    border: 1px solid var(--line);
+    display: grid; place-items: center; position: relative; overflow: hidden;
+    background: linear-gradient(150deg, var(--am-blue-600), var(--am-navy));
+    color: #FFF;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--am-navy) 40%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2);
 }
-.staff__av--vacant { color: var(--faint); }
+.staff__av > b { position: relative; z-index: 1; letter-spacing: .02em; }
+.staff__av img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 2;
+}
+/* The crest sits behind the monogram at low contrast — present enough to be
+   the airline's plate, quiet enough that two letters still read over it. */
+.staff__av-crest {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    opacity: .3; color: #FFF;
+}
+.staff__av-crest .mark { width: 78%; }
+/* A vacancy is a DIFFERENT thing from a missing picture, and has to look it:
+   no monogram, the crest alone, and the livery drained out of the plate. */
+.staff__av--vacant {
+    background: var(--surface-2); border-color: var(--line); color: var(--faint);
+    box-shadow: none;
+}
+.staff__av--vacant .staff__av-crest { opacity: .38; color: var(--faint); }
+
+/* The foot of the card: who the role answers to on the left, the way through
+   to their IFC profile on the right. The review asked for a profile button on
+   every staff member, and a name with an underline was not reading as one. */
+.staff__foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: .8rem; flex-wrap: wrap; margin-top: .3rem; padding-top: .9rem;
+    border-top: 1px solid var(--line-soft);
+}
+.staff__ifc { flex: none; }
+.staff__ifc svg { width: .85rem; height: .85rem; }
+/* The signature block on /about and / carries the same button. */
+.quote__ifc { margin-top: 1rem; }
+.quote__ifc svg { width: .85rem; height: .85rem; }
 .staff__name {
     font-family: var(--font-display); font-weight: 800; letter-spacing: -.015em;
     font-size: 1.22rem; line-height: 1.2;
@@ -2013,9 +2399,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     max-width: 46ch; margin: 0; color: var(--ink);
 }
 .quote p + p { font-size: clamp(1.02rem, 1.6vw, 1.14rem); font-family: var(--font-body); color: var(--muted); }
-.quote__by { display: flex; align-items: center; gap: .9rem; }
+/* Wraps because the signature gained an IFC profile button beside the name in
+   the round-2 review, and three items on one line do not fit a narrow column. */
+.quote__by { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
 .quote__by b { font-family: var(--font-display); font-weight: 800; }
 .quote__by span { font-size: .82rem; color: var(--muted); display: block; font-weight: 500; font-family: var(--font-body); }
+/* The signature's avatar is a <span> too, so the rule above was recolouring
+   the portrait plate and its crest to the muted grey and shrinking the
+   monogram to caption size — which is what made the initials invisible on the
+   navy plate. Restated at matching specificity rather than by reordering, so
+   an edit to either rule cannot quietly bring it back. */
+.quote__by span.staff__av {
+    display: grid; color: #FFF;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+}
+.quote__by span.staff__av-crest { display: grid; color: #FFF; }
 
 /* ============================ FACT ROWS ==================================
    A definition list set as ruled rows. Used for the identity table on /about
@@ -2046,6 +2444,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .footer { padding-block: clamp(2.25rem, 6vw, 3rem) 1.5rem; }
     .footer__grid { gap: 1.9rem; }
     .footer__brand .mark { width: 3.2rem; margin-bottom: .8rem; }
+    .footer__brand .brandmark { height: 2.1rem; margin-bottom: .8rem; }
     .footer__brand p { font-size: .88rem; }
     .footer ul { gap: .5rem; font-size: .88rem; }
     .disclaimer { font-size: .72rem; }
@@ -2130,334 +2529,272 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 
 /* ============================== LIVE HERO ================================
-   The home page opens on the aeroplane. Not on words about the aeroplane.
+   THE PHOTOGRAPH IS THE SCREEN, AND THE LOGO ARRIVES ON IT.
 
-   TWO HEROES DIED HERE, and the second one is the interesting note. First the
-   poster: the 787-9 drawn in its special livery, ringed by folk-art
-   illustration, over the wordmark, on flat navy — one immovable drawing,
-   sitting one click from photographs of the same airframe on the fleet page.
-   It was replaced by those photographs plus the usual furniture: eyebrow, 70px
-   tagline, a paragraph of positioning copy, then the buttons.
+   Seven heroes have been thrown out of this repo. The list is kept because the
+   instinct that produced each one comes back:
 
-   That furniture came off too. A headline and a lede laid over a photograph is
-   the move every airline homepage makes, it covered up the thing worth looking
-   at, and — the part that decided it — none of it was true the way the rest of
-   this site is true. It was written once and would have gone on being said.
+     1. A two-column white header. Fine, and not memorable.
+     2. A drawn poster, one click from photographs of the same airframe.
+     3. Those photographs with a marketing tagline laid over them.
+     4. The photograph as a panel in the flow, read as a card in the page.
+     5. Full bleed and full height with the headline over it — which cost the
+        light theme and cropped the aeroplane on a phone.
+     6. Words on the page's own paper, photograph in a band beneath them:
+        nothing cropped, light in light mode, and quiet.
 
-   WHAT SAYS IT INSTEAD, every word read off data rather than typed here:
+   This is the VA's call and it takes #5's shape back deliberately, with what
+   #6 was built to fix stated plainly rather than forgotten:
 
-     .hero__stage    the fleet photographs, one at a time, cross-faded with a
-                     slow drift. hero.js builds them off AMV_DATA.fleet[].photo,
-                     so the hero is whatever the airline actually operates.
-     .hero__plate    the aircraft naming ITSELF — type, registration, what the
-                     type is for, and a sector it flies, in cities where the
-                     site already names them. This is the display type now.
-     .hero__log      sectors the crew have flown, sampled off the crew centre.
-     .hero__facts    the airline in four counted figures.
+     * IT IS DARK IN BOTH THEMES. A photograph has no light mode, and white
+       type over one needs a single ground to be legible against whatever the
+       theme is doing. The rest of the page still follows the theme; the hero
+       is the exception, and the scrim is what makes that safe rather than a
+       gamble on which photograph loaded.
+     * THE AEROPLANE IS CROPPED, on a phone severely — `cover` on a full-bleed
+       stage cannot do anything else with a 1920x886 frame in a portrait
+       viewport. `object-position` holds the upper-middle, where these
+       airframes sit. The uncropped shots are the whole point of /fleet and
+       they are all still there, and the plate at the foot names whichever one
+       is on screen. Do not reach for `contain` to win it back: that
+       pillarboxes the airline's navy down both sides of a phone, which is how
+       hero #1 looked.
 
-   The page is still NAMED, by an .sr-only <h1> in the markup: a page with no
-   heading is broken for a screen reader and invisible to a crawler. It is
-   simply not set in 70px over the aircraft.
+   WHAT ARRIVES, and in this order. The photograph is already there. Then the
+   lockup, then the line under it, then the buttons, then the strip — one
+   stagger, half a second, and it is done. It runs ONCE on load and never
+   again, because a hero that re-animates every time you scroll back to the top
+   is a hero you learn to scroll past.
 
-   Dark in both themes, like the poster before it: a photograph has no light
-   mode, and what sits over it needs one ground to be legible against.
+   Nothing over the photograph is marketing copy. The lockup is the airline's
+   own artwork, `.hero__title` is its own line, `.hero__sub` is what it
+   factually is, `.hero__values` is AMV_DATA.values read out, and the credit at
+   the foot is the aircraft naming ITSELF off AMV_DATA.fleet.
 
-   EVERY LAYER IS OPTIONAL. No photographs, a quiet backend or scripting off,
-   and the stage stays the airline's navy wash, the plate collapses and the
-   flight strip never appears — leaving the buttons and the counted facts, which
-   is a working hero. Nothing here renders a skeleton or a placeholder leg. */
+   EVERY LAYER IS OPTIONAL. No photographs in data.js, a quiet backend, a
+   failed image fetch or scripting off, and this is the airline's navy, the
+   lockup, the line and the two buttons — a working hero. Nothing renders a
+   skeleton or a placeholder. */
 .hero--live {
-    /* --hero-navy, --hero-tail and --hero-tail-h are gone. They existed to
-       dissolve a navy hero into whatever section followed it; a hero on the
-       page's own paper has nothing to hand over. */
     position: relative; isolation: isolate; overflow: hidden;
-    /* The page's own paper, which means it follows the theme: white in light,
-       navy in dark, like every other section. The hero was the last thing on
-       the site painting itself dark regardless. */
-    background: var(--bg); color: var(--ink);
-    display: grid; align-content: start;
-    row-gap: clamp(1.6rem, 3.4vw, 2.6rem);
-    /* The height is set at the wide breakpoint, off the photograph's ratio
-       rather than off the viewport's — see "The stage" below, where the whole
-       geometry lives. This is the floor for a hero with no photographs at all.
-       svh rather than vh throughout: on a phone vh is the address bar's
-       promise, not the viewport, and the last row ends up under the chrome. */
-    min-height: 0;
-    padding-block: clamp(1.5rem, 3.6vw, 2.75rem) clamp(1.4rem, 3vw, 2.2rem);
+    display: grid; align-content: center;
+    /* The bar floats ON the photograph rather than above it, so the hero is
+       pulled up under the sticky block and given the height back as padding.
+       See `main > .hero--live:first-child` in the NAV block. */
+    min-height: clamp(34rem, 100svh, 52rem);
+    padding-block: clamp(4rem, 9vw, 6rem) clamp(5.5rem, 11vw, 7.5rem);
+    background: var(--am-navy); color: #FFF;
 }
 
-/* ---- La bandera, and the eagle standing on it ----------------------------
-   What sits behind the hero now that a photograph no longer does. Both are
-   the airline's own material — the flag's real colours at hard stops, and
-   mark.svg, which is the Caballero Águila traced off Aeromexico-Symbol.webp.
-   Nothing here is drawn.
-
-   The eagle watermark was REMOVED earlier in this file's history with the
-   note that 6% white on white does not fade out, it stops existing. That was
-   true of a white eagle. This one is painted in the brand blue, which is a
-   real value against paper — the device comes back because the ground it is
-   painted on changed, not because the objection was wrong.
-
-   Both are deliberately weak enough to read as the paper having colour in it
-   rather than as a picture. Anything stronger and the plate type, which sits
-   directly over the eagle, starts fighting it. */
-.hero--live::before {
-    content: ""; position: absolute; inset: 0; z-index: -3; pointer-events: none;
-    /* Hard stops at the thirds, exactly as .flagline draws them. The centre
-       band is the page's own white, so it is left unpainted rather than
-       filled — on paper that IS the white of the flag. */
-    background: linear-gradient(90deg,
-        var(--mx-green) 0 33.333%, transparent 0 66.666%, var(--mx-red) 0);
-    opacity: .05;
-    /* Faded at BOTH ends, and the top one matters more than it looks. Painted
-       solid from y=0 the two outer thirds are rectangles — a green block and a
-       red block butted against the header, which is what they read as rather
-       than as a flag. Emerging from nothing and dissolving into nothing leaves
-       the colour without the geometry. The bottom fade also keeps it out from
-       behind the counted figures, where two coloured columns under a row of
-       numbers reads as a rendering bug. */
-    -webkit-mask: linear-gradient(180deg,
-        transparent 0, #000 26%, #000 52%, transparent 92%);
-            mask: linear-gradient(180deg,
-        transparent 0, #000 26%, #000 52%, transparent 92%);
-}
-/* THE WATERMARK EAGLE IS GONE, and this is the second time it has been taken
-   out of this file for a different reason each time. First it was white on a
-   white hero, where it did not fade so much as cease to exist. It came back in
-   the brand blue, which worked — and then the crest arrived above it. Two
-   eagles on one screen, one of them a 4% ghost of the other, is not a
-   watermark and a logo; it is the logo printed twice. The crest is the mark
-   now. What stays behind the hero is the flag alone. */
-:root[data-theme="dark"] .hero--live::before { opacity: .1; }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero--live::before { opacity: .1; }
-}
-
-/* ---- The ruled-feather device: NOT ON THE HERO ---------------------------
-   It was here for one commit and the VA moved it. Worth recording why, because
-   the instinct to put it back will return: on the reference site the rail runs
-   down a hero that is a flat dark field with nothing else happening in it. Our
-   hero is not that any more — it has the crest, the flag behind, the aircraft
-   naming and a photograph, and a saturated red rail down the edge of that is
-   one more thing competing rather than an edge treatment.
-
-   So the device moved to the back of the page and dropped to a whisper, on the
-   same terms as the flag: a texture you read as the paper having something in
-   it, not a graphic you look at. See THE CLOSE, below the footer rules. */
-
-/* ---- The two columns ------------------------------------------------------
-   Copy left, photograph right, and the flight strip and the counted figures
-   full width underneath. Below the breakpoint they stack and the photograph
-   goes FIRST: on a phone the picture is the opening screen and the naming
-   reads under it, which is the arrangement the old full-bleed stage collapsed
-   to as well. */
-/* ---- The crest, and where it goes -----------------------------------------
-   The airline's name opens the page at full size and centred, then shrinks
-   into the nav bar as you scroll. hero.js drives it: the whole effect is one
-   custom property, --morph, running 0 -> 1 over the scroll distance between
-   the crest's resting position and the nav's own brand, plus a transform on
-   the mark. Everything else here is expressed in terms of that property.
-
-   THE MATH IS IN hero.js, not here, and it is worth knowing why the mark needs
-   no vertical transform for most of the travel: scrolling already carries the
-   crest upward at exactly the rate needed to arrive at the nav. The script
-   only has to scale it, slide it left, and hand over.
-
-   Degrades in both directions. With no JS, --morph stays 0, the crest sits
-   there at full size and the nav brand is visible as it always was — two
-   lockups on one screen, which is untidy but not broken. With reduced motion
-   the script sets --morph to 1 immediately and skips the transform, so the
-   crest is simply not part of the page. */
-.hero__lockup {
-    display: grid; justify-items: center; text-align: center;
-    gap: .55rem;
-    margin-bottom: clamp(.9rem, 2.4vw, 1.6rem);
-    /* Fades out only at the very end of the travel, when it is already the
-       same size and in the same place as the nav's brand — so the swap between
-       the two is not something you can see happen. */
-    opacity: clamp(0, calc((1 - var(--morph, 0)) * 12), 1);
-}
-.hero__lockup-mark {
-    width: clamp(4.5rem, 11vw, 8.5rem);
-    color: var(--am-blue);
-    transform-origin: 0 0;
-    will-change: transform;
-}
-:root[data-theme="dark"] .hero__lockup-mark { color: var(--am-blue-300); }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero__lockup-mark { color: var(--am-blue-300); }
-}
-/* The word and the tagline are gone well before the mark lands. They have no
-   counterpart to morph INTO — the nav's wordmark is a different size at a
-   different weight — so they leave early and let the eagle travel alone. */
-.hero__lockup-word,
-.hero__lockup-tag { opacity: clamp(0, calc((0.42 - var(--morph, 0)) * 4), 1); }
-.hero__lockup-word {
-    display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap;
-    justify-content: center;
-}
-.hero__lockup-word b {
-    font-family: var(--font-display); font-weight: 800;
-    font-variation-settings: 'SOFT' 60, 'WONK' 1;
-    font-size: clamp(1.9rem, 5vw, 3.2rem); letter-spacing: -.025em;
-    line-height: 1; color: var(--ink);
-}
-.hero__lockup-word span {
-    font-size: clamp(.72rem, 1.5vw, .92rem); font-weight: 700;
-    letter-spacing: .34em; text-transform: uppercase; color: var(--muted);
-}
-.hero__lockup-tag {
-    font-family: var(--font-display); font-style: italic;
-    font-size: clamp(.95rem, 1.8vw, 1.15rem); color: var(--muted);
-}
-
-/* The nav's own brand is the destination. It fades up over the last stretch of
-   the travel, against the crest fading down over the same stretch. Guarded on
-   .is-morphing so that a page without a crest — every page but the home page —
-   is never touched by this at all. */
-[data-site-nav].is-morphing .nav__brand {
-    opacity: clamp(0, calc((var(--morph, 0) - 0.88) * 12), 1);
-}
-
-/* ONE CENTRED COLUMN, and the two-column arrangement that was here first is
-   worth a note. Copy left, photograph right reads well on its own — it is what
-   the reference site does. It stopped working the moment the crest went in
-   above it: a centred lockup over a left-aligned column is two different
-   layouts sharing a screen, and the eye sees the disagreement before it sees
-   either one.
-
-   So the whole hero centres. Crest, then the aircraft naming itself, then the
-   controls, then the photograph, then the counted figures — one axis all the
-   way down. The photograph is capped rather than full-width: at the full 1180
-   a 1920/886 panel is 545px tall and pushes everything else off the opening
-   screen. */
-.hero__top { display: grid; gap: clamp(1.2rem, 2.8vw, 1.9rem); justify-items: center; }
-.hero__marque { min-width: 0; width: 100%; text-align: center; }
-.hero__stage  { min-width: 0; width: 100%; max-width: 54rem; }
-.hero__plate-name { justify-content: center; }
-/* The facts band carries its own generous margin for the hero it was drawn
-   for; in here the row-gap above is already doing that job. */
-.hero--live .hero__facts--band { margin-top: .4rem; }
-
-/* ---- The plate -----------------------------------------------------------
-   What the headline used to be, and set as display type because it IS the
-   headline now. The difference is that every word of it is read off the fleet
-   and changes when the stage does — an aircraft introducing itself, rather
-   than a sentence about aircraft in general.
-
-   Three parts, each of which degrades to nothing rather than to a placeholder:
-   the type, in the display face; the registration, in mono and marigold,
-   because a tail number is flight data and is set here like flight data; and
-   the line under them naming what the type is for and one sector it flies. */
-.hero__marque { position: relative; display: grid; justify-items: stretch; gap: 1.15rem; }
-/* The buttons and the dots share a line: the dots are the stage's controls and
-   they belong with the other controls, not stranded under the plate where they
-   read as an underline of it.
-
-   They used to be pushed apart with `margin-left: auto` on the dots, which was
-   right when the hero was left-aligned and the far edge meant something. On a
-   centred axis it just drags the dots off to the right of a symmetrical
-   composition, so the row centres and the gap separates the two groups. */
-.hero__controls {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-    gap: .9rem 1.6rem;
-}
-/* The dots take their own line under the buttons, which puts them directly
-   above the photograph they steer. Beside the buttons they were read as a
-   third control in that group, and they pulled the row off its own centre. */
-.hero__controls .hero__dots { flex: 0 0 100%; justify-content: center; }
-.hero__plate  { display: grid; gap: .3rem; margin: 0; }
-.hero__plate:empty { display: none; }
-.hero__plate-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .9rem; }
-.hero__plate b {
-    font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em;
-    font-size: clamp(1.9rem, 4.8vw, 3.4rem); line-height: 1.05; color: var(--ink);
-}
-/* The registration is flight data and is set like flight data. Marigold was
-   chosen to carry on navy and is a highlighter on paper; the livery red is the
-   colour this site already uses to mark something out on white. */
-.hero__plate .mono {
-    font-size: clamp(.85rem, 1.5vw, 1rem); font-weight: 700; letter-spacing: .06em;
-    color: var(--am-red);
-}
-.hero__plate-sub {
-    font-size: clamp(.95rem, 1.7vw, 1.1rem); color: var(--muted);
-}
-/* The livery red is chosen against paper. On the dark theme's navy it is the
-   low-contrast pair the marigold was picked to replace in the first place —
-   so on navy these three go back to marigold, which is the colour that was
-   carrying them when the whole hero was dark. */
-:root[data-theme="dark"] .hero__plate .mono,
-:root[data-theme="dark"] .hero__leg-route i { color: var(--am-marigold); }
-:root[data-theme="dark"] .hero__dot.is-on { background: var(--am-marigold); }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .hero__plate .mono,
-    :root:not([data-theme="light"]) .hero__leg-route i { color: var(--am-marigold); }
-    :root:not([data-theme="light"]) .hero__dot.is-on { background: var(--am-marigold); }
-}
-
-/* ---- The stage -----------------------------------------------------------
-   NOTHING IS CROPPED. This is still the rule the stage is built around, and
-   the new arrangement satisfies it more simply than the old one did: the panel
-   is given the photograph's OWN aspect ratio, so `contain` fits it exactly and
-   there is neither a crop nor a letterbox to manage. All of the geometry the
-   full-bleed version needed — the 50vw floor, the contain-by-width reasoning,
-   the ultrawide `cover` fallback, the pillarbox edge case — is gone with it.
-
-   It is a card like every other surface on the site: the page's radius, the
-   page's shadow, clipped so the photograph takes the corners. The tinted
-   ground is what shows while an off-site image is still in flight, so the
-   panel holds its shape instead of flashing white. */
-.hero__stage {
-    position: relative;
-    aspect-ratio: 1920 / 886;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    background: var(--surface-2);
-    box-shadow: var(--shadow-lg);
-}
-.hero__slide {
-    position: absolute; inset: 0; opacity: 0;
-    transition: opacity 1.1s var(--ease);
-}
+/* ---- The stage ------------------------------------------------------------
+   Behind everything, edge to edge, under the nav as well. */
+.hero__stage { position: absolute; inset: 0; z-index: -2; }
+.hero__slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.1s var(--ease); }
 .hero__slide.is-on { opacity: 1; }
 .hero__slide img {
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: 50% 50%;
+    /* Above centre: these are aeroplanes on approach and on stand, and the
+       bottom of the frame is apron and runway. Holding the upper-middle keeps
+       the airframe in shot at every ratio the crop has to cover. */
+    object-position: 50% 42%;
 }
 
-/* The drift is off. It was written in `object-position` because the old stage
-   letterboxed the photograph and the percentage panned through that slack,
-   which meant it could never reach the picture's edges. The panel is the
-   photograph's own ratio now — there is no slack, so the same animation could
-   only move the image inside a box that exactly fits it, which is a crop. The
-   cross-fade between aircraft stays; it never cropped anything.
+/* ---- The scrim ------------------------------------------------------------
+   Three layers, each doing one job. A wash over the whole frame so no
+   photograph is bright enough to lose white type. A head dark enough to carry
+   the nav where it overlaps a pale sky. A foot that goes nearly solid, taking
+   the credit and handing the section over to the page below. */
+.hero__scrim {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--am-navy) 78%, transparent) 0,
+            color-mix(in srgb, var(--am-navy) 26%, transparent) 30%,
+            color-mix(in srgb, var(--am-navy) 34%, transparent) 55%,
+            color-mix(in srgb, var(--am-navy) 90%, transparent) 90%,
+            var(--am-navy) 100%),
+        linear-gradient(90deg,
+            color-mix(in srgb, var(--am-navy) 55%, transparent) 0,
+            color-mix(in srgb, var(--am-navy) 10%, transparent) 55%,
+            color-mix(in srgb, var(--am-navy) 35%, transparent) 100%);
+}
+/* The tricolour closes the frame on the airline's own flag rather than on a
+   gradient — the same device the nav island wears along its top edge. */
+.hero--live::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    z-index: 1;
+}
 
-   Everything the veil did is gone with it. It existed to keep white type
-   legible over a photograph and to land the section on flat navy; the type is
-   ink on paper now and the section lands on paper. What the panel gets instead
-   is a hairline drawn INSIDE its own edge — a photograph that runs light at
-   the border otherwise dissolves into the page at the corners, and the radius
-   stops reading. */
-.hero__stage::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    border-radius: inherit;
-    box-shadow: inset 0 0 0 1px rgba(15, 27, 46, .07);
+/* ---- What it says ---------------------------------------------------------
+   Centred, over a centred photograph. */
+.hero__content {
+    position: relative; z-index: 1;
+    display: grid; justify-items: center; text-align: center;
+    gap: clamp(.9rem, 2vw, 1.3rem);
+    max-width: 48rem; margin-inline: auto;
+}
+
+/* THE LOGO, at the size it deserves. Capped in rem as well as vw so a very
+   wide screen does not turn it into a banner: past about 1100px the lockup
+   stops growing and the photograph takes the extra room instead. */
+.hero__logo {
+    width: min(82vw, 30rem);
+    color: #FFF;
+    filter: drop-shadow(0 4px 28px rgba(7, 20, 38, .55));
+}
+
+.hero__title {
+    margin: 0;
+    font-family: var(--font-display); font-weight: 600;
+    font-variation-settings: 'SOFT' 60, 'WONK' 1;
+    font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+    line-height: 1.05; letter-spacing: -.025em;
+    color: #FFF; text-wrap: balance;
+    text-shadow: 0 2px 24px rgba(7, 20, 38, .5);
+}
+.hero__title em { font-style: normal; color: var(--am-marigold); }
+
+.hero__sub {
+    margin: 0; max-width: 44ch;
+    font-size: clamp(.98rem, 1.8vw, 1.12rem); line-height: 1.6;
+    color: color-mix(in srgb, #FFF 86%, transparent);
+    text-wrap: pretty;
+}
+
+.hero__cta {
+    display: flex; flex-wrap: wrap; gap: .8rem; justify-content: center;
+    margin-top: clamp(.3rem, 1vw, .7rem);
+}
+/* Stated here, not inherited. Every other button on the site takes its colours
+   from the theme, which is right everywhere the ground follows the theme — and
+   wrong in the one section that is navy in BOTH. Scoped to .hero--live because
+   `.hero__cta` is not the hero's alone: the closing CTA band on seven other
+   pages reuses the class, and .band is PALE, so a white-on-navy pair applied
+   to the bare class paints a white button on a pale band. */
+.hero--live .hero__cta .btn--light {
+    background: #FFF; color: var(--am-navy); border-color: #FFF;
+    box-shadow: 0 10px 30px -12px rgba(7, 20, 38, .8);
+}
+.hero--live .hero__cta .btn--light:hover {
+    background: var(--am-marigold); color: var(--am-navy); border-color: var(--am-marigold);
+}
+.hero--live .hero__cta .btn--onink {
+    background: color-mix(in srgb, #FFF 10%, transparent); color: #FFF;
+    border-color: color-mix(in srgb, #FFF 48%, transparent);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.hero--live .hero__cta .btn--onink:hover {
+    background: color-mix(in srgb, #FFF 20%, transparent); border-color: #FFF; color: #FFF;
+}
+.hero--live .hero__cta .btn:focus-visible { outline: 2px solid var(--am-marigold); outline-offset: 3px; }
+
+.hero__values {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: .35rem .9rem; margin: clamp(.3rem, 1vw, .7rem) 0 0;
+    font-size: clamp(.62rem, 1.2vw, .7rem); font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: color-mix(in srgb, #FFF 62%, transparent);
+}
+.hero__values span { display: inline-flex; align-items: center; }
+.hero__values span + span::before {
+    content: ""; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--am-red); margin-right: .9rem; flex: none;
+}
+
+/* ---- The arrival ----------------------------------------------------------
+   One stagger, once, on load. Not [data-reveal]: that is scroll-driven and
+   re-arms, and this should happen exactly once, the moment the page opens.
+   `both` holds the from-state before the delay elapses, so nothing flashes at
+   full opacity and then starts. */
+@keyframes heroIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+.hero__content > * { animation: heroIn .72s var(--ease-rise) both; }
+.hero__logo            { animation-duration: .9s; animation-delay: .1s; }
+.hero__title           { animation-delay: .34s; }
+.hero__sub             { animation-delay: .46s; }
+.hero__cta             { animation-delay: .56s; }
+.hero__values          { animation-delay: .66s; }
+/* The foot gets its OWN keyframes, and this is not tidiness. It is centred
+   with `left: 50%; transform: translateX(-50%)`, and heroIn ends on
+   `transform: none` — which with fill-mode `both` persists and wipes the
+   centring, throwing the credit half a screen to the right. Any animated
+   element that carries a transform of its own has to carry it through the
+   keyframes too. */
+@keyframes heroFootIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+    to   { opacity: 1; transform: translateX(-50%); }
+}
+.hero__foot            { animation: heroFootIn .7s var(--ease-rise) .8s both; }
+
+/* ---- The credit -----------------------------------------------------------
+   The aircraft naming itself, at the foot of the frame with the dots that
+   steer it. A photo credit, set like one. */
+.hero__foot {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: clamp(1.2rem, 2.8vw, 2rem); z-index: 1;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 1rem 1.5rem; flex-wrap: wrap;
+}
+.hero__plate { display: grid; gap: .15rem; margin: 0; min-width: 0; }
+.hero__plate:empty { display: none; }
+.hero__plate-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .7rem; }
+.hero__plate b {
+    font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em;
+    font-size: clamp(.9rem, 1.8vw, 1.1rem); line-height: 1.2;
+    color: color-mix(in srgb, #FFF 92%, transparent);
+}
+.hero__plate .mono {
+    font-size: clamp(.68rem, 1.3vw, .76rem); font-weight: 700; letter-spacing: .08em;
+    color: var(--am-marigold);
+}
+.hero__plate-sub {
+    font-size: clamp(.7rem, 1.35vw, .8rem);
+    color: color-mix(in srgb, #FFF 58%, transparent);
 }
 
 /* ---- Steering the stage --------------------------------------------------
-   Buttons with real labels rather than decorated spans: this is the only way
-   to change the aircraft from a keyboard. */
-.hero__dots { display: flex; gap: .4rem; justify-content: center; }
+   Buttons with real labels rather than decorated spans: the only way to change
+   the aircraft from a keyboard. */
+.hero__dots { display: flex; gap: .4rem; flex: none; padding-bottom: .35rem; }
 .hero__dot {
     width: 1.5rem; height: 3px; padding: 0; border: 0; border-radius: 999px;
-    background: var(--line); cursor: pointer;
+    background: color-mix(in srgb, #FFF 34%, transparent); cursor: pointer;
     transition: background .3s var(--ease), width .3s var(--ease);
 }
-.hero__dot:hover { background: var(--faint); }
-.hero__dot.is-on { background: var(--am-red); width: 2.5rem; }
-.hero__dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.hero__dot:hover { background: color-mix(in srgb, #FFF 62%, transparent); }
+.hero__dot.is-on { background: var(--am-marigold); width: 2.5rem; }
+.hero__dot:focus-visible { outline: 2px solid var(--am-marigold); outline-offset: 4px; }
+
+/* ---- Phones ---------------------------------------------------------------
+   The dots come off: four controls 3px tall over a photograph on a touch
+   screen are a target nobody can hit and a row nobody reads. The stage still
+   advances on its own and is steerable on any larger screen. */
+@media (max-width: 47.99rem) {
+    .hero--live { padding-bottom: clamp(5rem, 18vw, 7rem); }
+    .hero__foot { justify-content: center; text-align: center; }
+    .hero__plate { justify-items: center; }
+    .hero__plate-name { justify-content: center; }
+    .hero__dots { display: none; }
+}
+
+/* The band under the hero carries the counted figures and the flown strip. */
+.hero-under { padding-top: clamp(1.8rem, 4vw, 2.8rem); }
+.hero-under .hero__log { margin-top: clamp(1.6rem, 3.5vw, 2.4rem); }
+
+/* Asked for less motion: the stage never advances on its own — hero.js stops
+   the timer — the cross-fade comes off, and the arrival does not run at all.
+   An entrance is the first thing somebody who asked for stillness should not
+   be given. */
+@media (prefers-reduced-motion: reduce) {
+    .hero__slide { transition: none; }
+    .hero__content > *,
+    .hero__foot { animation: none; }
+}
 
 /* ---- Who has been flying it ----------------------------------------------
    Approved sectors off the crew centre, sampled at random. Rules rather than
@@ -2477,14 +2814,16 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     display: grid; gap: .18rem;
     padding-top: .7rem; border-top: 1px solid var(--line);
 }
-.hero__leg-route { font-size: .95rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+.hero__leg-route { font-size: 1rem; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
 .hero__leg-route i { font-style: normal; color: var(--am-red); padding-inline: .1rem; }
-.hero__leg-who { font-size: .85rem; color: var(--muted); }
-.hero__leg-meta {
-    display: flex; flex-wrap: wrap; gap: .2rem .7rem;
-    font-size: .74rem; color: var(--faint);
-}
-.hero__leg-meta b { color: var(--muted); font-weight: 700; }
+/* "Flown by _ServerNoob", which is the whole of the review's note about this
+   strip. The four columns of 11px grey that used to sit under each sector —
+   flight number, type, block time, how long ago — are gone: a reader skipping
+   between them could not see what they came for, and every one of them is a
+   click away in the crew centre. */
+.hero__leg-who { font-size: .88rem; color: var(--muted); }
+.hero__leg-who b { color: var(--ink); font-weight: 700; }
+.hero__leg-meta { font-size: .74rem; color: var(--faint); }
 /* One leg on a phone, two on a large one, three from tablet up. The strip is
    context, not a list to read — three sectors stacked on a 375px screen would
    push the counted facts off the opening screen entirely. */

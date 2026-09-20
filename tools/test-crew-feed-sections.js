@@ -82,10 +82,18 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
 
         check('the activity section is removed, not left empty', await page.$('#recent') === null);
         check('the wall is removed too', await page.$('#wall') === null);
-        // The rest of the page is the point of removing them quietly.
-        check('the network section survives', await page.$('#mapHost') !== null);
-        check('…and still lists this repo’s sectors',
-            (await page.textContent('#networkLede')).includes('sector'));
+        // The rest of the page is the point of removing them quietly. The
+        // landmark used to be #mapHost; the route map came off the home page
+        // when it was cut back to glimpses, so this watches the cards that
+        // replaced it instead. Any element that is always on the page and is
+        // not one of these two sections does the job.
+        check('the rest of the page survives', await page.$('#glimpse') !== null);
+        // "…and still lists this repo's sectors" was here, reading #networkLede.
+        // That lede belonged to the route map on the home page, which came off
+        // when the page was cut back to glimpses — and textContent() on a
+        // selector that no longer matches does not fail, it WAITS, so the whole
+        // suite died on a timeout rather than reporting a missing element.
+        // Whether the network page lists sectors is test-network-sync.js's job.
         check('no page errors', errors.length === 0, errors.join(' | '));
         await page.close();
     }

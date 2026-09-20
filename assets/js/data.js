@@ -42,13 +42,13 @@ window.AMV_DATA = {
     staff: [
         {
             role: 'Chief Executive Officer', short: 'CEO',
-            name: 'Randomaviator2', ifc: 'randomaviator2',
+            name: '_ServerNoob', ifc: '_ServerNoob',
             owns: 'Direction, policy, partnerships, external representation, final say on appeals.',
             reports: null,
         },
         {
             role: 'Chief Operating Officer', short: 'COO',
-            name: '_ServerNoob', ifc: '_ServerNoob',
+            name: 'Randomaviator2', ifc: 'randomaviator2',
             owns: 'Day-to-day running of the airline; deputises for the CEO.',
             reports: 'CEO',
         },
@@ -94,13 +94,98 @@ window.AMV_DATA = {
        Mexico City is the hub; Monterrey, Guadalajara and Cancún are bases.
        Cancún is a base in the plan and a destination in the network — both are
        true, and the network page counts its sectors off the route list rather
-       than claiming a number for it. */
+       than claiming a number for it.
+
+       `runways`, `elevation` and `terminals` are the aerodrome's own published
+       figures — the mobile review asked for more than a code and a name against
+       each base, and these are facts about the airport rather than claims about
+       the airline. Check them against the current AIP before a chart changes
+       and they quietly go stale here.
+
+       `photo` is OPTIONAL and empty for the same reason heroStills is: there is
+       no hub photography in this repo, and a stock picture of Terminal 2 pulled
+       off the internet is the invented artwork this brand was written to keep
+       out, with a licensing problem on top. Shoot the base in Infinite Flight,
+       upload it to the crew centre's gallery, paste the URL in here with its
+       real pixel size, and the base card on /network becomes a photograph
+       instead of the crest plate it draws without one:
+
+           photo: { src: 'https://…/MMMX-1234567890.webp', w: 1600, h: 900,
+                    alt: 'A 787-9 on stand at Mexico City Benito Juárez.' } */
     hubs: [
-        { icao: 'MMMX', iata: 'MEX', city: 'Mexico City',  name: 'Benito Juárez Intl',        role: 'Primary hub' },
-        { icao: 'MMMY', iata: 'MTY', city: 'Monterrey',    name: 'Mariano Escobedo Intl',     role: 'Base' },
-        { icao: 'MMGL', iata: 'GDL', city: 'Guadalajara',  name: 'Miguel Hidalgo y Costilla', role: 'Base' },
-        { icao: 'MMUN', iata: 'CUN', city: 'Cancún',       name: 'Cancún Intl',               role: 'Base' },
+        {
+            icao: 'MMMX', iata: 'MEX', city: 'Mexico City', name: 'Benito Juárez Intl',
+            role: 'Primary hub', runways: 2, elevation: '7,316 ft', terminals: 'T1 · T2',
+            note: 'The whole network departs from here. Every tier begins at Benito Juárez.',
+            photo: null,
+        },
+        {
+            icao: 'MMMY', iata: 'MTY', city: 'Monterrey', name: 'Mariano Escobedo Intl',
+            role: 'Base', runways: 2, elevation: '1,278 ft', terminals: 'A · B · C',
+            note: 'The northern base, and the shortest hop to the US transborder network.',
+            photo: null,
+        },
+        {
+            icao: 'MMGL', iata: 'GDL', city: 'Guadalajara', name: 'Miguel Hidalgo y Costilla',
+            role: 'Base', runways: 2, elevation: '5,016 ft', terminals: 'T1 · T2',
+            note: 'Connect country: the regional base most Cadets fly their first sector into.',
+            photo: null,
+        },
+        {
+            icao: 'MMUN', iata: 'CUN', city: 'Cancún', name: 'Cancún Intl',
+            role: 'Base', runways: 2, elevation: '22 ft', terminals: 'T2 · T3 · T4',
+            note: 'Sea level and busy — the one base where the weather does the flying for you.',
+            photo: null,
+        },
     ],
+
+    /* ---- What an airport is called ----------------------------------------
+       ICAO → city, for destinations that are NOT in `routes` below. The network
+       page and the map take a destination's city from its route record, and a
+       sector opened in the crew centre has no route record here — which is how
+       LIRF and KSFO ended up on the map labelled with nothing but their own
+       code, exactly as the review reported.
+
+       These are the airport's real city, nothing more. Nothing is derived from
+       them: a code with no entry still prints as a code, because a guessed
+       place name is a wrong place name. Add a line when staff open a
+       destination and it is named everywhere at once. */
+    places: {
+        // Mexico and Central America
+        MMMX: 'Mexico City',  MMGL: 'Guadalajara',  MMMY: 'Monterrey',   MMUN: 'Cancún',
+        MMTJ: 'Tijuana',      MMSD: 'Los Cabos',    MMPR: 'Puerto Vallarta',
+        MMMD: 'Mérida',       MMZC: 'Zacatecas',    MMHO: 'Hermosillo',  MMCU: 'Chihuahua',
+        MMBT: 'Bahías de Huatulco', MMAA: 'Acapulco', MMCZ: 'Cozumel',   MMLO: 'León',
+        MMQT: 'Querétaro',    MMVR: 'Veracruz',     MMTC: 'Torreón',     MMCL: 'Culiacán',
+        MMOX: 'Oaxaca',       MMSP: 'San Luis Potosí', MMTP: 'Tapachula',
+        MGGT: 'Guatemala City', MSLP: 'San Salvador', MHTG: 'Tegucigalpa',
+        MROC: 'San José',     MPTO: 'Panama City',  MHLM: 'San Pedro Sula',
+        MDSD: 'Santo Domingo', MUHA: 'Havana',      MKJP: 'Kingston',    MYNN: 'Nassau',
+        // United States and Canada
+        KJFK: 'New York',     KLAX: 'Los Angeles',  KIAH: 'Houston',     KMIA: 'Miami',
+        KORD: 'Chicago',      KSFO: 'San Francisco', KATL: 'Atlanta',    KDFW: 'Dallas',
+        KDEN: 'Denver',       KSEA: 'Seattle',      KBOS: 'Boston',      KLAS: 'Las Vegas',
+        KPHX: 'Phoenix',      KMCO: 'Orlando',      KEWR: 'Newark',      KIAD: 'Washington',
+        KDCA: 'Washington',   KSAN: 'San Diego',    KAUS: 'Austin',      KSLC: 'Salt Lake City',
+        KMSP: 'Minneapolis',  KDTW: 'Detroit',      KPDX: 'Portland',    KSAT: 'San Antonio',
+        CYYZ: 'Toronto',      CYUL: 'Montréal',     CYVR: 'Vancouver',   CYYC: 'Calgary',
+        // Europe
+        LEMD: 'Madrid',       LEBL: 'Barcelona',    LFPG: 'Paris',       EGLL: 'London',
+        EHAM: 'Amsterdam',    EDDF: 'Frankfurt',    LIRF: 'Rome',        LIMC: 'Milan',
+        LPPT: 'Lisbon',       EDDM: 'Munich',       LSZH: 'Zurich',      LOWW: 'Vienna',
+        EKCH: 'Copenhagen',   LTFM: 'Istanbul',     UUEE: 'Moscow',      EIDW: 'Dublin',
+        EGKK: 'London',       LFPO: 'Paris',        LEPA: 'Palma',
+        // South America
+        SPJC: 'Lima',         SCEL: 'Santiago',     SBGR: 'São Paulo',   SAEZ: 'Buenos Aires',
+        SKBO: 'Bogotá',       SEQM: 'Quito',        SVMI: 'Caracas',     SBGL: 'Rio de Janeiro',
+        SLLP: 'La Paz',       SUMU: 'Montevideo',   SGAS: 'Asunción',    SKCG: 'Cartagena',
+        // Asia Pacific, Middle East and Africa
+        RJAA: 'Tokyo',        RJTT: 'Tokyo',        RKSI: 'Seoul',       ZBAA: 'Beijing',
+        ZSPD: 'Shanghai',     VHHH: 'Hong Kong',    WSSS: 'Singapore',   RPLL: 'Manila',
+        YSSY: 'Sydney',       NZAA: 'Auckland',     OMDB: 'Dubai',       OTHH: 'Doha',
+        LLBG: 'Tel Aviv',     HECA: 'Cairo',        FAOR: 'Johannesburg', GMMN: 'Casablanca',
+        VIDP: 'Delhi',        VABB: 'Mumbai',       VTBS: 'Bangkok',     WMKK: 'Kuala Lumpur',
+    },
 
     /* ---- Where everything is ----------------------------------------------
        Aerodrome reference points, degrees, WGS-84. Used by the route map to
@@ -214,6 +299,40 @@ window.AMV_DATA = {
             },
         },
     ],
+
+    /* ---- The hero: a video from the cabin ---------------------------------
+       THE HOME PAGE OPENS ON MOTION when this is filled in. Point `src` at a
+       clip and hero.js plays it full-bleed behind the headline instead of
+       rotating the fleet photographs — the photographs stay exactly where they
+       are and become the fallback, so an empty `src` here changes nothing.
+
+       It is EMPTY on purpose, and it is the VA's to fill. The clip wanted is
+       the view from the cabin at cruise, captured in Infinite Flight: the
+       airline's own footage of its own aeroplane, on the same terms as every
+       photograph in `fleet` below. A stock cabin clip off the internet is the
+       "invented artwork standing in for a real airline" the header of
+       brand.css exists to keep out, with a licensing problem on top.
+
+       To fill it:
+
+           video: {
+               src:    '/assets/video/cabin-cruise.mp4',   // H.264 MP4
+               poster: '/assets/video/cabin-cruise.jpg',   // first frame
+               w: 1920, h: 1080,
+               alt: 'The view from the cabin at cruise, over the Gulf.',
+           },
+
+       `poster` is not optional in practice: it is what shows while the video
+       loads, what stands in on a slow connection, and what a visitor who asked
+       for reduced motion sees instead of the clip, because hero.js does not
+       autoplay for them. Without it the hero is a black rectangle until the
+       first frame decodes.
+
+       Keep it short, silent and gentle — it loops, it is muted (a hero that
+       makes noise is a hero people leave), and it sits behind type. Twenty
+       seconds under about 4 MB is the budget; this is the largest thing on the
+       page and it downloads before anyone has decided to stay. */
+    video: null,
 
     /* ---- The hero stage: hub stills (optional) ----------------------------
        Photographs that lead the home page's rotation, ahead of the fleet.
@@ -335,42 +454,98 @@ window.AMV_DATA = {
 
        This must stay identical to the ladder configured in the Crew Center
        (Appearance → Ranks). The crew centre is what actually promotes people;
-       if the two disagree, the crew centre wins and this file is wrong. */
+       if the two disagree, the crew centre wins and this file is wrong.
+
+       `stripes` and `wing` are the rank's INSIGNIA — the epaulette drawn beside
+       it on /ranks. The review's finding was that a ladder of hour thresholds
+       reads as a table rather than as a progression, and a pilot can see four
+       bars coming in a way they cannot see "200 hours" coming. They are the
+       conventional flight-deck bars: one for a cadet, two for a second officer,
+       three for a first officer, four for a command, with the eagle's wing
+       added at the two senior grades and the crest standing alone for the
+       appointed rank. Nothing enforces them; they are a drawing of the ladder
+       that is already here.
+
+       `perks` is NOT FROM THE OPERATIONS PLAN and is the one thing on this page
+       that is not. The plan states the hour thresholds, the sector caps and the
+       fleet releases — which is what a rank COSTS, and says nothing about what
+       it BUYS beyond the aircraft. The review asked for exactly that, so these
+       are drafted from what the airline already does elsewhere in the plan
+       (Line Trainers §2, event crewing §9, director eligibility §2, the
+       multiplier §4). Confirm each line with the CEO and Flight Operations and
+       correct it here — or delete it: an unkept privilege is worse than none.
+       The first entry of each is the fleet release, which IS the plan's. */
     ranks: [
         {
-            name: 'Cadet', minHours: 0, sectorHours: 3,
+            name: 'Cadet', minHours: 0, sectorHours: 3, stripes: 1,
             note: 'Where every pilot starts. One sector in your first seven days and you are a line pilot.',
             duty: 'Fly the published network inside the Cadet sector limit. Line Trainers are there for the first few.',
+            perks: [
+                'E190 and 737-800 — the Connect and domestic fleet, released on day one.',
+                'A Line Trainer on call — for your first sectors, and for as long after as you want one.',
+                'The whole crew centre — logbook, roster, route booking and automatic flight reports.',
+            ],
         },
         {
-            name: 'Second Officer', minHours: 10, sectorHours: 5,
+            name: 'Second Officer', minHours: 10, sectorHours: 5, stripes: 2,
             note: 'The transborder network opens up, and with it the first sectors into the United States.',
             duty: 'Full domestic flying plus US transborder sectors up to five hours.',
+            perks: [
+                'The 737 MAX 8 — and with it the whole US transborder network.',
+                'Event sign-ups open — any group departure inside your sector limit.',
+                'A say in the network — put a route to Flight Operations and it gets considered.',
+            ],
         },
         {
-            name: 'First Officer', minHours: 40, sectorHours: 7.5,
+            name: 'First Officer', minHours: 40, sectorHours: 7.5, stripes: 3,
             note: 'Widebody flying begins. The 787-8 and the deeper South American network.',
             duty: 'Long-haul sectors up to seven and a half hours; may crew event flights.',
+            perks: [
+                'The 787-8 — your first widebody, and the South American long-haul with it.',
+                'Nominated event crew — a seat on the flight rather than a place in the ballot.',
+                'Eligible for staff — you may stand for a director post or a Line Trainer seat.',
+            ],
         },
         {
-            name: 'Senior First Officer', minHours: 80, sectorHours: 10,
+            name: 'Senior First Officer', minHours: 80, sectorHours: 10, stripes: 3, wing: true,
             note: 'The flagship. Madrid, Amsterdam and the transatlantic network on the 787-9.',
             duty: 'Sectors up to ten hours. Expected to help newer pilots on group flights.',
+            perks: [
+                'The 787-9 flagship — Madrid, Amsterdam and the transatlantic network.',
+                'First call on gates — you pick your stand and slot at a hub takeover.',
+                'Named as a mentor — newer pilots are assigned to you on group flights.',
+            ],
         },
         {
-            name: 'Captain', minHours: 200, sectorHours: 13,
+            name: 'Captain', minHours: 200, sectorHours: 13, stripes: 4,
             note: 'Command of the long-haul fleet, and the full fleet released.',
             duty: 'Sectors up to thirteen hours. Leads group departures when Flight Ops asks.',
+            perks: [
+                'The full fleet — every type released, the 777-200ER included.',
+                'Command of group departures — you lead them when Flight Operations asks.',
+                'Sign-off authority — you may clear a Cadet’s first sector when no trainer is free.',
+            ],
         },
         {
-            name: 'Senior Captain', minHours: 500, sectorHours: null,
+            name: 'Senior Captain', minHours: 500, sectorHours: null, stripes: 4, wing: true,
             note: 'No sector limit at all — Tokyo, Seoul and the ultra-long-range codeshares.',
             duty: 'Event command and mentoring duties. The rank that flies the sectors nobody else may file.',
+            perks: [
+                'No sector limit at all — Tokyo, Seoul and the ultra-long-range codeshares.',
+                'Event command — plan and run one of your own with the Director of Events.',
+                'A standing voice — network proposals come to you at the monthly staff meeting.',
+            ],
         },
         {
-            name: 'Aeroméxico Airman', minHours: null, sectorHours: null, appointed: true, multiplier: 1.4,
+            name: 'Aeroméxico Airman', minHours: null, sectorHours: null, appointed: true,
+            multiplier: 1.4, crest: true,
             note: 'Awarded, not earned by hours. Full fleet, no sector limit, and a 1.4× multiplier on every hour logged after it.',
             duty: 'Made by the CEO on the Director of Flight Operations’ recommendation, for sustained contribution — and withdrawn on the same authority if the standard is not kept.',
+            perks: [
+                'The crest in place of the bars — full fleet, and no sector limit.',
+                'A 1.4× multiplier — on every hour logged after the appointment.',
+                'First refusal — on charter, anniversary and joint-VA flying.',
+            ],
         },
     ],
 
@@ -392,6 +567,7 @@ window.AMV_DATA = {
         { req: 'An active Infinite Flight Pro subscription', why: 'The airline flies the Expert Server, which Pro is required for.' },
         { req: 'Grade 2 or above to apply', why: 'Grade 3 is what Infinite Flight requires to enter the Expert Server, so that is what you need to fly the line.' },
         { req: 'No active violations or suspensions on the IFC', why: 'Everyone has a bad day. What matters is that nothing is outstanding against you now.' },
+        { req: 'Not on the IFVARB Blacklist or Watchlist', why: 'The board keeps both lists so virtual airlines do not have to re-learn the same problem. We check yours before an application is approved.' },
         { req: 'An Infinite Flight Community account', why: 'So we can reach you, and you can reach us.' },
         { req: 'Agreement to the Operations Plan and code of conduct', why: 'Fly the callsign properly, follow ATC, be decent to people.' },
     ],
@@ -417,38 +593,29 @@ window.AMV_DATA = {
         { when: 'Within a week', what: 'Attendance, what worked and what did not are written up for the staff channel.' },
     ],
 
-    // Dates are ISO-8601 with an explicit UTC offset so they render correctly
-    // in every pilot's local time.
-    events: [
-        {
-            title: 'Valle de México Fly-In',
-            date: '2026-09-19T21:00:00Z',
-            from: 'Anywhere', to: 'MMMX', ac: 'Any Aeromexico fleet type',
-            server: 'Expert', slots: 0, kind: 'Fly-in',
-            blurb: 'Bring anything in our fleet into MMMX. Arrival slots are first-come; ATC staffed for three hours.',
-        },
-        {
-            title: 'Connect Regional Rush',
-            date: '2026-09-26T20:00:00Z',
-            from: 'MMGL', to: 'MMMY', ac: 'Embraer E190',
-            server: 'Expert', slots: 24, kind: 'Group flight',
-            blurb: 'A short, sharp Connect sector for newer pilots — inside the Cadet limit, and perfect for a first logged event flight.',
-        },
-        {
-            title: 'Águila Transatlántica',
-            date: '2026-10-10T19:00:00Z',
-            from: 'MMMX', to: 'LEMD', ac: 'Boeing 787-9 Dreamliner',
-            server: 'Expert', slots: 40, kind: 'Group flight',
-            blurb: 'The full flagship run to Madrid, flown as a group departure out of Mexico City with staffed ATC on the ground.',
-        },
-        {
-            title: 'Pacífico Nocturno',
-            date: '2026-10-24T04:00:00Z',
-            from: 'MMMX', to: 'RJAA', ac: 'Boeing 787-9 Dreamliner',
-            server: 'Expert', slots: 30, kind: 'Group flight',
-            blurb: 'Our longest sector, overnight into Narita. Senior Captains only — it is past every other rank’s sector limit.',
-        },
-    ],
+    /* ---- Events -----------------------------------------------------------
+       EMPTY, AND IT STAYS EMPTY. This array used to carry four events —
+       Valle de México Fly-In, Connect Regional Rush, Águila Transatlántica,
+       Pacífico Nocturno — each with a date, a route, an aircraft, a server and
+       a slot count. None of them was real. They were written here as "fallback
+       copy" so the events page and the home page's next-departure band would
+       have something to show before the crew centre answered.
+
+       That is the same mistake as the roster figures at the foot of this file,
+       and worse in one way: a made-up hours total is a number nobody can turn
+       up for. An invented event has a date on it. The home page was
+       advertising a departure to pilots who could have set an alarm for it.
+
+       The calendar lives in the crew centre, which is where staff actually
+       publish events and where sign-ups are counted. Both pages read it
+       directly now: they hold a waiting state while the request is in flight
+       and say plainly that nothing is scheduled if it answers with nothing.
+       An empty calendar is a true statement about the airline and takes one
+       event in the crew centre to stop being true.
+
+       Do not put a specimen event in here to see what the card looks like.
+       Publish it in the crew centre. */
+    events: [],
 
     /* ---- The first twelve months (plan §12) ------------------------------- */
     roadmap: [
@@ -458,12 +625,23 @@ window.AMV_DATA = {
         { q: 'Q4', objective: 'Consolidate — mentoring and the full network', measure: '75 active pilots; line trainers assigned; 80% activity compliance' },
     ],
 
-    /* ---- What the airline holds itself to (plan §1) ----------------------- */
+    /* ---- What the airline holds itself to (plan §1) -----------------------
+       `title` is the plan's own wording and is what /about sets out, with the
+       `note` under it. `tag` is the same commitment in two or three words, for
+       the strip across the home page's hero — four full titles there run to
+       seventy characters of tracked small caps and wrap into a paragraph,
+       which is not what a strip is for. A tag is a compression of its title,
+       never a fifth value: if the two ever say different things, the tag is
+       the one that is wrong. */
     values: [
-        { title: 'Realism first',        note: 'Routes, aircraft and procedures follow the real airline unless the simulator makes that impossible.' },
-        { title: 'Members before numbers', note: 'A roster of active pilots who enjoy flying is the goal. Headcount is a by-product, not the target.' },
-        { title: 'Staff serve the roster', note: 'Every staff role exists to remove work from pilots, not to add rank.' },
-        { title: 'Say what is decided',  note: 'Decisions, rule changes and disciplinary outcomes are communicated in plain terms, promptly.' },
+        { title: 'Realism first', tag: 'Realism first',
+          note: 'Routes, aircraft and procedures follow the real airline unless the simulator makes that impossible.' },
+        { title: 'Members before numbers', tag: 'Members first',
+          note: 'A roster of active pilots who enjoy flying is the goal. Headcount is a by-product, not the target.' },
+        { title: 'Staff serve the roster', tag: 'Staff serve pilots',
+          note: 'Every staff role exists to remove work from pilots, not to add rank.' },
+        { title: 'Say what is decided', tag: 'Said plainly',
+          note: 'Decisions, rule changes and disciplinary outcomes are communicated in plain terms, promptly.' },
     ],
 
     // NO ROSTER FIGURES HERE, DELIBERATELY.

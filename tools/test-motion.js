@@ -43,7 +43,10 @@ const server = http.createServer((req, res) => {
     fs.createReadStream(file).pipe(res);
 });
 
-const PAGES = ['index', 'network', 'fleet', 'ranks', 'events', 'staff', 'join', 'about'];
+// 'join' became 'apply' in the round-2 review. The old path still resolves on
+// the deployed site through _redirects, but this harness serves files off disk
+// with no redirect table, so the name here has to be the real one.
+const PAGES = ['index', 'network', 'fleet', 'ranks', 'events', 'staff', 'apply', 'about'];
 
 // Every page is checked with the crew centre unreachable AND answering, because
 // the two produce different markup — a live answer injects cards that have to
@@ -65,6 +68,35 @@ async function settle(page) {
     for (let y = 0; y < h; y += 500) { await page.evaluate(v => scrollTo(0, v), y); await page.waitForTimeout(90); }
     await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(1200);
+}
+
+// Wait for every running transition and animation to FINISH, rather than
+// guessing at a number of milliseconds. The seam probe reads pixel luminance
+// off a full-page screenshot, so an element caught mid-fade reads as a colour
+// that is on the page for no more than a frame — which is how this test
+// produced a hard-seam failure that no amount of re-running reproduced.
+//
+// It got worse, not better, when reveals were FIXED: groups filled by a page's
+// own script never used to animate at all (site.js stamped them as staged
+// while they were still empty), so half the page was static when this was
+// written. getAnimations() covers both CSS transitions and animations.
+// It LOOPS, and that is the point. Waiting on getAnimations() once is not
+// enough: a scroll can reveal an element, and the transition that reveals it
+// is created a frame later — after the wait has already resolved on an empty
+// list. This keeps asking until the page has been quiet twice in a row, or
+// until it gives up, so a page that animates forever cannot hang the suite.
+async function stillFrame(page, budgetMs = 4000) {
+    const until = Date.now() + budgetMs;
+    let quiet = 0;
+    while (Date.now() < until && quiet < 2) {
+        const running = await page.evaluate(async () => {
+            const a = document.getAnimations();
+            await Promise.all(a.map(x => x.finished.catch(() => {})));
+            return a.length;
+        });
+        await page.waitForTimeout(120);        // a frame for anything new to start
+        quiet = running === 0 ? quiet + 1 : 0;
+    }
 }
 
 const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[data-reveal]')]
@@ -116,8 +148,12 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
             const g = document.querySelector('.grid.grid-3[data-reveal-group]');
             return [...g.children].map(c => parseInt(getComputedStyle(c).getPropertyValue('--reveal-delay'), 10));
         });
+        // Not "=== 6". That was the six-card WHY grid, and asserting a card
+        // COUNT makes this a snapshot of the page's shape rather than a test
+        // of the cascade — it failed the day the home page was cut back to
+        // glimpses, for a reason that had nothing to do with reveals.
         check('every card in the grid is a reveal with its own delay',
-            delays.length === 6 && delays.every(Number.isFinite), JSON.stringify(delays));
+            delays.length >= 2 && delays.every(Number.isFinite), JSON.stringify(delays));
         check('the run counts up and never restarts halfway down',
             delays.every((d, i) => i === 0 || d > delays[i - 1]), JSON.stringify(delays));
 
@@ -135,8 +171,10 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
 
         const groups = await page.evaluate(() =>
             [...document.querySelectorAll('[data-reveal-group]')].map(g => g.children.length));
+        // Likewise: what matters is that no group is left with nothing to
+        // stagger, not how many groups the page happens to have.
         check('every group on the home page actually has children to stagger',
-            groups.length >= 3 && groups.every(n => n > 1), JSON.stringify(groups));
+            groups.length >= 1 && groups.every(n => n > 1), JSON.stringify(groups));
         await page.close();
     }
 
@@ -184,7 +222,7 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
         const page = await open('index', { live });
         await settle(page);
         await page.evaluate(() => scrollTo(0, 0));
-        await page.waitForTimeout(400);
+        await stillFrame(page);
         // A section that removed itself has no seam to judge; measuring it
         // reads the top-left corner of the page instead, which is the nav.
         const bounds = await page.evaluate(() => [...document.querySelectorAll('main > section, main > .band')]
@@ -242,12 +280,35 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
         // test is not "is it small" but "is it spread": a ramp puts only a
         // fraction of the change in the 12px at the join, and a knife edge puts
         // nearly all of it there.
+        //
+        // THERE IS NO MINIMUM. This used to assert that at least two such
+        // changeovers existed, then one. Both were wrong in the same way: they
+        // were written for a site with several dark sections, and the brief
+        // since then is a white site that follows the theme. In light mode
+        // there is now no dark ground on the home page at all — the hero took
+        // the page's paper back when it stopped putting type over the
+        // photograph — so requiring one is requiring the design to grow a dark
+        // section it does not want, and the check failed at zero for weeks
+        // while saying nothing true.
+        //
+        // What is left below still judges every mixed seam that DOES exist, so
+        // a dark ground returning is still held to the rule. `soft` above
+        // already guards that the probe found seams at all.
         const mixed = read.filter(r => dark(r.far) !== dark(r.deep));
-        check(`[${label}] there is a navy changeover to judge`, mixed.length >= 2, String(mixed.length));
         mixed.forEach(r => {
             const total = Math.abs(r.far - r.deep);
             const step = Math.abs(r.above - r.below);
-            if (/\bband\b/.test(r.cls)) {
+            // A dark ground that ENDS ON A DEVICE keeps its edge crisp: the
+            // band wears a marigold greca crown, the hero closes on the
+            // tricolour. Ramping either one would put a sliver of white above
+            // the device and read as a gap, which is the same reasoning the
+            // band was exempted for in the first place. Every other dark/pale
+            // seam still has to spread.
+            //
+            // `hero-under` is matched rather than `hero`: the seam belongs to
+            // the section BELOW the join, and that is the band of counted
+            // figures sitting under the hero's photograph.
+            if (/\b(band|hero-under)\b/.test(r.cls)) {
                 check(`[${label}] the edge into "${r.cls}" is kept crisp (${step.toFixed(0)} of ${total.toFixed(0)})`,
                     total > 100 && step > total * 0.6, JSON.stringify(r.run));
             } else {

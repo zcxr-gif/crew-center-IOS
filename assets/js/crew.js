@@ -162,11 +162,19 @@
             }))
             .filter(e => e.title);
 
-        // An empty calendar is a real answer and still not the one to show: the
-        // page would go from four events to nothing because the crew center has
-        // not been filled in yet. data.js stays the fallback, as everywhere
-        // else in this file.
-        return live.length ? live : null;
+        // AN EMPTY CALENDAR COMES BACK AS [], not as null, and this is the one
+        // place in this file where those two differ. Everywhere else null means
+        // "we have nothing to say, leave what is on the page" — which was right
+        // while data.js carried four events to fall back to. Those events were
+        // invented and are gone, so there is nothing to fall back to and
+        // nothing to protect: an empty calendar is simply the truth about the
+        // airline this week, and the pages say so.
+        //
+        // null is still returned above for a real failure — no answer, or an
+        // answer that is not a calendar — because "we could not ask" and "there
+        // is nothing on" are different, even though both pages currently show
+        // the same note for them.
+        return live;
     }
 
     /* ---- Flown events -------------------------------------------------------

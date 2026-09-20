@@ -48,7 +48,7 @@
 <noscript>
     <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
     <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
-    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="/about">About us</a> · <a href="/staff">Staff</a> · <a href="/apply">Apply</a> ·
     <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
 </noscript>
 
@@ -126,7 +126,7 @@
             <h2>Everyone starts at Cadet.</h2>
             <p>Ten hours is one long-haul or four Connect sectors. The ladder moves faster than it reads.</p>
             <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Apply to fly <span data-icon="arrow"></span></a>
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/network">See the network</a>
             </div>
         </div>
@@ -145,6 +145,22 @@
         ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     const earned = A.earnedRanks(D.ranks);
+
+    // G_Captain's note was that this page is small and flat — "it could be
+    // larger with some keypoint bold". The size is in brand.css; the bold is
+    // here, and it is not markup typed into data.js. Every privilege is
+    // written as "the thing you get — what that means", so the lead clause up
+    // to the em dash IS the keypoint, and that is what is set in the ink.
+    //
+    // Escaped FIRST, then wrapped: the emphasis goes around text that is
+    // already inert, so a data file can never smuggle a tag through it. A line
+    // written without a lead clause simply gets none rather than being set
+    // bold end to end.
+    function perk(text) {
+        const safe = esc(text);
+        const m = safe.match(/^([^—]+?)\s*(—\s.+)$/);
+        return m ? `<b>${m[1]}</b> ${m[2]}` : safe;
+    }
     const cap = r => r.sectorHours == null ? 'No limit'
         : (Number.isInteger(r.sectorHours) ? r.sectorHours : r.sectorHours.toFixed(1)) + ' hours';
 
@@ -160,22 +176,55 @@
     const releases = {};
     D.fleet.forEach(a => { (releases[a.releasedAt] = releases[a.releasedAt] || []).push(a); });
 
+    // THE INSIGNIA. The review asked for a badge against each rank, and it was
+    // right that a column of hour thresholds reads as a table rather than as
+    // something to climb. This is the epaulette every pilot already knows: a
+    // navy board with gold bars across it, one to four, with the eagle's wing
+    // added at the two senior grades. The appointed rank wears the crest
+    // instead, because it is not a step on the same ladder.
+    //
+    // It is drawn, not fetched: an <img> per rank is seven more requests and
+    // seven more things to 404, and this one recolours with the theme.
+    function badge(r) {
+        if (r.crest) {
+            return `<span class="insignia insignia--crest" aria-hidden="true">
+                        <span class="mark"></span>
+                    </span>`;
+        }
+        const bars = Array.from({ length: r.stripes || 1 }, () => '<i></i>').join('');
+        return `<span class="insignia${r.wing ? ' insignia--wing' : ''}" aria-hidden="true">
+                    ${bars}
+                </span>`;
+    }
+
+    // "Four bars" / "the crest" — the badge is decorative, so what it MEANS is
+    // said in text for anyone not looking at it.
+    function badgeText(r) {
+        if (r.crest) return 'The crest, in place of the bars';
+        const n = r.stripes || 1;
+        const word = ['', 'One bar', 'Two bars', 'Three bars', 'Four bars'][n] || `${n} bars`;
+        return r.wing ? `${word} and the wing` : word;
+    }
+
     document.getElementById('ladder').innerHTML = D.ranks.map((r, i) => {
         const opens = releases[r.name] || [];
-        const bars = earned.indexOf(r) < 0 ? earned.length : earned.indexOf(r) + 1;
         return `
         <div class="ladder__row${r.appointed ? ' is-appointed' : ''}" data-reveal data-reveal-delay="${Math.min(i, 5) * 60}">
             <div class="ladder__lead">
-                <span class="ladder__bars" aria-hidden="true">${
-                    Array.from({ length: bars }, (_, k) =>
-                        `<i style="height:${30 + k * 12}%"></i>`).join('')}</span>
+                ${badge(r)}
                 <span class="ladder__name">${esc(r.name)}</span>
                 <span class="ladder__hours">${r.appointed ? 'By appointment'
                     : r.minHours === 0 ? 'Day one' : r.minHours + ' hours'}</span>
+                <span class="ladder__insignia-note">${esc(badgeText(r))}</span>
             </div>
             <div class="ladder__body">
-                <p>${esc(r.note)}</p>
-                <p style="font-size:.92rem">${esc(r.duty)}</p>
+                <p class="ladder__note">${esc(r.note)}</p>
+                <p class="ladder__duty">${esc(r.duty)}</p>
+                ${(r.perks && r.perks.length) ? `
+                <div class="ladder__perks">
+                    <h3>What it gets you</h3>
+                    <ul>${r.perks.map(t => `<li>${perk(t)}</li>`).join('')}</ul>
+                </div>` : ''}
                 <div class="ladder__facts">
                     <span class="ladder__fact"><i>Longest sector</i><b>${esc(cap(r))}</b></span>
                     <span class="ladder__fact"><i>Releases</i><b>${

@@ -9,12 +9,13 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 ```
 index.html         Home — hero, live figures, why, the route map, next event
 fleet.html         The six operated types, what each one flies, and what is planned
-network.html       The route map, then every published sector grouped by tier
-ranks.html         The ladder: hours, aircraft released, sector limits
+network.html       The route map, the flagship destinations, then every published sector
+ranks.html         The ladder: insignia, hours, aircraft released, sector limits, privileges
 events.html        The calendar, the programme, and what has been flown
 about.html         Mission, the CEO's message, standards, the first twelve months
 staff.html         Who runs the airline, and what each of them owns
-join.html          Requirements, the real application form (framed), and life after joining
+apply.html         Requirements, the real application form (framed), and life after joining
+                   (served at /apply; /join is kept as a permanent alias)
 crew.html          The Crew Center, framed in our own chrome
 
 brand.json         ← the brand contract. See "One brand, two products" below.
@@ -103,7 +104,8 @@ motifs sharing a section, not that device.
 
 | file | what it is | where it runs |
 |---|---|---|
-| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries, and faded behind dark sections |
+| `assets/img/lockup.png` | **the airline's own logo**, crest and wordmark in one piece, supplied by the VA | nav bar, footer |
+| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | favicon, fleet entries, staff plates, rank insignia, hub plates, `.band` crest |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
@@ -259,9 +261,24 @@ already on the page". `data.js` stays the fallback rather than becoming dead
 weight. Never build a section that only exists once a fetch resolves; a visitor
 on hotel wifi gets an empty page instead of a slow one.
 
-An **empty** answer is treated the same as no answer, deliberately. A crew
-center whose route list has not been filled in yet would otherwise blank a
-network page that this repo already knows 23 sectors for.
+**Two feeds are exempt, and the exemption is the point.** The route network and
+the events calendar are read from the crew center or not shown at all. They
+hold a waiting state while the request is in flight and say plainly that there
+is nothing when it answers with nothing.
+
+The reason is that both are things a reader can *act* on — book the sector,
+turn up for the departure — so a plausible placeholder is not a graceful
+degradation, it is a false statement with a date on it. `data.js` carried four
+invented events for exactly this purpose and the home page advertised them
+under the heading "The next departure". They are gone, `events: []` is
+deliberate, and `tools/test-events-page.js` fails if anything like them comes
+back. Everything else in `data.js` — the fleet, the ranks, the hubs — is a
+description of the airline that is true whether or not a server answers, which
+is why those still make good fallbacks.
+
+For every other feed an **empty** answer is treated the same as no answer,
+deliberately. A crew center whose roster figures have not been filled in yet
+would otherwise blank a section this repo can already describe.
 
 The two record shapes do not match, and that is the interesting part. The crew
 center knows the sector and the aircraft; `data.js` knows the things a reader
@@ -493,61 +510,150 @@ of approved sectors sampled at random off the crew centre's public flight log
 (`AMV_CREW.pireps()`): real pilots, real routes, filed by flying them. Then the
 airline in four counted figures.
 
-**There is no headline and no lede, and that is the point.** Three heroes have
-now been thrown out of this repo. A two-column white header, which was fine and
-in the VA's words not memorable. A poster — the 787-9 drawn in its special
-livery, ringed by folk art, over the wordmark — which was memorable and was a
-drawing, sitting one click from photographs of the same airframe. And then the
-photographs with the usual furniture on top: eyebrow, 70px tagline, a paragraph
-of positioning copy. That furniture came off because it covered up the subject,
-and because unlike the rest of this site it was written once and would have gone
-on being said.
+**The apply tab** is the one piece of furniture that follows you between
+pages, so it carries the single action the whole site asks for and nothing
+else. A tab down the right edge opens a drawer along the foot of the screen —
+the coronausa.com pattern the VA pointed at.
 
-What replaced it is `.hero__plate`: the aircraft on screen **naming itself** —
-type, registration, what the type is for, and a sector it flies, in cities where
-the site already names them. It is set in the display face because it is the
-headline now. Every word of it is read off `data.js` and changes when the stage
-does. The page is still named for a screen reader and a crawler by an `.sr-only`
-`<h1>`; it is simply not set in 70px over the aeroplane. `plane-hero.webp`,
-`plane-logo.webp` and `tools/crop-hero.py` went with the poster, and the share
-card on every page is a real photograph now.
+It is a **disclosure, not a dialogue**: no overlay, no focus trap, nothing
+underneath goes inert. You can ignore it and keep reading, which is the whole
+difference between this and a pop-up. Escape closes it, focus moves into the
+drawer on open and back to the tab on close.
 
-Four things about the stage are deliberate:
+What it is *not* is the thing that shape is usually used for. Corona's drawer
+is an email capture — address, date of birth, postcode, for a discount. There
+is no list to add anyone to here, so a form pretending otherwise would collect
+real addresses into nothing, which is worse than not asking. It is a sentence
+and the button that was already on the page.
+
+`APPLY_SKIP` in `site.js` keeps it off `/apply`, which *is* the thing it points
+at, and `/crew`, which is one viewport tall by design.
+
+**The lockup is the airline's own logo**, not an assembly. The nav used to
+build the name out of `mark.svg` plus two lines of type — Fraunces for
+"Aeromexico", letter-spaced sans for "Virtual" — which was always an
+approximation of the lockup the VA actually owns. That lockup is now a file,
+and `.brandmark` paints it.
+
+It is painted through a **mask**, exactly as `.mark` is: the supplied PNG is
+white on transparent, so its alpha channel is the shape and `currentColor` is
+the ink. One file serves both themes, and `.nav__brand` states `color:
+var(--ink)` so it is near-black on paper and near-white on navy with no second
+rule. It is **sized by height** — the ratio is the file's own, so a bar that
+fixes a height gets the width for free.
+
+The file is the supplied PNG cropped to its ink and flattened to white, since
+everything but the alpha is discarded by the mask anyway.
+
+**Why this ships when the Connect lockup does not.** The Connect note in
+`brand.css` refuses to ship the real AEROMÉXICO CONNECT artwork, because that
+is Aeroméxico's own registered sub-brand wordmark and this repo draws its mark
+from a traced SVG and sets everything else in type. This is not that: it is
+Aeromexico Virtual's lockup, for Aeromexico Virtual's own name, handed over by
+the VA that owns it. The Connect sub-brand is still typeset.
+
+A **stacked** lockup was supplied too and is not shipped: both placements are
+horizontal, the footer is already fighting to stay short on a phone, and a
+favicon has to read at 16px where a wordmark is a smudge and the crest alone is
+right. Crop it the same way and add a variant if a placement turns up.
+
+**The header is an island.** A rounded bar floating with air on all four sides
+rather than a full-width strip ruled off from the page, and on the home page it
+floats *over* the hero's photograph.
+
+Three things about it are load-bearing:
+
+- **The host is what is pinned, not `.nav`.** A sticky element can only travel
+  inside its own parent's border box, and the host is exactly as tall as the
+  bar plus its gap — sticky on `.nav` has nowhere to go and the header scrolls
+  away with the page. The host also supplies the gap, as *padding*, so the
+  bar's own box is exactly the island and `overflow: hidden` clips the
+  tricolour and the open mobile menu to its corner radius. The menu expanding
+  the island into a rounded panel is that clip, not a separate treatment.
+- **`--header-h` is the bar plus the gap twice**, because the tricolour lives
+  inside the bar now and no longer adds height. `scroll-padding-top`, the
+  mobile menu's `max-height` and the hero's `min-height` all read it.
+- **The hero floats under it** via `main > .hero--live:first-child`, which pulls
+  the hero up by `--header-h` and gives it back as padding — nothing inside the
+  hero moves, only the picture grows upward. Scoped to a `.hero--live` that is
+  the *first* thing in `main`, so every other page keeps the island on its own
+  ground with a white edge to float against.
+
+What went when the island came in: the scrim under the bar (an island has
+nothing to dissolve into), the full-width navy-to-red edge beneath it (a ruled
+line across the page is the opposite of floating), and the flagline as a
+separate strip above it. The tricolour is drawn along the *inside* of the
+island's top edge, and it carries a hairline underneath: the flag's middle
+third is white, and without that line it disappears into a light island and the
+flag reads as two disconnected bars.
+
+**The photograph is the screen, and the logo arrives on it.** Seven heroes have
+been thrown out of this repo; the list and the reasoning are in `brand.css`,
+because the instinct that produced each one comes back. This one takes back the
+shape of #5 — full bleed, full height, type over the picture — at the VA's
+direction, with what #6 was built to fix stated rather than forgotten:
+
+- **It is dark in both themes.** A photograph has no light mode, and white type
+  over one needs a single ground to be legible against whatever the theme is
+  doing. The rest of the page still follows the theme; the hero is the
+  exception, and the scrim is what makes that safe rather than a gamble on
+  which photograph happened to load.
+- **The aeroplane is cropped**, on a phone severely. `cover` on a full-bleed
+  stage cannot do anything else with a 1920×886 frame in a portrait viewport.
+  `object-position` holds the upper-middle where these airframes sit, the
+  uncropped shots are the whole point of `/fleet`, and the plate at the foot
+  names whichever one is on screen. Do not reach for `contain` to win it back:
+  that pillarboxes the airline's navy down both sides of a phone.
+
+**What arrives, and in what order.** The photograph is already there; then the
+lockup, the line under it, the buttons, the strip. One stagger, about half a
+second. It runs **once on load and never again** — a hero that re-animates
+every time you scroll back to the top is one you learn to scroll past — which
+is why it is a plain CSS animation and not `[data-reveal]`, which is
+scroll-driven and re-arms. Reduced motion gets no entrance at all.
+
+**Any animated element carrying a transform of its own has to carry it through
+the keyframes.** `.hero__foot` is centred with `translateX(-50%)`, and the
+shared `heroIn` ends on `transform: none`, which with `fill-mode: both`
+persists and wipes the centring — the credit lands half a screen to the right.
+It has its own keyframes for exactly that reason.
+
+**The bar goes to glass while it is on the photograph.** `site.js` adds
+`.is-over-hero` to the nav host while the hero is still behind it, measured
+against the hero's own height so a short phone and a tall desktop hand over at
+the same point in the picture. Every colour in that state is **stated**: the
+bar normally takes theme tokens, and over a photograph in light mode those are
+near-black text on a dark picture. The open mobile menu keeps the page's paper
+rather than going glass with the bar, because a translucent panel of links is
+not readable.
+
+Nothing over the photograph is marketing copy: the lockup is the airline's own
+artwork, `.hero__title` is its own line, `.hero__sub` is what it factually is,
+`.hero__values` is `AMV_DATA.values` read out, and the credit at the foot is
+the aircraft **naming itself** off `AMV_DATA.fleet`.
+
+Four more things about the stage are deliberate:
 
 - **Every layer is optional.** No photographs in `data.js`, a quiet backend, a
-  failed image fetch or scripting off, and the hero is the airline's navy wash,
-  the two buttons and the counted facts. A photo that 404s drops out of the
-  rotation; the flight strip stays `[hidden]` until real sectors arrive. There
-  is no skeleton and no placeholder leg anywhere in it — and now no copy to fall
-  back on either, which is the whole reason that contract is strict.
+  failed image fetch or scripting off, and the hero is the headline, the
+  sub-line and the two buttons on the page's own paper — a working hero. A photo that
+  404s drops out of the rotation; the flight strip, which sits under the hero
+  now rather than in it, stays `[hidden]` until real sectors arrive. There is
+  no skeleton and no placeholder leg anywhere in it.
 - **It only runs when it is being looked at.** Seven second dwell, paused by an
   `IntersectionObserver` when the hero scrolls away, by `visibilitychange` when
   the tab goes to the back, and by hover or focus. Asked for reduced motion it
-  does not advance at all — the dots still work, and the drift and cross-fade
-  come off in CSS.
+  does not advance at all — the dots still work, and the cross-fade comes off
+  in CSS.
 - **Photographs load as they are needed.** Only the first slide carries a `src`
   on first paint; each one loads as the slide before it comes up. Five 1920px
   photographs fetched to show one is the whole of an opening screen's budget.
-- **Nothing is cropped, on either screen.** `object-fit` is `contain`, not the
-  `cover` a full-bleed hero normally reaches for: these are 1920x886 photographs
-  of whole aeroplanes, and under `cover` a tall frame ate the tail off one side
-  and the nose off the other. Two geometries carry it. Wide (>= 48rem) the hero
-  is at least 50vw tall — taller than a 2.167 ratio needs at that width — so
-  `contain` fits by width and the slack lands as navy inside the veil, where it
-  is invisible. Narrow (< 48rem) the stage leaves the absolute layer, takes the
-  photograph's own `aspect-ratio`, and the plate stacks underneath it on navy;
-  that is the only arrangement in which this ratio fits a 390px screen whole
-  and still leaves the type somewhere legible. The one case `contain` gets
-  wrong is a viewport *wider* than the photograph, where fitting by width would
-  pillarbox it — an `(min-aspect-ratio: 19/10)` query falls back to `cover`
-  there, because a few percent off the sides beats two navy columns.
-- **The drift is `object-position`, not `transform: scale()`.** A Ken Burns
-  scale grows the image past its box and the box clips it, which is a crop —
-  the one thing this stage does not do. Percentage `object-position` on a
-  *contained* image is defined against the letterbox slack, so a 28% -> 72%
-  pan moves only through navy and cannot reach the picture's edges at any
-  viewport. On the phone band there is no slack, so the drift comes off there
-  and the cross-fade carries it.
+- **The drift is gone.** It was written in `object-position`, which panned
+  through the letterbox slack a *contained* image leaves, so it could never
+  reach the picture's edges. The band is the photograph's own ratio now, so
+  there is no slack at all: the same animation could only move the image
+  inside a box that exactly fits it, which is a crop. The cross-fade between
+  aircraft stays; it never cropped anything.
 - **Hub photography slots in through `AMV_DATA.heroStills`.** Entries there
   lead the rotation, ahead of the fleet, and the plate renders an ICAO in the
   marigold slot where an airframe puts its tail number — so a hub still reads
@@ -653,12 +759,21 @@ A sector whose airports are not in `AMV_DATA.airports` is listed by the network
 page and left off the map, and the legend says how many. Do not add coordinates
 you have not looked up.
 
-**The home page and the calendar now read the same feed.** Both paint from
-`data.js` first and upgrade to `AMV_CREW.events()` when it answers, so the home
-page can no longer advertise a departure the calendar has never heard of — which
-it could for as long as that card was hand-typed only.
+**The home page and the calendar read the same feed, and only that feed.** Both
+call `AMV_CREW.events()` and render what it returns: a waiting state while the
+request is in flight, the soonest published event if there is one, and an empty
+note if there is not.
 
-`data.js` events stay as the fallback, and they earn their place: a visitor who
-is offline, blocked or on a slow connection gets a calendar rather than a
-spinner. Keep them roughly true. Entries carry ISO-8601 dates with an explicit
-UTC offset and past ones age out on their own — nothing needs deleting.
+`data.js` used to carry four events as a fallback so neither page was ever
+empty, and every one of them was invented — Valle de México Fly-In, Connect
+Regional Rush, Águila Transatlántica, Pacífico Nocturno, each with a date, a
+route and a slot count. A visitor on a slow connection was shown four
+departures that did not exist, under a heading promising the next one. That is
+worse than a blank card: an invented statistic is something nobody can turn up
+for, and an invented event is not.
+
+So `events: []` in `data.js` is deliberate and should stay that way. Publish
+events in the crew center, which is where sign-ups are counted anyway. Do not
+put a specimen event in `data.js` to see what the card looks like —
+`tools/test-events-page.js` checks for those four titles by name and fails if
+they reappear.

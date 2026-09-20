@@ -65,7 +65,7 @@
 <noscript>
     <nav class="wrap section--tight"><a href="/">Home</a> · <a href="/fleet">Fleet</a> ·
     <a href="/network">Network</a> · <a href="/ranks">Ranks</a> · <a href="/events">Events</a> ·
-    <a href="/about">Airline</a> · <a href="/staff">Staff</a> · <a href="/join">Join</a> ·
+    <a href="/about">About us</a> · <a href="/staff">Staff</a> · <a href="/apply">Apply</a> ·
     <a href="https://inflight.info/crew/aeromexico-virtual">Crew Center</a></nav>
 </noscript>
 
@@ -106,6 +106,31 @@
         </div>
     </section>
 
+    <!-- ==================== HIGHLIGHTS ====================
+         The mobile review asked for "a few highlight destinations instead of
+         all your routes to make the page more attractive", and it is right that
+         a wall of twenty-three sectors is not an invitation. The full list has
+         not gone anywhere — it is directly below, filtered and searchable — but
+         the page now leads with six.
+
+         WHICH six is not an opinion typed in here: it is the longest sector in
+         each region the network reaches, which is the same rule the map already
+         uses to decide what to label. A region gained or lost in the crew
+         centre changes this strip with nothing edited. -->
+    <section class="section">
+        <div class="wrap">
+            <div class="head" data-reveal>
+                <span class="eyebrow">Worth the block time</span>
+                <h2>Flagship destinations</h2>
+                <p class="lede">
+                    The furthest we go in each part of the network — one sector per region, taken
+                    off the published list rather than picked by hand.
+                </p>
+            </div>
+            <div class="grid grid-3" id="highlights"></div>
+        </div>
+    </section>
+
     <!-- ==================== THE SECTORS, BY TIER ==================== -->
     <section class="section section--alt">
         <div class="wrap">
@@ -130,8 +155,10 @@
             <div class="pager" id="pager"></div>
             <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
                 Distances are great-circle nautical miles. Block times are scheduled and will vary
-                with routing, winds and the day's traffic. Flight numbers are issued in the crew
-                centre against the series shown.
+                with routing, winds and the day's traffic. A sector marked <b>est.</b> has no
+                published block time yet, so the figure shown is worked out from its distance
+                against our own schedule — treat it as approximate. Flight numbers are issued in
+                the crew centre against the series shown.
             </p>
         </div>
     </section>
@@ -152,7 +179,14 @@
 
     <!-- ==================== BASES ====================
          Moved to the foot of the page. They were the first thing on it, which
-         put three cards of airport metadata ahead of the network itself. -->
+         put three cards of airport metadata ahead of the network itself.
+
+         Two reviewers said the same thing about these cards: they look plain,
+         and they say less about an airport than an airport has to say. They
+         carry a plate, the aerodrome's own runway count, elevation and
+         terminals, and a line about what the base is FOR. The plate becomes a
+         photograph the moment `photo` is filled in on a hub in data.js — see
+         the note there about why this repo will not paste in a stock one. -->
     <section class="section section--ink">
         <div class="wrap">
             <div class="head" data-reveal>
@@ -180,7 +214,7 @@
             <h2 id="destLine">Pick a destination.</h2>
             <p>Route access opens up as you rank. Cadets start domestic; Senior Captains take the 787 to Narita.</p>
             <div class="hero__cta">
-                <a class="btn btn--light" href="/join">Join the crew <span data-icon="arrow"></span></a>
+                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/ranks">How ranks work</a>
             </div>
         </div>
@@ -268,17 +302,62 @@
             const legs = loaded
                 ? ROUTES.filter(r => r.from === h.icao || r.to === h.icao).length
                 : '—';
+            // A photograph if the VA has one of its own; otherwise the crest on
+            // the livery, with the IATA code set over it. Not a stock picture
+            // of a terminal — see the note against `photo` in data.js.
+            const plate = h.photo && h.photo.src
+                ? `<img src="${esc(h.photo.src)}" alt="${esc(h.photo.alt || (h.city + ' — ' + h.name))}"
+                        width="${h.photo.w || ''}" height="${h.photo.h || ''}" loading="lazy" decoding="async">`
+                : `<span class="hub-card__crest" aria-hidden="true">${A.MARK}</span>
+                   <span class="hub-card__iata mono" aria-hidden="true">${esc(h.iata)}</span>`;
+            // Only the figures this base actually has. A missing one drops its
+            // whole cell rather than printing a dash next to real numbers.
+            const specs = [
+                ['ICAO', h.icao], ['IATA', h.iata], ['Sectors', legs],
+                ['Runways', h.runways], ['Elevation', h.elevation], ['Terminals', h.terminals],
+            ].filter(([, v]) => v != null && v !== '');
             return `
-            <article class="card card--hover" data-reveal data-reveal-delay="${i * 70}">
-                <div class="card__icon">${icon('pin')}</div>
+            <article class="card card--hover hub-card" data-reveal data-reveal-delay="${i * 70}">
+                <div class="hub-card__plate${h.photo && h.photo.src ? ' has-photo' : ''}">${plate}</div>
                 <span class="tag tag--hub">${esc(h.role)}</span>
                 <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
                 <p>${esc(h.name)}</p>
+                ${h.note ? `<p class="hub-card__note">${esc(h.note)}</p>` : ''}
                 <div class="fleet-card__specs" style="padding-top:1.1rem">
-                    <span>ICAO <b>${esc(h.icao)}</b></span>
-                    <span>IATA <b>${esc(h.iata)}</b></span>
-                    <span>Sectors <b>${legs}</b></span>
+                    ${specs.map(([k, v]) => `<span>${esc(k)} <b>${esc(v)}</b></span>`).join('')}
                 </div>
+            </article>`;
+        }).join('');
+    }
+
+    // ---- Flagship destinations ----------------------------------------------
+    // The longest sector in each region, which is the same rule map.js uses to
+    // choose what to label. Nothing is picked by hand: the strip is a fact
+    // about the network, so it cannot end up recommending a route that was
+    // withdrawn from the crew centre last week.
+    function renderHighlights() {
+        const el = document.getElementById('highlights');
+        if (!el) return;
+        if (!loaded || !ROUTES.length) { el.innerHTML = ''; return; }
+        const far = {};
+        ROUTES.forEach(r => {
+            const k = r.region || r.tier || 'Network';
+            if (!far[k] || (r.dist || 0) > (far[k].dist || 0)) far[k] = r;
+        });
+        const picks = Object.values(far).sort((a, b) => (b.dist || 0) - (a.dist || 0)).slice(0, 6);
+        el.innerHTML = picks.map((r, i) => {
+            const rank = r.minRank || ((A.minRankFor(r, D.ranks, D.fleet) || {}).name) || '';
+            return `
+            <article class="card card--hover highlight" data-reveal data-reveal-delay="${i * 70}">
+                <span class="highlight__region">${esc(r.region || r.tier || 'Network')}</span>
+                <h3 class="highlight__city">${esc(r.city || r.to)}</h3>
+                <p class="highlight__pair mono">${esc(r.from)} <i>→</i> ${esc(r.to)}</p>
+                <div class="fleet-card__specs" style="padding-top:1.1rem">
+                    ${r.block ? `<span>${r.estimated ? 'Block ≈' : 'Block'} <b>${esc(r.block)}</b></span>` : ''}
+                    ${r.dist ? `<span>Distance <b>${r.dist.toLocaleString()} nm</b></span>` : ''}
+                    ${r.ac ? `<span>Aircraft <b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
+                </div>
+                ${rank ? `<span class="rank-chip" style="margin-top:.9rem">${esc(rank)} and above</span>` : ''}
             </article>`;
         }).join('');
     }
@@ -359,7 +438,9 @@
             </div>
             <div class="route-card__meta">
                 ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
-                ${r.block  ? `<span class="route-meta"><i>Block</i><b>${esc(r.block)}</b></span>` : ''}
+                ${r.block  ? `<span class="route-meta" ${r.estimated
+                    ? 'title="Estimated from the great-circle distance — this sector has no published block time yet."'
+                    : ''}><i>Block${r.estimated ? ' (est.)' : ''}</i><b>${r.estimated ? '≈ ' : ''}${esc(r.block)}</b></span>` : ''}
                 ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
                 ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
                 ${r.codeshare ? `<span class="route-meta"><i>Codeshare</i><b>${esc(r.partner || 'Partner airline')}</b></span>` : ''}
@@ -472,6 +553,7 @@
 
     renderHubs();
     renderFilters();
+    renderHighlights();
     render();
     renderMap();
     A.refresh();
@@ -512,7 +594,7 @@
             loaded = true;
             ROUTES = live.map(r => {
                 const m = local[key(r)] || {};
-                return {
+                const row = {
                     from: r.from, to: r.to,
                     city:   m.city   || '',
                     // An honest bucket, not a guess — except for a codeshare,
@@ -528,9 +610,20 @@
                     partner: r.partner,
                     minRank: r.minRank,
                 };
+                // What is still missing after the match is filled in here
+                // rather than left blank: the destination's city from the
+                // ICAO→city table, the distance from the two aerodrome
+                // positions, and — only if there is still no block time — one
+                // worked out from that distance, flagged `estimated` so every
+                // card and tooltip prints it with a "≈". This is the review's
+                // LIRF and KSFO: they were shown as a bare code with no
+                // duration because nothing here had anything else to say
+                // about them. See AMV.enrichRoute.
+                return A.enrichRoute(row, COORDS);
             });
             renderHubs();
             renderFilters();
+            renderHighlights();
             render();
             renderMap();
             A.refresh();
