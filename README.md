@@ -104,7 +104,8 @@ motifs sharing a section, not that device.
 
 | file | what it is | where it runs |
 |---|---|---|
-| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | nav, footer, favicon, fleet entries, and faded behind dark sections |
+| `assets/img/lockup.png` | **the airline's own logo**, crest and wordmark in one piece, supplied by the VA | nav bar, footer |
+| `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | favicon, fleet entries, staff plates, rank insignia, hub plates, `.band` crest |
 | `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
 | `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
@@ -527,6 +528,34 @@ and the button that was already on the page.
 
 `APPLY_SKIP` in `site.js` keeps it off `/apply`, which *is* the thing it points
 at, and `/crew`, which is one viewport tall by design.
+
+**The lockup is the airline's own logo**, not an assembly. The nav used to
+build the name out of `mark.svg` plus two lines of type — Fraunces for
+"Aeromexico", letter-spaced sans for "Virtual" — which was always an
+approximation of the lockup the VA actually owns. That lockup is now a file,
+and `.brandmark` paints it.
+
+It is painted through a **mask**, exactly as `.mark` is: the supplied PNG is
+white on transparent, so its alpha channel is the shape and `currentColor` is
+the ink. One file serves both themes, and `.nav__brand` states `color:
+var(--ink)` so it is near-black on paper and near-white on navy with no second
+rule. It is **sized by height** — the ratio is the file's own, so a bar that
+fixes a height gets the width for free.
+
+The file is the supplied PNG cropped to its ink and flattened to white, since
+everything but the alpha is discarded by the mask anyway.
+
+**Why this ships when the Connect lockup does not.** The Connect note in
+`brand.css` refuses to ship the real AEROMÉXICO CONNECT artwork, because that
+is Aeroméxico's own registered sub-brand wordmark and this repo draws its mark
+from a traced SVG and sets everything else in type. This is not that: it is
+Aeromexico Virtual's lockup, for Aeromexico Virtual's own name, handed over by
+the VA that owns it. The Connect sub-brand is still typeset.
+
+A **stacked** lockup was supplied too and is not shipped: both placements are
+horizontal, the footer is already fighting to stay short on a phone, and a
+favicon has to read at 16px where a wordmark is a smudge and the crest alone is
+right. Crop it the same way and add a variant if a placement turns up.
 
 **The header is an island.** A rounded bar floating with air on all four sides
 rather than a full-width strip ruled off from the page, and on the home page it

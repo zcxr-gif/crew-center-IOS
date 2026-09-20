@@ -19,6 +19,21 @@
     // regenerate it from the source bitmap.
     const MARK = '<span class="mark" role="img" aria-label="Aeromexico Virtual"></span>';
 
+    /* The airline's own lockup — the crest and the wordmark as ONE piece of
+       artwork, supplied by the VA. It replaces the crest-plus-typeset-name the
+       nav used to assemble, which was always an approximation of this.
+
+       Painted through a CSS mask, exactly as .mark is, so one white-on-
+       transparent file serves both themes and takes whatever colour it is
+       given. aria-hidden because the anchor around it carries the name.
+
+       On whether this may ship at all, since brand.css argues the opposite a
+       few hundred lines down: the Connect note refuses to ship the real
+       AEROMÉXICO CONNECT lockup because that is Aeroméxico's own registered
+       sub-brand wordmark. This is not that. It is Aeromexico Virtual's lockup
+       for Aeromexico Virtual's own name, handed over by the VA that owns it. */
+    const LOCKUP = '<span class="brandmark" aria-hidden="true"></span>';
+
     // ---- Icons (inline; no icon-font CDN to wait on) ------------------------
     const P = {
         menu: 'M4 12h16M4 6h16M4 18h16',
@@ -109,8 +124,7 @@
             <div class="flagline" aria-hidden="true"></div>
             <div class="wrap nav__inner">
                 <a class="nav__brand" href="/" data-nav-brand aria-label="Aeromexico Virtual — home">
-                    ${MARK}
-                    <span class="wordmark"><b>Aeromexico</b><span>Virtual</span></span>
+                    ${LOCKUP}
                 </a>
                 <div class="nav__links">${links}</div>
                 <div class="nav__actions">
@@ -177,7 +191,7 @@
             <div class="wrap">
                 <div class="footer__grid">
                     <div class="footer__brand">
-                        ${MARK}
+                        ${LOCKUP}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network from
                            Mexico City.</p>
                         <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>

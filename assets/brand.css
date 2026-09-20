@@ -1125,10 +1125,54 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     display: flex; align-items: center; gap: 1.5rem; height: var(--nav-h);
     padding-inline: clamp(.9rem, 2.4vw, 1.5rem);
 }
-.nav__brand { display: flex; align-items: center; gap: .7rem; margin-right: auto; min-width: 0; }
+/* `color` is stated because the lockup inside is painted with currentColor and
+   this is an <a>, which would otherwise take a link colour. --ink is the
+   theme's own text colour, so the mark is near-black on paper and near-white
+   on navy without a second rule for the dark theme. */
+.nav__brand {
+    display: flex; align-items: center; gap: .7rem; margin-right: auto;
+    min-width: 0; color: var(--ink);
+}
 /* The Caballero Águila, painted through assets/img/mark.svg as a mask so one
    file serves every placement and both themes. The ratio is the traced
    artwork's own — re-trace and this must move with it. */
+/* ---- The lockup -----------------------------------------------------------
+   THE AIRLINE'S OWN LOGO, crest and wordmark as one piece of artwork, supplied
+   by the VA. It replaces the nav's old assembly of .mark plus two lines of
+   type, which was an approximation of this.
+
+   Painted through a MASK, exactly as .mark is: the file is white on
+   transparent, so its alpha channel is the shape and `currentColor` is the
+   ink. One file serves both themes and every placement, and there is no second
+   copy of the artwork to keep in step.
+
+   SIZED BY HEIGHT. The ratio is the cropped file's own, so setting a height is
+   enough and the width falls out of it — which is what a lockup in a bar wants,
+   since the bar is what fixes the height.
+
+   The two files are the supplied PNGs cropped to their ink and flattened to
+   white, because everything but the alpha is thrown away by the mask anyway.
+
+   On whether this may ship at all, since the Connect note below argues the
+   opposite: that note refuses to ship the real AEROMÉXICO CONNECT lockup
+   because it is Aeroméxico's own registered sub-brand wordmark. This is not
+   that. It is Aeromexico Virtual's lockup for Aeromexico Virtual's own name,
+   handed over by the VA that owns it. */
+.brandmark {
+    display: block; flex: none;
+    aspect-ratio: 938 / 225;
+    background: currentColor;
+    -webkit-mask: url('/assets/img/lockup.png') no-repeat left center / contain;
+            mask: url('/assets/img/lockup.png') no-repeat left center / contain;
+}
+/* The VA supplied a STACKED lockup too — crest over the name, in a near
+   square. It is not shipped, because nothing on the site wants that shape: the
+   two places the lockup appears are both horizontal (a bar and a footer
+   column already fighting to stay short on a phone), and the favicon has to
+   read at 16px, where a wordmark is a smudge and the crest alone is the right
+   answer. A 70 KB asset nothing references is weight for nothing. If a
+   placement for it turns up, crop it the same way and add the variant here. */
+
 .mark {
     display: block; flex: none;
     aspect-ratio: var(--mark-ratio, 2778 / 2118);
@@ -1136,25 +1180,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     -webkit-mask: url('/assets/img/mark.svg') no-repeat center / contain;
             mask: url('/assets/img/mark.svg') no-repeat center / contain;
 }
-/* The crest was 3rem, which is most of the bar's height: the eagle was
-   reading as the header rather than sitting in it, and next to a two-line
-   wordmark it overpowered the airline's own name. It scales with the bar now
-   rather than being a fixed size, so a narrower phone gets a smaller one. */
-.nav__brand .mark { width: clamp(1.9rem, 4.4vw, 2.3rem); color: var(--am-blue); }
-:root[data-theme="dark"] .nav__brand .mark { color: var(--am-blue-300); }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .nav__brand .mark { color: var(--am-blue-300); }
-}
-.nav__brand .wordmark { display: flex; flex-direction: column; line-height: 1.08; min-width: 0; }
-.nav__brand .wordmark b {
-    font-family: var(--font-display); font-weight: 800;
-    font-variation-settings: 'SOFT' 50, 'WONK' 1;
-    font-size: 1.06rem; letter-spacing: -.02em; white-space: nowrap;
-}
-.nav__brand .wordmark span {
-    font-size: .6rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .22em; color: var(--muted);
-}
+.nav__brand .brandmark { height: clamp(1.55rem, 3.6vw, 1.95rem); }
+/* The .wordmark rules that were here are gone with the thing they styled: the
+   nav used to assemble the airline's name out of the crest plus two lines of
+   type, which was always an approximation of the lockup the VA actually owns.
+   That lockup is a file now — see .brandmark, above the NAV block. */
 /* The site map gained Home, About us and Staff in the round-2 review, so there
    are eight entries here where there were six. At a fixed 1.9rem gap that
    overran the bar between 992px (where the desktop nav appears) and about
@@ -1539,6 +1569,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
 }
 .footer ul { list-style: none; padding: 0; display: grid; gap: .6rem; font-size: .92rem; }
 .footer__brand .mark { width: 4rem; margin-bottom: 1.05rem; color: var(--am-blue); }
+.footer__brand .brandmark { height: 2.5rem; margin-bottom: 1.05rem; color: var(--ink); }
 .footer__wordmark {
     font-family: var(--font-display); font-weight: 800;
     font-variation-settings: 'SOFT' 50, 'WONK' 1;
@@ -2367,6 +2398,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     .footer { padding-block: clamp(2.25rem, 6vw, 3rem) 1.5rem; }
     .footer__grid { gap: 1.9rem; }
     .footer__brand .mark { width: 3.2rem; margin-bottom: .8rem; }
+    .footer__brand .brandmark { height: 2.1rem; margin-bottom: .8rem; }
     .footer__brand p { font-size: .88rem; }
     .footer ul { gap: .5rem; font-size: .88rem; }
     .disclaimer { font-size: .72rem; }
