@@ -943,6 +943,98 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
        `align-items: center` on the section centres the picture against it. */
 }
 
+/* ========================= THE APPLY TAB =================================
+   A tab down the right edge that opens a drawer along the foot of the screen.
+   The one piece of furniture on this site that follows you between pages, so
+   it carries the single action the whole site is asking for and nothing else.
+
+   A DISCLOSURE, NOT A DIALOGUE. No overlay, no focus trap, nothing underneath
+   goes inert: you can ignore it and keep reading. That is the difference
+   between this and the pop-up the same shape is usually used for.
+
+   Sits under the header (z-index 60) and over the page. The drawer is pinned
+   to the bottom so it never covers the thing you are reading, which is at the
+   top of the viewport. */
+.applytab { position: fixed; inset: 0; z-index: 55; pointer-events: none; }
+.applytab > * { pointer-events: auto; }
+
+/* ---- The tab --------------------------------------------------------------
+   Vertical, on the right, in the livery red. `writing-mode` rather than a
+   rotate: the text stays selectable and the box sizes itself to the words, so
+   a longer label does not need the height recalculating by hand. */
+.applytab__tab {
+    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    display: flex; align-items: center; gap: .55rem;
+    writing-mode: vertical-rl;
+    padding: 1.1rem .5rem;
+    border: 0; border-radius: .6rem 0 0 .6rem;
+    background: var(--am-red); color: #FFF; cursor: pointer;
+    font-family: var(--font-text); font-size: .72rem; font-weight: 800;
+    letter-spacing: .14em; text-transform: uppercase;
+    box-shadow: -4px 0 18px -8px color-mix(in srgb, var(--am-navy) 70%, transparent);
+    transition: padding-right .25s var(--ease), background .25s var(--ease);
+}
+.applytab__tab:hover { padding-right: .8rem; background: var(--am-navy); }
+.applytab__tab:focus-visible { outline: 2px solid var(--am-marigold); outline-offset: 3px; }
+/* The arrow points the way the drawer will come from: up, out of the foot. */
+.applytab__tab svg { width: .9rem; height: .9rem; transform: rotate(-90deg); }
+.applytab.is-open .applytab__tab { display: none; }
+
+/* ---- The drawer -----------------------------------------------------------
+   Full width along the foot. The tricolour along its top edge is the same
+   device the header wears, so the two read as the same airline's furniture. */
+.applytab__drawer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -18px 50px -24px color-mix(in srgb, var(--am-navy) 70%, transparent);
+    animation: applyUp .32s var(--ease-rise) both;
+}
+.applytab__drawer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px;
+    background: linear-gradient(90deg,
+        var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--am-navy) 16%, transparent);
+}
+@keyframes applyUp { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+    .applytab__drawer { animation: none; }
+    .applytab__tab { transition: none; }
+}
+
+.applytab__inner {
+    display: flex; align-items: center; gap: clamp(1rem, 3vw, 2.5rem);
+    flex-wrap: wrap;
+    padding-block: clamp(1.1rem, 2.6vw, 1.6rem);
+}
+.applytab__say { flex: 1 1 22rem; min-width: 0; }
+.applytab__head {
+    margin: 0; font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(1.15rem, 2.6vw, 1.6rem); letter-spacing: -.02em; color: var(--ink);
+}
+.applytab__sub {
+    margin: .35rem 0 0; font-size: .92rem; line-height: 1.55;
+    color: var(--muted); max-width: 52ch;
+}
+.applytab__do { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; }
+/* The close sits in the corner of the drawer rather than in the flow, so the
+   sentence and the buttons keep the width they would have had without it. */
+.applytab__close {
+    position: absolute; top: .7rem; right: .7rem;
+    width: 2.1rem; height: 2.1rem;
+}
+.applytab__close svg { width: .9rem; height: .9rem; }
+
+@media (max-width: 47.99rem) {
+    /* Above the foot of the screen rather than centred: a phone's thumb lives
+       at the bottom, and the middle of the right edge is where a scrollbar and
+       a browser's own back-swipe gesture both are. */
+    .applytab__tab { top: auto; bottom: 22%; transform: none; }
+    .applytab__inner { padding-right: 2.6rem; }
+    .applytab__do { width: 100%; }
+    .applytab__do .btn { flex: 1 1 auto; justify-content: center; }
+}
+
 /* ============================ NAV ========================================
    THE HEADER IS AN ISLAND: a rounded bar floating with air on all four sides,
    rather than a full-width strip ruled off from the page.
@@ -1044,7 +1136,11 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     -webkit-mask: url('/assets/img/mark.svg') no-repeat center / contain;
             mask: url('/assets/img/mark.svg') no-repeat center / contain;
 }
-.nav__brand .mark { width: 3rem; color: var(--am-blue); }
+/* The crest was 3rem, which is most of the bar's height: the eagle was
+   reading as the header rather than sitting in it, and next to a two-line
+   wordmark it overpowered the airline's own name. It scales with the bar now
+   rather than being a fixed size, so a narrower phone gets a smaller one. */
+.nav__brand .mark { width: clamp(1.9rem, 4.4vw, 2.3rem); color: var(--am-blue); }
 :root[data-theme="dark"] .nav__brand .mark { color: var(--am-blue-300); }
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .nav__brand .mark { color: var(--am-blue-300); }

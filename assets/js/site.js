@@ -568,9 +568,90 @@
         wireCounters();
     }
 
+    /* ---- The apply tab ------------------------------------------------------
+       A tab down the right edge that opens a drawer along the foot of the
+       screen — the pattern the VA pointed at on coronausa.com. It is the one
+       thing on this site that follows you between pages, so it has to earn
+       that: it carries the single action the whole site is asking for, and
+       nothing else.
+
+       WHAT IT IS NOT is the thing that pattern is usually used for. Corona's
+       drawer is an email capture — address, date of birth, postcode, in
+       exchange for a discount. There is no list to add anyone to here, so a
+       form that pretended otherwise would be collecting real addresses into
+       nothing, which is worse than not asking. This is a sentence and the
+       button that was already on the page.
+
+       It is a disclosure, not a dialogue: no overlay, no focus trap, nothing
+       underneath it goes inert. You can ignore it and keep reading, which is
+       the whole difference between this and a pop-up.
+
+       NOT SHOWN where it would be noise: on /apply, which IS the thing it
+       points at, and on /crew, which is one viewport tall by design and has
+       no room for furniture over it. */
+    const APPLY_SKIP = ['/apply', '/crew'];
+
+    function renderApplyTab() {
+        if (APPLY_SKIP.includes(HERE)) return;
+
+        const host = document.createElement('div');
+        host.className = 'applytab';
+        host.innerHTML = `
+            <button class="applytab__tab" type="button" aria-expanded="false"
+                    aria-controls="applyDrawer">
+                <span>Apply to fly</span>
+                ${icon('arrow')}
+            </button>
+            <div class="applytab__drawer" id="applyDrawer" hidden>
+                <div class="wrap applytab__inner">
+                    <div class="applytab__say">
+                        <p class="applytab__head">The eagle flies at 0600.</p>
+                        <p class="applytab__sub">
+                            Grade&nbsp;2 and an Infinite Flight Pro subscription is the whole bar.
+                            The application takes about three minutes and a person answers it
+                            inside 72&nbsp;hours.
+                        </p>
+                    </div>
+                    <div class="applytab__do">
+                        <a class="btn btn--primary" href="/apply">Apply to fly ${icon('arrow')}</a>
+                        <a class="btn btn--ghost btn--sm" href="/ranks">What you would fly</a>
+                    </div>
+                    <button class="icon-btn applytab__close" type="button"
+                            aria-label="Close">${icon('x')}</button>
+                </div>
+            </div>`;
+        document.body.appendChild(host);
+
+        const tab = host.querySelector('.applytab__tab');
+        const drawer = host.querySelector('.applytab__drawer');
+        const close = host.querySelector('.applytab__close');
+
+        function set(open) {
+            tab.setAttribute('aria-expanded', String(open));
+            host.classList.toggle('is-open', open);
+            if (open) {
+                drawer.hidden = false;
+                // Focus moves into the drawer so a keyboard lands on the
+                // action rather than being left back on the tab.
+                const first = drawer.querySelector('a, button');
+                if (first) first.focus();
+            } else {
+                drawer.hidden = true;
+                tab.focus();
+            }
+        }
+
+        tab.addEventListener('click', () => set(true));
+        close.addEventListener('click', () => set(false));
+        addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && host.classList.contains('is-open')) set(false);
+        });
+    }
+
     function boot() {
         document.querySelectorAll('[data-site-nav]').forEach(renderNav);
         document.querySelectorAll('[data-site-footer]').forEach(renderFooter);
+        renderApplyTab();
         refresh();
     }
 

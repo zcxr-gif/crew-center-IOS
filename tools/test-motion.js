@@ -70,6 +70,35 @@ async function settle(page) {
     await page.waitForTimeout(1200);
 }
 
+// Wait for every running transition and animation to FINISH, rather than
+// guessing at a number of milliseconds. The seam probe reads pixel luminance
+// off a full-page screenshot, so an element caught mid-fade reads as a colour
+// that is on the page for no more than a frame — which is how this test
+// produced a hard-seam failure that no amount of re-running reproduced.
+//
+// It got worse, not better, when reveals were FIXED: groups filled by a page's
+// own script never used to animate at all (site.js stamped them as staged
+// while they were still empty), so half the page was static when this was
+// written. getAnimations() covers both CSS transitions and animations.
+// It LOOPS, and that is the point. Waiting on getAnimations() once is not
+// enough: a scroll can reveal an element, and the transition that reveals it
+// is created a frame later — after the wait has already resolved on an empty
+// list. This keeps asking until the page has been quiet twice in a row, or
+// until it gives up, so a page that animates forever cannot hang the suite.
+async function stillFrame(page, budgetMs = 4000) {
+    const until = Date.now() + budgetMs;
+    let quiet = 0;
+    while (Date.now() < until && quiet < 2) {
+        const running = await page.evaluate(async () => {
+            const a = document.getAnimations();
+            await Promise.all(a.map(x => x.finished.catch(() => {})));
+            return a.length;
+        });
+        await page.waitForTimeout(120);        // a frame for anything new to start
+        quiet = running === 0 ? quiet + 1 : 0;
+    }
+}
+
 const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[data-reveal]')]
     .filter(el => !el.classList.contains('is-in') && el.getClientRects().length)
     .map(el => (el.tagName + '.' + String(el.className || '')).slice(0, 60)));
@@ -193,7 +222,7 @@ const stranded = (page) => page.evaluate(() => [...document.querySelectorAll('[d
         const page = await open('index', { live });
         await settle(page);
         await page.evaluate(() => scrollTo(0, 0));
-        await page.waitForTimeout(400);
+        await stillFrame(page);
         // A section that removed itself has no seam to judge; measuring it
         // reads the top-left corner of the page instead, which is the nav.
         const bounds = await page.evaluate(() => [...document.querySelectorAll('main > section, main > .band')]

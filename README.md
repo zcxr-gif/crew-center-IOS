@@ -509,6 +509,25 @@ of approved sectors sampled at random off the crew centre's public flight log
 (`AMV_CREW.pireps()`): real pilots, real routes, filed by flying them. Then the
 airline in four counted figures.
 
+**The apply tab** is the one piece of furniture that follows you between
+pages, so it carries the single action the whole site asks for and nothing
+else. A tab down the right edge opens a drawer along the foot of the screen —
+the coronausa.com pattern the VA pointed at.
+
+It is a **disclosure, not a dialogue**: no overlay, no focus trap, nothing
+underneath goes inert. You can ignore it and keep reading, which is the whole
+difference between this and a pop-up. Escape closes it, focus moves into the
+drawer on open and back to the tab on close.
+
+What it is *not* is the thing that shape is usually used for. Corona's drawer
+is an email capture — address, date of birth, postcode, for a discount. There
+is no list to add anyone to here, so a form pretending otherwise would collect
+real addresses into nothing, which is worse than not asking. It is a sentence
+and the button that was already on the page.
+
+`APPLY_SKIP` in `site.js` keeps it off `/apply`, which *is* the thing it points
+at, and `/crew`, which is one viewport tall by design.
+
 **The header is an island.** A rounded bar floating with air on all four sides
 rather than a full-width strip ruled off from the page, and on the home page it
 floats *over* the hero's photograph.
