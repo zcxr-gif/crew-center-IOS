@@ -80,10 +80,19 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.route('**/api/crew/**', r => r.abort());
         await page.goto(`http://127.0.0.1:${port}/network.html`);
         await page.waitForTimeout(1200);
-        const cards = await page.$$eval('.route-card', els => els.length);
-        check('with the backend down the sectors are still listed', cards > 10, String(cards));
+        // The crew centre is the ONLY source of sectors. When it cannot be
+        // reached there is nothing to fall back to — data.js is a lookup for
+        // labels, not a spare route network — so the page says so rather than
+        // publishing a network the airline has not confirmed. This check used
+        // to assert the opposite, and went on asserting it after the local
+        // first paint was deliberately removed.
+        const rows = await page.$$eval('.rtable tbody tr', els => els.length);
+        check('with the backend down no sectors are invented', rows === 0, String(rows));
+        const empty = (await page.textContent('#routes')).trim();
+        check('…and the page says there are none', /No sectors published yet/.test(empty), empty.slice(0, 80));
         const band = (await page.textContent('#destLine')).trim();
-        check('…and the band counts what is on the page', /^23 destinations\./.test(band), band);
+        check('…and the band does not count a network it does not have',
+            band === 'Pick a destination.', band);
         await page.close();
     }
 
@@ -97,7 +106,7 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.goto(`http://127.0.0.1:${port}/network.html`);
         await page.waitForTimeout(1500);
 
-        const codes = await page.$$eval('.route-end__code', els => els.map(e => e.textContent.trim()));
+        const codes = await page.$$eval('.rtable tbody tr', els => els.map(e => e.dataset.to));
         check('the crew centre’s sectors replace this repo’s', codes.includes('LEBL'), codes.join(','));
         check('a sector staff switched off does not reach the public', !codes.includes('MMTJ'), codes.join(','));
 
@@ -105,7 +114,7 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         check('the band moves with the list rather than staying at 23',
             /^3 destinations\./.test(band), band);
 
-        const cards = await page.$$eval('.route-card', els => els.length);
+        const cards = await page.$$eval('.rtable tbody tr', els => els.length);
         check('three sectors, not four', cards === 3, String(cards));
 
         const body = await page.textContent('#routes');
@@ -117,11 +126,11 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
 
         // The whole point of the coordinates feed: Barcelona is not in
         // data.js, and without it the sector would be listed and not drawn.
-        const note = (await page.textContent('#mapNote')).trim();
+        const note = (await page.textContent('#globeHint')).trim();
         check('every sector is drawn, including the airport this repo has never heard of',
-            note === '', note);
-        const drawn = await page.$$eval('#mapHost .map__pt', els => els.length);
-        check('…and its dot is on the map', drawn >= 4, String(drawn));
+            !/not drawn/.test(note), note);
+        const drawn = await page.$$eval('#globeHost', ([el]) => el._globe.pts.length);
+        check('…and its dot is on the globe', drawn >= 4, String(drawn));
 
         check('no page errors', errors.filter(e => !/Failed to load/.test(e)).length === 0, errors.join(' | '));
         await page.screenshot({ path: __dirname + '/site-network.png', fullPage: false });
@@ -135,10 +144,10 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.route('**/api/crew/**/route-map', r => r.abort());
         await page.goto(`http://127.0.0.1:${port}/network.html`);
         await page.waitForTimeout(1500);
-        const note = (await page.textContent('#mapNote')).trim();
-        check('without the coordinates feed the unplaceable sector is declared, not dropped',
-            /^1 sector not mapped/.test(note), note);
-        const codes = await page.$$eval('.route-end__code', els => els.map(e => e.textContent.trim()));
+        const note = (await page.textContent('#globeHint')).trim();
+        check('without the coordinates feed the undrawable sector is declared, not dropped',
+            /^1 sector not drawn/.test(note), note);
+        const codes = await page.$$eval('.rtable tbody tr', els => els.map(e => e.dataset.to));
         check('…and it is still listed', codes.includes('LEBL'), codes.join(','));
         await page.close();
     }
@@ -150,8 +159,11 @@ const json = (body) => (r) => r.fulfill({ status: 200, contentType: 'application
         await page.route('**/api/crew/**/route-map', json({ routes: [], airports: [] }));
         await page.goto(`http://127.0.0.1:${port}/network.html`);
         await page.waitForTimeout(1400);
-        const cards = await page.$$eval('.route-card', els => els.length);
-        check('an empty crew centre leaves this repo’s network in place', cards > 10, String(cards));
+        // Same rule as the backend being down: an answer of "none" is an
+        // answer, and the page states it rather than filling the gap from
+        // data.js.
+        const cards = await page.$$eval('.rtable tbody tr', els => els.length);
+        check('an empty crew centre publishes an empty network, not this repo’s', cards === 0, String(cards));
         await page.close();
     }
 

@@ -265,10 +265,10 @@
 
 <div data-site-footer></div>
 
-<!-- world.js, map.js and live.js came off this page with the route map and the
-     live roster. world.js alone is the generated Natural Earth coastline; it is
-     the largest script on the site and the home page no longer draws anything
-     with it. They are still loaded by /network, which does. -->
+<!-- The route map's scripts and live.js came off this page with the route map
+     and the live roster. The map is now globe.js plus the generated land grid
+     in globe-land.js, which together are the largest scripts on the site and
+     draw nothing here. /network loads them; this page does not. -->
 <script src="/assets/js/data.js?v=3"></script>
 <script src="/assets/js/site.js?v=3"></script>
 <script src="/assets/js/crew.js?v=3"></script>
