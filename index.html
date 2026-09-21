@@ -55,78 +55,96 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         THE SIXTH, and the one that stops fighting the two things that were
-         costing it. It keeps the big headline of the fifth and gives up the
-         thing that made that headline expensive: type laid over the picture.
+         THE EIGHTH: THE WINDOW, THEN THE FLIGHT DECK, THEN THE EAGLE.
 
-         Two findings from the VA, and they turn out to be the same finding.
-         The hero was navy in BOTH themes, which is wrong on a light site — you
-         pick light mode and the first screen is still dark. And the photograph
-         was cropped to the middle third on a phone, because a full-bleed stage
-         in a portrait viewport cannot do anything else with a 1920x886 frame.
+         The VA asked for an opening screen with no words on it at all — the
+         logo, and a move from a passenger window forward into the flight deck.
+         That is what this is, and it settles an argument the seven heroes
+         before it kept losing.
 
-         Both were the price of putting the words on the picture. Take the
-         words off it and both are refunded: the hero takes the page's own
-         paper and follows the theme like every other section, and the stage
-         becomes a band at the photograph's OWN ratio, so nothing is cropped at
-         any width. This is the flynas arrangement out of the VA's own
-         references — the airline says who it is, then shows you the aeroplane.
+         Every one of them was the airline TELLING you something over a picture:
+         a tagline, a sub-line, a strip of values, a caption naming an airframe.
+         The copy was the part that kept going wrong — it was navy in both
+         themes because white type needs a dark ground; it cropped the aeroplane
+         on a phone because type over a full-bleed photograph needs the frame
+         filled. Take every word off the screen and both problems stop existing.
+         Nothing here has to stay legible, so nothing here has to be dark for
+         the sake of legibility: it is dark because it is a sunrise at cruise.
 
-         Everything that made the fifth hero honest is unchanged. The headline
-         is the airline's own line; the sub-line is what it factually is; the
-         strip is AMV_DATA.values read out; the credit under the photograph is
-         the aircraft naming ITSELF off AMV_DATA.fleet. No marketing copy.
+         WHAT IS ON SCREEN IS NOT A DRAWING. brand.css's standing rule is that
+         nothing pictorial may be invented, and this obeys it. The window, the
+         posts, the glareshield and the cloud deck are emitted by
+         tools/make-flightdeck.py and tools/make-cloudbank.py as monochrome
+         masks, from coordinates — the same footing as the greca and the ruled
+         stripes. The one image is the airline's own lockup. Read the headers of
+         those two scripts before changing any of it by hand.
 
-         Every layer is still optional: no photographs, a quiet backend or
-         scripting off, and this is the headline, the sub-line and the two
-         buttons on the page's paper. Nothing here renders a placeholder. -->
-    <section class="hero hero--live" data-hero>
-        <!-- THE PHOTOGRAPH IS THE SCREEN. Empty in the markup on purpose: the
-             slides are the fleet photographs in data.js, so a type gained or
-             lost changes the hero with nothing typed in here. Absolute and
-             full bleed, so it runs under the floating nav as well — which is
-             why the bar goes to glass while you are on it. -->
-        <div class="hero__stage" data-hero-stage aria-hidden="true"></div>
-        <!-- Its own element, not a gradient on the stage: the stage cross-fades
-             between aircraft and the scrim has to hold still through that or
-             the type flickers every seven seconds. -->
-        <div class="hero__scrim" aria-hidden="true"></div>
+         THE MOVE, in three acts, and all of it CSS — see FLIGHT DECK HERO in
+         brand.css. You are at the window; the camera goes through it; you are
+         on the flight deck and the lockup settles on the glass. It runs ONCE
+         and then holds, with the deck drifting. Asked for reduced motion it
+         does not run at all: you arrive on the last frame, which is the frame
+         that matters.
 
-        <div class="wrap hero__content">
-            <!-- The airline's own lockup, at the size it deserves, arriving
-                 after the photograph rather than with it. Everything below it
-                 follows on the same stagger — see LIVE HERO in brand.css. -->
-            <span class="brandmark hero__logo" aria-hidden="true"></span>
-
-            <!-- The page's real <h1>. The lockup above carries the name; this
-                 carries what the airline says about itself, and a page with no
-                 heading is broken for a screen reader and invisible to a
-                 crawler however good the picture is. -->
-            <h1 class="hero__title">Fly the <em>Eagle&nbsp;Warrior</em>.</h1>
-
-            <p class="hero__sub">
-                An Infinite Flight virtual airline flying the Aeroméxico network out of
-                Mexico City, on the Expert Server.
-            </p>
-
-            <div class="hero__cta">
-                <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
-                <a class="btn btn--onink" href="/network">Route map</a>
+         EVERY LAYER IS OPTIONAL, still. Scripting off, masks unsupported, a
+         file that will not load — and this is the airline's navy with the
+         lockup on it. Nothing below renders a placeholder, and the only thing
+         a reader loses if all of it fails is the weather. -->
+    <section class="hero hero--live hero--deck" data-hero>
+        <!-- THE SEQUENCE. One aria-hidden subtree: it is scenery, and a screen
+             reader should be handed the <h1> below, not a list of empty divs.
+             Order is back to front and that is load-bearing — the sky is behind
+             the cabin wall, which is behind the structure that replaces it. -->
+        <div class="deck" aria-hidden="true">
+            <!-- Outside. A dawn at altitude: the gradient is the sky, the sun
+                 is a single soft radial low in it, and the two cloud decks
+                 are the same geometry at two scales and two speeds, which is
+                 what makes the distance between them read. -->
+            <div class="deck__sky">
+                <div class="deck__sun"></div>
+                <div class="deck__cloud deck__cloud--far"></div>
+                <div class="deck__cloud deck__cloud--near"></div>
             </div>
 
-            <!-- AMV_DATA.values, read out. Four things the airline holds itself
-                 to, stated on the page that asks you to join it. Filled by the
-                 page script so it cannot drift from /about. -->
-            <p class="hero__values" id="heroValues"></p>
+            <!-- ACT ONE: the cabin. A wall with one window in it, lit only by
+                 what comes through the hole. The bezel is the depth of the
+                 reveal — the single detail that stops the aperture reading as
+                 a shape cut out of a rectangle. -->
+            <div class="deck__cabin"></div>
+            <div class="deck__bezel"></div>
+
+            <!-- ACT TWO: the flight deck, arriving as the wall rushes past —
+                 the push has no element of its own, it is what these two doing
+                 opposite things at the same moment look like. The glareshield
+                 is a second, darker mass over the structure, so the deck reads
+                 as a room rather than a stencil; the glow is the instruments,
+                 which is all you can see of them from this angle. -->
+            <div class="deck__frame"></div>
+            <div class="deck__glare"></div>
+            <div class="deck__glow"></div>
+            <!-- Two rakes of light across the glass. Nothing is masked here —
+                 it is what tells you there is glass between you and the sky. -->
+            <div class="deck__glass"></div>
         </div>
 
-        <!-- The credit: the aircraft naming itself, and the dots that steer it.
-             At the foot of the frame, where a credit goes. The dots are real
-             buttons — the only way to change the aircraft from a keyboard. -->
-        <div class="wrap hero__foot">
-            <div class="hero__plate" data-hero-caption aria-live="polite"></div>
-            <div class="hero__dots" data-hero-dots aria-label="Choose an aircraft"></div>
+        <div class="wrap hero__content">
+            <!-- The page's real <h1>, and the only words in the hero: hidden
+                 to the eye, exactly as legible as any other heading to a screen
+                 reader or a crawler. The VA asked for no type on the opening
+                 screen; a page with no heading at all is a different thing, and
+                 it is broken. -->
+            <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual
+                airline flying the Aeroméxico network from Mexico City</h1>
+
+            <!-- ACT THREE, and the point of the whole thing: the airline's own
+                 lockup, settling on the glass once you are sat in the seat. -->
+            <span class="brandmark hero__logo" aria-hidden="true"></span>
         </div>
+
+        <!-- Where to go next, with no word on it. The hero is a full screen and
+             a full screen with nothing under the fold visible is a screen people
+             stop at. -->
+        <a class="deck__next" href="#below" aria-label="Skip to the page"></a>
     </section>
 
     <!-- ==================== THE AIRLINE, COUNTED ====================
@@ -137,7 +155,7 @@
          The flown strip starts [hidden] and is revealed only once real flights
          arrive from the crew centre — there is no placeholder leg and no
          invented pilot. -->
-    <section class="section section--tight hero-under">
+    <section class="section section--tight hero-under" id="below">
         <div class="wrap">
             <dl class="hero__facts hero__facts--band" id="heroFacts" data-reveal-group data-reveal-step="60"></dl>
             <div class="hero__log" data-hero-log hidden>

@@ -102,8 +102,8 @@ window.AMV_DATA = {
        the airline. Check them against the current AIP before a chart changes
        and they quietly go stale here.
 
-       `photo` is OPTIONAL and empty for the same reason heroStills is: there is
-       no hub photography in this repo, and a stock picture of Terminal 2 pulled
+       `photo` is OPTIONAL and empty for the same reason `video` below is: there
+       is no hub photography in this repo, and a stock picture of Terminal 2 pulled
        off the internet is the invented artwork this brand was written to keep
        out, with a licensing problem on top. Shoot the base in Infinite Flight,
        upload it to the crew centre's gallery, paste the URL in here with its
@@ -301,10 +301,12 @@ window.AMV_DATA = {
     ],
 
     /* ---- The hero: a video from the cabin ---------------------------------
-       THE HOME PAGE OPENS ON MOTION when this is filled in. Point `src` at a
-       clip and hero.js plays it full-bleed behind the headline instead of
-       rotating the fleet photographs — the photographs stay exactly where they
-       are and become the fallback, so an empty `src` here changes nothing.
+       WHAT YOU SEE THROUGH THE GLASS when this is filled in. The home page
+       opens on a window, a move forward into the flight deck and the airline's
+       lockup; what is outside is a generated sunrise. Point `src` at a clip
+       and hero.js puts it there instead — the deck, the glareshield and the
+       lockup are untouched, so this changes the VIEW and not the hero. An
+       empty `src` changes nothing at all.
 
        It is EMPTY on purpose, and it is the VA's to fill. The clip wanted is
        the view from the cabin at cruise, captured in Infinite Flight: the
@@ -329,47 +331,11 @@ window.AMV_DATA = {
        first frame decodes.
 
        Keep it short, silent and gentle — it loops, it is muted (a hero that
-       makes noise is a hero people leave), and it sits behind type. Twenty
+       makes noise is a hero people leave), and it sits behind the flight deck
+       and the lockup rather than filling the frame on its own. Twenty
        seconds under about 4 MB is the budget; this is the largest thing on the
        page and it downloads before anyone has decided to stay. */
     video: null,
-
-    /* ---- The hero stage: hub stills (optional) ----------------------------
-       Photographs that lead the home page's rotation, ahead of the fleet.
-       Meant for the airline's HUBS — Benito Juárez first, then the bases —
-       because a hero that opens on where the airline flies FROM says something
-       the aircraft shots cannot.
-
-       EMPTY ON PURPOSE, and it stays empty until the VA has photographs it
-       owns. There is no hub photography in this repo, and a stock picture of
-       Terminal 2 pulled off the internet is exactly the "invented artwork
-       standing in for a real airline" that the header of brand.css was written
-       to keep out — with a licensing problem on top. The fleet shots work
-       because they are the VA's own, taken in the sim, of its own airframes.
-       Hub shots should clear the same bar: a screenshot on stand or short
-       final at MMMX in Infinite Flight is ideal, and the crew centre's own
-       gallery is the natural place to host them.
-
-       One entry per photograph, and hero.js needs nothing else:
-
-           {
-               src:   'https://…/MMMX-1234567890.webp',   // absolute
-               w: 1920, h: 886,                            // the file's real size
-               alt:   'Aeroméxico 787-9 on stand at Mexico City Benito Juárez.',
-               title: 'Benito Juárez Intl',   // the plate's display line
-               reg:   'MMMX',                 // set in mono marigold beside it,
-                                              // where an airframe puts its tail
-                                              // number — an ICAO reads the same
-               note:  'Primary hub',          // → "Primary hub · Mexico City"
-               route: 'Mexico City',          // an ICAO PAIR here ("MMMX–EGLL")
-                                              // is expanded into city names;
-                                              // anything else prints as written
-           }
-
-       `w` and `h` are not optional: these are off-site images, and without the
-       real dimensions the stage has no intrinsic ratio while one is in flight.
-       Any entry whose photograph 404s drops out of the rotation by itself. */
-    heroStills: [],
 
     /* ---- Fleet development (plan §5, §14) ---------------------------------
        Types the Operations Plan names and the airline has not put into service.
