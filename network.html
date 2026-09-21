@@ -71,95 +71,72 @@
 
 <main id="main">
 
-    <!-- ==================== THE MAP ====================
-         The network, drawn. Every reviewer asked for this, and the page it
-         replaces opened with twenty-three sectors listed one under another —
-         which is a table of airports, not a network. The list is still here,
-         below, grouped by tier; it is no longer the first thing you meet. -->
+    <!-- ==================== THE NETWORK ====================
+         One section, three ways in, and as little prose as the page can get
+         away with. It used to open with a four-line lede, then a strip of six
+         flagship cards, then a paged route list under its own two-line lede,
+         then the bases under theirs — four headings and about two hundred
+         words before you reached a fact you could act on.
+
+         The globe, the table and the bases are the same rows drawn three
+         ways, so they are three tabs rather than three sections. Nothing was
+         dropped except the words: every figure the flagship strip carried is
+         on the card that opens when you pick a destination, and every sector
+         it ranked is in the table. -->
     <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4rem)">
         <div class="wrap">
-            <div class="head" style="margin-bottom:1.6rem">
+            <div class="head" style="margin-bottom:1.4rem">
                 <span class="eyebrow">The network</span>
                 <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Out of the Valley of Mexico</h1>
                 <div class="rule"></div>
-                <p class="lede" style="margin-top:1.4rem">
-                    Every sector below is a real Aeroméxico route, flyable end to end in Infinite
-                    Flight. Published in five tiers, each with its own flight-number series, and
-                    each open to a pilot once their rank permits both the aircraft and the block
-                    time.
+            </div>
+
+            <div class="viewswitch" role="tablist" aria-label="How to read the network">
+                <button class="viewswitch__tab" type="button" role="tab" id="tab-globe"
+                        aria-controls="view-globe" aria-selected="true" data-view="globe">
+                    <span data-icon="route"></span> Globe
+                </button>
+                <button class="viewswitch__tab" type="button" role="tab" id="tab-routes"
+                        aria-controls="view-routes" aria-selected="false" data-view="routes" tabindex="-1">
+                    Routes <b class="viewswitch__n" id="routeCount">—</b>
+                </button>
+                <button class="viewswitch__tab" type="button" role="tab" id="tab-bases"
+                        aria-controls="view-bases" aria-selected="false" data-view="bases" tabindex="-1">
+                    Bases <b class="viewswitch__n">4</b>
+                </button>
+            </div>
+
+            <!-- ---- Globe ---- -->
+            <div class="view" id="view-globe" role="tabpanel" aria-labelledby="tab-globe">
+                <div class="filters" id="filters" role="group" aria-label="Filter the network by tier"></div>
+                <!-- The stage is what the canvas fills, not the sphere: the
+                     globe slides left inside it to clear room for the card,
+                     and the leader line from the dot to the card has to be
+                     drawn in the same canvas to reach it. -->
+                <div class="globe-stage" id="globeStage" data-reveal>
+                    <div class="globe-host" id="globeHost"></div>
+                    <aside class="globe-card" id="globeCard" aria-live="polite" hidden></aside>
+                </div>
+                <p class="globe-hint">
+                    <span data-icon="route"></span>
+                    <span id="globeHint">Drag to turn it · pick a destination for its sector</span>
                 </p>
             </div>
 
-            <div class="filters" id="filters" role="group" aria-label="Filter the network by tier"></div>
-            <div class="map-host" id="mapHost" data-reveal>
-                <p class="muted" style="padding:3rem 0;text-align:center">Drawing the network…</p>
-            </div>
-            <p class="map-hint"><span data-icon="route"></span> Drag or scroll the map sideways</p>
-            <p class="map-legend">
-                <span><i class="is-hub"></i> Hub and bases</span>
-                <span><i></i> Destination</span>
-                <span><i class="is-arc"></i> Longest sector in its region</span>
-                <span id="mapNote"></span>
-            </p>
-            <p class="mono muted" id="mapPick" style="margin-top:.4rem;font-size:.86rem;min-height:1.3em"
-               role="status" aria-live="polite">Tap or focus a dot to name it.</p>
-        </div>
-    </section>
-
-    <!-- ==================== HIGHLIGHTS ====================
-         The mobile review asked for "a few highlight destinations instead of
-         all your routes to make the page more attractive", and it is right that
-         a wall of twenty-three sectors is not an invitation. The full list has
-         not gone anywhere — it is directly below, filtered and searchable — but
-         the page now leads with six.
-
-         WHICH six is not an opinion typed in here: it is the longest sector in
-         each region the network reaches, which is the same rule the map already
-         uses to decide what to label. A region gained or lost in the crew
-         centre changes this strip with nothing edited. -->
-    <section class="section">
-        <div class="wrap">
-            <div class="head" data-reveal>
-                <span class="eyebrow">Worth the block time</span>
-                <h2>Flagship destinations</h2>
-                <p class="lede">
-                    The furthest we go in each part of the network — one sector per region, taken
-                    off the published list rather than picked by hand.
-                </p>
-            </div>
-            <div class="grid grid-3" id="highlights"></div>
-        </div>
-    </section>
-
-    <!-- ==================== THE SECTORS, BY TIER ==================== -->
-    <section class="section section--alt">
-        <div class="wrap">
-            <div class="head" style="margin-bottom:1.2rem">
-                <span class="eyebrow">All routes</span>
-                <h2 style="margin-top:.9rem"><span id="routeCount">—</span> sectors</h2>
-                <p class="lede">
-                    Read live from the crew centre — the same list it books against. Filter by tier
-                    or search a code, city or flight number. The rank against each sector is the
-                    higher of what the aircraft needs and what the block time needs, which is the
-                    same test the crew centre applies when you book.
-                </p>
-            </div>
-            <div class="route-controls">
+            <!-- ---- Routes ---- -->
+            <div class="view" id="view-routes" role="tabpanel" aria-labelledby="tab-routes" hidden>
                 <label class="field">
                     <span class="sr-only">Search the route network</span>
                     <input id="routeSearch" type="search" autocomplete="off"
                            placeholder="Search a code, city, flight or aircraft">
                 </label>
+                <div id="routes"></div>
             </div>
-            <div id="routes"></div>
-            <div class="pager" id="pager"></div>
-            <p class="muted" style="margin-top:1.1rem;font-size:.84rem">
-                Distances are great-circle nautical miles. Block times are scheduled and will vary
-                with routing, winds and the day's traffic. A sector marked <b>est.</b> has no
-                published block time yet, so the figure shown is worked out from its distance
-                against our own schedule — treat it as approximate. Flight numbers are issued in
-                the crew centre against the series shown.
-            </p>
+
+            <!-- ---- Bases ---- -->
+            <div class="view" id="view-bases" role="tabpanel" aria-labelledby="tab-bases" hidden>
+                <div class="grid grid-4" id="hubs"></div>
+            </div>
         </div>
     </section>
 
@@ -169,7 +146,6 @@
             <div class="head" data-reveal>
                 <span class="chip chip--live"><i class="dot-live" aria-hidden="true"></i> Live now</span>
                 <h2 style="margin-top:.9rem">Who's flying the network</h2>
-                <p class="lede">Aeromexico Virtual pilots airborne on the Expert Server this minute.</p>
             </div>
             <div data-live-roster data-reveal>
                 <div class="frame-host muted" style="padding:3rem;text-align:center">Loading live traffic…</div>
@@ -212,7 +188,7 @@
                  twenty-three sectors long, and would have gone on saying it
                  through every route staff added in the crew centre. -->
             <h2 id="destLine">Pick a destination.</h2>
-            <p>Route access opens up as you rank. Cadets start domestic; Senior Captains take the 787 to Narita.</p>
+            <p>Cadets start domestic. Senior Captains take the 787 to Narita.</p>
             <div class="hero__cta">
                 <a class="btn btn--light" href="/apply">Apply to fly <span data-icon="arrow"></span></a>
                 <a class="btn btn--onink" href="/ranks">How ranks work</a>
@@ -225,9 +201,9 @@
 <div data-site-footer></div>
 
 <script src="/assets/js/data.js?v=3"></script>
-<script src="/assets/js/world.js?v=3"></script>
+<script src="/assets/js/globe-land.js?v=3"></script>
 <script src="/assets/js/site.js?v=3"></script>
-<script src="/assets/js/map.js?v=3"></script>
+<script src="/assets/js/globe.js?v=3"></script>
 <script src="/assets/js/crew.js?v=3"></script>
 <script src="/assets/js/live.js?v=3"></script>
 <script>
@@ -238,47 +214,36 @@
 
     // The sectors this page shows, and they come from ONE place: the crew
     // centre. data.js used to paint them first so the page was complete
-    // immediately, and the crew centre then replaced them — which meant the map
-    // and the list drew one network and then visibly redrew a different one a
-    // second later. The VA's reading is the right one: a route table this page
-    // is about to contradict is not a head start, it is a wrong answer shown
-    // confidently.
+    // immediately, and the crew centre then replaced them — which meant the
+    // globe and the table drew one network and then visibly redrew a different
+    // one a second later. A route table this page is about to contradict is
+    // not a head start, it is a wrong answer shown confidently.
     //
-    // So: null while the request is in flight (the page shows a skeleton), an
-    // array once it answers, and [] if it answers with nothing (the page shows
-    // the empty note). D.routes is still read, but only as a LOOKUP — the city
-    // a destination is in, the tier we file it under, a block time — never as a
-    // source of sectors. Nothing appears on this page that the crew centre did
-    // not list.
+    // D.routes is still read, but only as a LOOKUP — the city a destination is
+    // in, the tier we file it under, a block time — never as a source of
+    // sectors. Nothing appears on this page that the crew centre did not list.
     let ROUTES = [];
     // Whether the crew centre has ANSWERED, which is not the same question as
     // whether ROUTES has anything in it: [] before the answer means "we do not
     // know yet" and [] after it means "there are none", and the page says two
-    // different things for those. Kept as a separate flag rather than ROUTES
-    // being null, because null is a value every reader of ROUTES then has to
-    // remember to guard — and the first version of this missed two of them.
+    // different things for those.
     let loaded = false;
     let active = 'All';
     let query = '';
-    let page = 1;
-    const PER_PAGE = 5;
 
-    const list    = document.getElementById('routes');
-    const count   = document.getElementById('routeCount');
-    const mapHost = document.getElementById('mapHost');
-    const mapNote = document.getElementById('mapNote');
+    const list  = document.getElementById('routes');
+    const count = document.getElementById('routeCount');
 
     // Lookups off the same arrays, so nothing here is a second copy of a fact.
     const hubBy  = Object.fromEntries(D.hubs.map(h => [h.icao, h]));
     const typeBy = Object.fromEntries(D.fleet.map(a => [a.short, a.type]));
-    const tierBy = Object.fromEntries(D.tiers.map(t => [t.name, t]));
 
     // Tier first, then the search box. Matching is done over the fields a
     // person would actually type: either ICAO, the city, the flight number, the
     // aircraft and the tier. Case- and accent-insensitive, so "cancun" finds
     // Cancún — without that the search silently fails on half this network.
     const fold = (v) => String(v || '')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
     function shown() {
         let rows = active === 'All' ? ROUTES : ROUTES.filter(r => r.tier === active);
@@ -292,9 +257,41 @@
         });
     }
 
-    // ---- Bases --------------------------------------------------------------
-    // The sector count per base is counted off whichever list is current, so it
-    // cannot end up saying 23 while the list below it shows 3.
+    const placeOf = (icao) => (hubBy[icao] || {}).city
+        || (ROUTES.find(r => r.to === icao) || {}).city || '';
+    const rankOf = (r) => r.minRank || ((A.minRankFor(r, D.ranks, D.fleet) || {}).name) || '';
+
+    /* ---- The three views ---------------------------------------------------
+       Tabs rather than three stacked sections, because they are the same rows
+       three ways and stacking them made the page a scroll of near-duplicates.
+       The tier filter belongs to the globe and the search box to the table, so
+       each lives inside its own panel rather than in a control bar above them
+       both — a search box that does nothing to what is on screen is worse than
+       no search box. */
+    const views = ['globe', 'routes', 'bases'];
+    let view = 'globe';
+
+    function show(next) {
+        if (!views.includes(next) || next === view) return;
+        view = next;
+        views.forEach(v => {
+            const panel = document.getElementById('view-' + v);
+            const tab = document.getElementById('tab-' + v);
+            const on = v === view;
+            panel.hidden = !on;
+            tab.setAttribute('aria-selected', String(on));
+            tab.tabIndex = on ? 0 : -1;
+        });
+        // The globe was measured while it was display:none, so it has to be
+        // told the panel is open — otherwise it paints into a zero-width
+        // canvas and the reader gets a blank square.
+        if (view === 'globe' && window.AMV_GLOBE) drawGlobe();
+        A.refresh(document.getElementById('view-' + view));
+    }
+
+    /* ---- Bases -------------------------------------------------------------
+       The sector count per base is counted off whichever list is current, so
+       it cannot end up saying 23 while the table beside it shows 3. */
     function renderHubs() {
         document.getElementById('hubs').innerHTML = D.hubs.map((h, i) => {
             // An em dash while we are still asking. A base showing "Sectors 0"
@@ -322,42 +319,11 @@
                 <span class="tag tag--hub">${esc(h.role)}</span>
                 <h3 style="margin-top:.7rem">${esc(h.city)}</h3>
                 <p>${esc(h.name)}</p>
-                ${h.note ? `<p class="hub-card__note">${esc(h.note)}</p>` : ''}
                 <div class="fleet-card__specs" style="padding-top:1.1rem">
                     ${specs.map(([k, v]) => `<span>${esc(k)} <b>${esc(v)}</b></span>`).join('')}
                 </div>
-            </article>`;
-        }).join('');
-    }
-
-    // ---- Flagship destinations ----------------------------------------------
-    // The longest sector in each region, which is the same rule map.js uses to
-    // choose what to label. Nothing is picked by hand: the strip is a fact
-    // about the network, so it cannot end up recommending a route that was
-    // withdrawn from the crew centre last week.
-    function renderHighlights() {
-        const el = document.getElementById('highlights');
-        if (!el) return;
-        if (!loaded || !ROUTES.length) { el.innerHTML = ''; return; }
-        const far = {};
-        ROUTES.forEach(r => {
-            const k = r.region || r.tier || 'Network';
-            if (!far[k] || (r.dist || 0) > (far[k].dist || 0)) far[k] = r;
-        });
-        const picks = Object.values(far).sort((a, b) => (b.dist || 0) - (a.dist || 0)).slice(0, 6);
-        el.innerHTML = picks.map((r, i) => {
-            const rank = r.minRank || ((A.minRankFor(r, D.ranks, D.fleet) || {}).name) || '';
-            return `
-            <article class="card card--hover highlight" data-reveal data-reveal-delay="${i * 70}">
-                <span class="highlight__region">${esc(r.region || r.tier || 'Network')}</span>
-                <h3 class="highlight__city">${esc(r.city || r.to)}</h3>
-                <p class="highlight__pair mono">${esc(r.from)} <i>→</i> ${esc(r.to)}</p>
-                <div class="fleet-card__specs" style="padding-top:1.1rem">
-                    ${r.block ? `<span>${r.estimated ? 'Block ≈' : 'Block'} <b>${esc(r.block)}</b></span>` : ''}
-                    ${r.dist ? `<span>Distance <b>${r.dist.toLocaleString()} nm</b></span>` : ''}
-                    ${r.ac ? `<span>Aircraft <b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
-                </div>
-                ${rank ? `<span class="rank-chip" style="margin-top:.9rem">${esc(rank)} and above</span>` : ''}
+                <button class="btn btn--ghost btn--sm hub-card__go" type="button"
+                        data-to="${esc(h.icao)}">Show on the globe</button>
             </article>`;
         }).join('');
     }
@@ -377,169 +343,261 @@
 
     // ---- Tier filter --------------------------------------------------------
     function renderFilters() {
-        if (!loaded) { document.getElementById('filters').innerHTML = ''; return; }
+        const host = document.getElementById('filters');
+        if (!loaded) { host.innerHTML = ''; return; }
         const live = D.tiers.map(t => t.name).filter(n => ROUTES.some(r => r.tier === n));
         // A sector from the crew centre with no tier of ours still has to be
         // reachable, so its bucket is offered rather than hidden.
         const extra = [...new Set(ROUTES.map(r => r.tier).filter(t => t && !live.includes(t)))];
         const all = ['All', ...live, ...extra];
         if (!all.includes(active)) active = 'All';
-        document.getElementById('filters').innerHTML = all.map(t =>
+        host.innerHTML = all.map(t =>
             `<button class="filter" type="button" data-tier="${esc(t)}"
                      aria-pressed="${t === active}">${esc(t)}</button>`).join('');
     }
 
-    // ---- The map ------------------------------------------------------------
-    // Positions start as this repo's table and grow as the crew centre tells us
-    // where its own destinations are — see AMV_CREW.airports.
+    /* ---- The globe ---------------------------------------------------------
+       Positions start as this repo's table and grow as the crew centre tells
+       us where its own destinations are — see AMV_CREW.airports. */
     let COORDS = D.airports;
+    const stage = document.getElementById('globeStage');
+    const globeHost = document.getElementById('globeHost');
+    const cardEl = document.getElementById('globeCard');
+    const hintEl = document.getElementById('globeHint');
+    const wide = window.matchMedia('(min-width: 900px)');
 
-    function renderMap() {
-        if (!window.AMV_MAP) return;
+    function drawGlobe() {
+        if (!window.AMV_GLOBE || !globeHost) return;
         const rows = shown();
-        const drawn = window.AMV_MAP.draw(mapHost, rows, { hubs: D.hubs, airports: COORDS });
+        const drawn = window.AMV_GLOBE.draw(globeHost, rows, { hubs: D.hubs, airports: COORDS });
         // Say plainly when a sector could not be placed rather than quietly
-        // drawing a smaller network than the one listed underneath.
+        // drawing a smaller network than the table lists.
         const off = rows.length - drawn;
-        mapNote.textContent = off > 0
-            ? `${off} sector${off === 1 ? '' : 's'} not mapped — no published coordinates`
-            : '';
+        hintEl.textContent = off > 0
+            ? `${off} sector${off === 1 ? '' : 's'} not drawn — no published coordinates`
+            : 'Drag to turn it · pick a destination for its sector';
     }
 
-    // ---- The sector list ----------------------------------------------------
-    // Every line below the code is optional. A sector that came from the crew
-    // center and has no twin in data.js has no city and no region to show, and
-    // an empty line reserved for one is worse than not drawing it.
-    function end(icao, city, name, home, side) {
-        return `
-            <div class="route-end route-end--${side}">
-                <span class="route-end__code">${esc(icao)}</span>
-                ${city ? `<span class="route-end__place">
-                    ${home ? '<span class="flag" aria-hidden="true"></span>' : ''}${esc(city)}
-                </span>` : ''}
-                ${name ? `<span class="route-end__name">${esc(name)}</span>` : ''}
+    /* What the card says about a picked airport. A destination gets its
+       sector; the hub and the bases get what departs them, because "Mexico
+       City, 23 sectors" is the true answer there and inventing a single
+       sector to describe it would not be. */
+    function cardFor(icao) {
+        const rows = shown();
+        const inbound = rows.filter(r => r.to === icao);
+        const outbound = rows.filter(r => r.from === icao);
+        const hub = hubBy[icao];
+        const close = `<button class="globe-card__close" type="button"
+                               aria-label="Close">${icon('x')}</button>`;
+
+        const fact = (k, v) => v ? `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>` : '';
+
+        if (!inbound.length && outbound.length) {
+            const n = outbound.length;
+            const far = outbound.reduce((a, b) => (b.dist || 0) > (a.dist || 0) ? b : a);
+            return `${close}
+                <span class="globe-card__eyebrow">${esc(hub ? hub.role : 'Origin')}</span>
+                <h3 class="globe-card__city">${esc((hub && hub.city) || icao)}</h3>
+                <p class="globe-card__code mono">${esc(icao)}${hub ? ' · ' + esc(hub.iata) : ''}</p>
+                <dl class="globe-card__facts">
+                    ${fact('Sectors', `${n} departing`)}
+                    ${fact('Furthest', esc(far.city || far.to))}
+                    ${fact('Runways', hub && hub.runways)}
+                    ${fact('Elevation', hub && esc(hub.elevation))}
+                </dl>`;
+        }
+
+        if (!inbound.length) return '';
+
+        // Normally one sector reaches a destination. Where more than one does,
+        // all of them are listed rather than the first being passed off as
+        // the answer.
+        const sector = (r) => {
+            const rank = rankOf(r);
+            return `
+            <div class="globe-card__sector">
+                <p class="globe-card__code mono">${esc(r.from)} <i>→</i> ${esc(r.to)}</p>
+                <dl class="globe-card__facts">
+                    ${fact('Flight', esc(r.flight))}
+                    ${fact('Aircraft', esc(typeBy[r.ac] || r.ac))}
+                    ${fact('Distance', r.dist ? r.dist.toLocaleString() + ' nm' : '')}
+                    ${fact(r.estimated ? 'Block (est.)' : 'Block', r.block ? (r.estimated ? '≈ ' : '') + esc(r.block) : '')}
+                    ${fact('Codeshare', r.codeshare ? esc(r.partner || 'Partner airline') : '')}
+                </dl>
+                ${rank ? `<span class="rank-chip">${esc(rank)} and above</span>` : ''}
             </div>`;
+        };
+
+        const first = inbound[0];
+        return `${close}
+            <span class="globe-card__eyebrow">${esc(first.region || first.tier || 'Network')}</span>
+            <h3 class="globe-card__city">${esc(first.city || icao)}</h3>
+            ${inbound.map(sector).join('')}`;
     }
 
-    function card(r, i) {
-        const h = hubBy[r.from] || {};
-        // The crew centre enforces the gate at booking, so when it states one
-        // that is the true answer; the ladder-derived rank is what we work out
-        // for a sector it has not gated itself.
-        const derived = A.minRankFor(r, D.ranks, D.fleet);
-        const rankName = r.minRank || (derived && derived.name) || '';
-        return `
-        <article class="route-card" data-reveal data-reveal-delay="${Math.min(i, 6) * 40}">
-            <div class="route-card__ends">
-                ${end(r.from, h.city || '', '', true, 'from')}
-                <span class="route-card__arrow" aria-hidden="true">${icon('arrow')}</span>
-                <span class="sr-only">to</span>
-                ${end(r.to, r.city, '', r.region === 'Domestic', 'to')}
-            </div>
-            <div class="route-card__meta">
-                ${r.flight ? `<span class="route-meta"><i>Flight</i><b>${esc(r.flight)}</b></span>` : ''}
-                ${r.block  ? `<span class="route-meta" ${r.estimated
-                    ? 'title="Estimated from the great-circle distance — this sector has no published block time yet."'
-                    : ''}><i>Block${r.estimated ? ' (est.)' : ''}</i><b>${r.estimated ? '≈ ' : ''}${esc(r.block)}</b></span>` : ''}
-                ${r.dist   ? `<span class="route-meta"><i>Distance</i><b>${r.dist.toLocaleString()} nm</b></span>` : ''}
-                ${r.ac     ? `<span class="route-meta"><i>Aircraft</i><b>${esc(typeBy[r.ac] || r.ac)}</b></span>` : ''}
-                ${r.codeshare ? `<span class="route-meta"><i>Codeshare</i><b>${esc(r.partner || 'Partner airline')}</b></span>` : ''}
-                ${r.tier ? `<span class="route-meta"><i>Tier</i><b>${esc(r.tier)}</b></span>` : ''}
-                ${rankName ? `<span class="rank-chip" title="Minimum rank to file this sector">${esc(rankName)}</span>` : ''}
-            </div>
-        </article>`;
+    /* Opening and closing the card. The globe slides off centre to clear room
+       for it, and the card is told where it landed so the globe can run a
+       leader line out to it — the panel is meant to read as something the
+       globe put there, not as a box that appeared beside it. */
+    let cardTimer = 0;
+    function openCard(icao) {
+        const html = icao ? cardFor(icao) : '';
+        if (!html) { closeCard(); return; }
+        clearTimeout(cardTimer);
+        cardEl.innerHTML = html;
+        cardEl.hidden = false;
+        // One frame between "in the document" and "animating in", or the
+        // browser has nothing to transition from and the card simply appears.
+        requestAnimationFrame(() => {
+            cardEl.classList.add('is-in');
+            placeCard();
+        });
+        window.AMV_GLOBE.offset(globeHost, wide.matches ? -0.16 : 0, wide.matches ? 0 : -0.13);
     }
 
-    function render() {
-        // Still waiting on the crew centre: hold the shape of five sectors
-        // rather than drawing a network we are about to replace.
+    function closeCard() {
+        if (cardEl.hidden) return;
+        cardEl.classList.remove('is-in');
+        window.AMV_GLOBE.offset(globeHost, 0, 0);
+        window.AMV_GLOBE.anchor(globeHost, null);
+        // Hidden only once it has finished leaving, so the exit animation is
+        // not cut off by the attribute that stops it being rendered at all.
+        cardTimer = setTimeout(() => { cardEl.hidden = true; cardEl.innerHTML = ''; }, 260);
+    }
+
+    // Where the card is, in canvas pixels. Recomputed whenever either box can
+    // have moved, because the leader is drawn to a rect and a stale one points
+    // at nothing.
+    function placeCard() {
+        const canvas = globeHost.querySelector('canvas');
+        if (!canvas || cardEl.hidden) return;
+        const c = canvas.getBoundingClientRect(), r = cardEl.getBoundingClientRect();
+        window.AMV_GLOBE.anchor(globeHost, {
+            x: r.left - c.left, y: r.top - c.top, w: r.width, h: r.height,
+        });
+    }
+
+    /* ---- The table ---------------------------------------------------------
+       Every sector at once, not five at a time behind a pager. The page that
+       paged them also grouped them by tier into panels, which meant a page
+       could show one heading and part of one group — and 23 rows is a table,
+       not a scroll. What each row is FOR is a pick: it takes you back to the
+       globe pointed at that destination, so the table and the globe are two
+       ways into the same row rather than two separate features. */
+    function renderTable() {
         if (!loaded) {
             count.textContent = '—';
-            list.innerHTML = `<section class="panel"><div class="skeleton" aria-hidden="true">${
-                Array.from({ length: PER_PAGE }, () => `
+            list.innerHTML = `<div class="skeleton" aria-hidden="true">${
+                Array.from({ length: 6 }, () => `
                     <div class="skeleton__row">
                         <div class="skeleton__bar skeleton__bar--sm"></div>
                         <div class="skeleton__bar skeleton__bar--md"></div>
                     </div>`).join('')
-            }</div></section>`;
-            document.getElementById('pager').innerHTML = '';
+            }</div>`;
             return;
         }
 
         const rows = shown();
         count.textContent = ROUTES.length;
 
-        // FLAT AND PAGED, where this used to be grouped into a panel per tier.
-        // Five sectors a page cannot be grouped — a tier is often more than
-        // five on its own, so a page would show one heading and part of one
-        // group, which reads as a bug rather than as a grouping. The tier has
-        // not been lost: it is a filter above the list and a label on every
-        // card, so it is still reachable and still stated per sector.
-        const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
-        if (page > pages) page = pages;
-        const slice = rows.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+        if (!rows.length) {
+            list.innerHTML = `<div class="empty">
+                <b>${query ? 'No sector matches that' : 'No sectors published yet'}</b>
+                <p>${query
+                    ? 'Try an airport code, a city or a flight number.'
+                    : 'Sectors appear here as they are published to the route network.'}</p>
+            </div>`;
+            return;
+        }
 
-        list.innerHTML = slice.length
-            ? `<section class="panel" data-reveal>${slice.map(card).join('')}</section>`
-            : `<div class="empty">
-                   <b>${query ? 'No sector matches that' : 'No sectors in this tier yet'}</b>
-                   <p>${query
-                        ? 'Try an airport code, a city or a flight number.'
-                        : 'Sectors appear here as they are published to the route network.'}</p>
-               </div>`;
+        list.innerHTML = `
+        <div class="rtable-scroll">
+        <table class="rtable">
+            <caption class="sr-only">Every published sector. Choosing one opens it on the globe.</caption>
+            <thead><tr>
+                <th scope="col">Sector</th>
+                <th scope="col">Destination</th>
+                <th scope="col" class="rtable__opt">Flight</th>
+                <th scope="col" class="rtable__opt">Aircraft</th>
+                <th scope="col" class="rtable__num">Distance <span class="rtable__unit">nm</span></th>
+                <th scope="col" class="rtable__opt rtable__num">Block</th>
+                <th scope="col">Rank</th>
+            </tr></thead>
+            <tbody>${rows.map(r => {
+                const rank = rankOf(r);
+                return `<tr data-to="${esc(r.to)}">
+                    <td><button class="rtable__pick mono" type="button" data-to="${esc(r.to)}">
+                        ${esc(r.from)} <i aria-hidden="true">→</i> ${esc(r.to)}
+                        <span class="sr-only">— show on the globe</span>
+                    </button></td>
+                    <td>${esc(r.city || '—')}${r.codeshare
+                        ? ` <span class="tag tag--sm">${esc(r.partner || 'Codeshare')}</span>` : ''}</td>
+                    <td class="rtable__opt mono">${esc(r.flight || '—')}</td>
+                    <td class="rtable__opt">${esc(typeBy[r.ac] || r.ac || '—')}</td>
+                    <td class="rtable__num mono">${r.dist ? r.dist.toLocaleString() : '—'}</td>
+                    <td class="rtable__opt rtable__num mono">${r.block
+                        ? (r.estimated ? '≈ ' : '') + esc(r.block) : '—'}</td>
+                    <td>${rank ? `<span class="rank-chip rank-chip--sm">${esc(rank)}</span>` : '—'}</td>
+                </tr>`;
+            }).join('')}</tbody>
+        </table>
+        </div>
+        <p class="rtable__note">
+            Distances are great-circle nautical miles; a block time marked ≈ is worked out from
+            the distance because none is published yet.
+        </p>`;
+    }
 
-        renderPager(rows.length, pages);
+    function renderAll() {
+        renderFilters();
+        renderTable();
+        renderHubs();
         renderDestLine();
-        // The cards are injected, so their [data-reveal] has to be wired each
-        // time — without this a filtered-in card sits at opacity 0 forever.
-        A.refresh(list);
+        if (view === 'globe') drawGlobe();
+        A.refresh();
     }
 
-    // The pager states where you are in words as well as in buttons, because
-    // "Next" with nothing else on the row does not tell you how much is left.
-    function renderPager(total, pages) {
-        const host = document.getElementById('pager');
-        if (!total) { host.innerHTML = ''; return; }
-        const first = (page - 1) * PER_PAGE + 1;
-        const last = Math.min(page * PER_PAGE, total);
-        host.innerHTML = `
-            <p class="pager__count">Showing <b>${first}\u2013${last}</b> of <b>${total}</b> sector${total === 1 ? '' : 's'}</p>
-            ${pages > 1 ? `
-            <div class="pager__nav">
-                <button class="btn btn--ghost btn--sm" type="button" data-page="prev"
-                        ${page === 1 ? 'disabled' : ''}>Previous</button>
-                <span class="pager__at" aria-live="polite">Page ${page} of ${pages}</span>
-                <button class="btn btn--ghost btn--sm" type="button" data-page="next"
-                        ${page === pages ? 'disabled' : ''}>Next</button>
-            </div>` : ''}`;
+    /* ---- Events ------------------------------------------------------------ */
+
+    // Picking a destination, from the globe itself.
+    if (window.AMV_GLOBE) {
+        window.AMV_GLOBE.onselect(globeHost, openCard);
+        // Hovering still names a point, which is what tells you a dot is worth
+        // clicking before you have clicked one.
+        window.AMV_GLOBE.onpick(globeHost, (icao) => {
+            if (window.AMV_GLOBE.selected(globeHost)) return;
+            hintEl.textContent = icao
+                ? `${icao}${placeOf(icao) ? ' — ' + placeOf(icao) : ''}`
+                : 'Drag to turn it · pick a destination for its sector';
+        });
     }
 
-    // Only the bases keep a permanent label on a narrow screen, so the rest are
-    // named on tap. Delegated, because the map is redrawn on every filter.
-    const pick = document.getElementById('mapPick');
-    const namePoint = (e) => {
-        const pt = e.target.closest && e.target.closest('.map__pt');
-        if (pt) pick.textContent = pt.dataset.place || '';
-    };
-    // Typing resets to the first page: staying on page 4 of a result set that
-    // now has one page shows an empty list and looks broken.
+    cardEl.addEventListener('click', (e) => {
+        if (e.target.closest('.globe-card__close')) window.AMV_GLOBE.clear(globeHost);
+    });
+
+    // Picking one from the table, or from a base card: same destination, same
+    // card, by way of the globe — so there is one place a sector is explained.
+    function pickFrom(e) {
+        const btn = e.target.closest('[data-to]');
+        if (!btn) return;
+        const icao = btn.dataset.to;
+        show('globe');
+        // The globe may have only just been un-hidden and measured, so the
+        // pick waits a frame for it to have a size to turn within.
+        requestAnimationFrame(() => {
+            if (!window.AMV_GLOBE.select(globeHost, icao)) return;
+            stage.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        });
+    }
+    list.addEventListener('click', pickFrom);
+    document.getElementById('hubs').addEventListener('click', pickFrom);
+
     document.getElementById('routeSearch').addEventListener('input', (e) => {
         query = e.target.value;
-        page = 1;
-        render();
+        renderTable();
+        A.refresh(list);
     });
-
-    document.getElementById('pager').addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-page]');
-        if (!btn) return;
-        page += btn.dataset.page === 'next' ? 1 : -1;
-        render();
-        document.getElementById('routes').scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
-
-    mapHost.addEventListener('click', namePoint);
-    mapHost.addEventListener('focusin', namePoint);
-    mapHost.addEventListener('mouseover', namePoint);
 
     document.getElementById('filters').addEventListener('click', (e) => {
         const btn = e.target.closest('[data-tier]');
@@ -547,21 +605,41 @@
         active = btn.dataset.tier;
         document.querySelectorAll('#filters .filter').forEach(b =>
             b.setAttribute('aria-pressed', String(b.dataset.tier === active)));
-        render();
-        renderMap();
+        drawGlobe();
+        renderTable();
     });
 
-    renderHubs();
-    renderFilters();
-    renderHighlights();
-    render();
-    renderMap();
-    A.refresh();
+    // The tab strip, with the arrow keys a tablist is expected to answer.
+    const strip = document.querySelector('.viewswitch');
+    strip.addEventListener('click', (e) => {
+        const tab = e.target.closest('[data-view]');
+        if (tab) show(tab.dataset.view);
+    });
+    strip.addEventListener('keydown', (e) => {
+        const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        const next = views[(views.indexOf(view) + step + views.length) % views.length];
+        show(next);
+        document.getElementById('tab-' + next).focus();
+    });
+
+    // The card is positioned by CSS, so anything that can move it has to
+    // re-measure: the viewport, and the switch between side panel and sheet.
+    window.addEventListener('resize', placeCard);
+    if (wide.addEventListener) wide.addEventListener('change', () => {
+        if (cardEl.hidden) return;
+        window.AMV_GLOBE.offset(globeHost, wide.matches ? -0.16 : 0, wide.matches ? 0 : -0.13);
+        placeCard();
+    });
+
+    renderAll();
+
 
     // ---- Live routes from the crew center -----------------------------------
     // The crew center is where sectors are actually added, so it — not this
-    // repo — is the airline's route network. data.js has already painted the
-    // page above; this replaces it if and only if the crew center answers.
+    // repo — is the airline's route network. The page holds a skeleton until
+    // this answers, and draws nothing it did not list.
     //
     // The two records are not the same shape. The crew center knows the sector
     // and the aircraft; data.js knows the things a reader wants and an ops tool
@@ -573,7 +651,7 @@
     (function liveRoutes() {
         // No crew centre at all is an answer: there are no sectors to show, and
         // the page says so rather than sitting on a skeleton forever.
-        if (!window.AMV_CREW) { ROUTES = []; loaded = true; renderFilters(); render(); renderMap(); return; }
+        if (!window.AMV_CREW) { ROUTES = []; loaded = true; renderAll(); return; }
         const key = r => `${r.from}-${r.to}`;
         const local = Object.fromEntries(D.routes.map(r => [key(r), r]));
 
@@ -589,7 +667,7 @@
             // Backend quiet. There is nothing to fall back to any more — that
             // was the point of removing the local first paint — so this resolves
             // to the empty note rather than to data.js's table.
-            if (!live) { ROUTES = []; loaded = true; renderFilters(); render(); renderMap(); return; }
+            if (!live) { ROUTES = []; loaded = true; renderAll(); return; }
 
             loaded = true;
             ROUTES = live.map(r => {
@@ -621,13 +699,8 @@
                 // about them. See AMV.enrichRoute.
                 return A.enrichRoute(row, COORDS);
             });
-            renderHubs();
-            renderFilters();
-            renderHighlights();
-            render();
-            renderMap();
-            A.refresh();
-        }).catch(() => { ROUTES = []; loaded = true; renderFilters(); render(); renderMap(); });
+            renderAll();
+        }).catch(() => { ROUTES = []; loaded = true; renderAll(); });
     })();
 })();
 </script>

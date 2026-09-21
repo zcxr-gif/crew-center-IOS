@@ -22,11 +22,11 @@ brand.json         ← the brand contract. See "One brand, two products" below.
 assets/brand.css   The design system. Every token lives here.
 assets/js/data.js  Identity, staff, fleet, hubs, network, ranks, events — from the Operations Plan
 assets/js/site.js  Nav, footer, mark, icons, theme, reveal, counters, rank arithmetic
-assets/js/map.js   Draws the route map: great circles, dots, label placement
-assets/js/world.js GENERATED coastlines — see tools/make-worldmap.py
+assets/js/globe.js The route map: the network on a turning globe, and its card
+assets/js/globe-land.js GENERATED land grid — see tools/make-globe.py
 assets/js/live.js  Mounts the live-traffic embed
 assets/js/crew.js  Read-only client for the crew center's public feeds
-tools/             Regenerate mark.svg, the ruled device and world.js from source
+tools/             Regenerate mark.svg, the ruled device and globe-land.js
 assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
 
@@ -440,6 +440,7 @@ the path is `$PLAYWRIGHT_CHROMIUM`, or `/opt/pw-browsers/chromium`).
 node tools/test-events-page.js     # the calendar, and what must not reach it
 node tools/test-network-sync.js    # the network, counted off the crew centre
 node tools/test-motion.js          # nothing stranded invisible; the seams
+node tools/test-globe.js           # the globe turns, and stops when asked to
 ```
 
 ## Deploying
@@ -726,38 +727,68 @@ ground**: the ruled-feather rails and the eagle watermark run the section's full
 height, so both carry the same fade in their own `background`, the greca's trick
 and for the greca's reason — one mask layer, no `mask-composite`.
 
-**The route map is generated, not drawn.** `assets/js/world.js` is Natural
-Earth's public-domain 1:110m land, reprojected Robinson and simplified by
-`tools/make-worldmap.py`; the arcs are real great circles interpolated in
-`assets/js/map.js`; the airports are their real aerodrome reference points in
-`AMV_DATA.airports`. Nothing about it is illustrated, which is what lets it
-past the rule at the top of `brand.css`. To regenerate it:
+**The route map is a globe, and it is generated, not drawn.**
+`assets/js/globe-land.js` is Natural Earth's public-domain 1:110m land,
+sampled onto a 1.7-degree lat/lon grid by `tools/make-globe.py` and shipped as
+one bit per cell — 7,466 land points in about 4 kB, which as explicit
+coordinate pairs would be nearer 30 kB. `assets/js/globe.js` expands that to
+unit vectors once and rotates them on a canvas; the arcs are real great circles
+between the aerodrome reference points in `AMV_DATA.airports`. Nothing about it
+is illustrated, which is what lets it past the rule at the top of `brand.css`.
+To regenerate it:
 
 ```sh
 curl -O https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson
-python3 tools/make-worldmap.py ne_110m_land.geojson
+python3 tools/make-globe.py ne_110m_land.geojson
 ```
 
-Two details in `map.js` are load-bearing and look like fussiness until you
-remove them. Label type is sized from how many map units the host paints per
-pixel, because an SVG scales its text with the viewBox and a label that reads on
-a desktop map is nine pixels tall on a phone; the map redraws on resize for the
-same reason. And the crop is computed twice — once from the arcs, then again to
-contain the labels that were placed inside it — because Mexico City, Monterrey,
-Guadalajara and Cancún sit within a few degrees of each other and their names
-end up outside the first box.
+**There used to be a flat Robinson map here, and it is gone.** `map.js`,
+`world.js` and `tools/make-worldmap.py` went with it, along with `.map*` in
+`brand.css`. Robinson answered *where* the airline flies and could not answer
+*how far*, because no flat map can; the globe answers both, once the detail the
+flat map carried — the labels, the block times, the rank gate — has somewhere
+else to live. It does:
 
-The map is sized by HEIGHT and allowed to be wider than the page, inside a
-scroller you can drag, swipe or scroll. Fitted to the container's width instead,
-a network running from Los Angeles to Tokyo is 258 degrees of longitude squeezed
-into one column — about 130px tall on a phone, which is a diagram of a map
-rather than a map. It opens with the primary hub brought to the middle of the
-view, and the "drag sideways" hint only appears when there is more than 64px of
-pan to be had.
+  * pick a destination and the globe turns to face it, everything else on the
+    sphere steps back, and that sector's card opens beside it with every figure
+    the old flagship strip carried;
+  * the full list is a tab away as a table, and picking a row there comes back
+    to the globe pointed at that sector;
+  * the bases are the third tab.
 
-A sector whose airports are not in `AMV_DATA.airports` is listed by the network
-page and left off the map, and the legend says how many. Do not add coordinates
-you have not looked up.
+They are the same rows drawn three ways, not three features. If you are
+restoring any of the flat map, restore the view it belonged to rather than the
+rule — and note that `.sr-only` and `.skip` were filed under the route cards
+and the header, were nearly lost with them, and now live in their own
+`ASSISTIVE` block because nine pages depend on them.
+
+Four things in `globe.js` are load-bearing. The dots crowd towards the poles
+because the grid is angular in both axes; that is the graticule, not a texture,
+and evening it out would make the sphere read as a flat circle of confetti. The
+arcs are lifted off the surface in proportion to the distance flown, so a
+sector stays legible when it crosses the limb instead of disappearing over the
+horizon halfway through. An arc is hidden exactly where it is behind the sphere
+*and* inside the disc — which is the whole of the occlusion test an orthographic
+projection needs, and the reason a sector to Tokyo dives behind the planet and
+comes out the other side. And the turn towards a pick overshoots by a few per
+cent before settling: a plain ease-out is correct and feels like a slide
+transition, and the overshoot is what makes it feel like something with mass.
+
+The page registers `onselect` and `onpick` before the first `draw()`, which is
+the order the page reads in. `globe.js` therefore keeps handlers on the HOST
+element as well as on its state, because the state does not exist until the
+first draw — registering them up front silently produced a globe that picked up
+nothing at all, once.
+
+Under `prefers-reduced-motion` the globe is still drawn, can still be turned by
+hand, and a pick still opens its card with every figure in it — but the drift,
+the travelling arc heads, the turn and the frame loop itself all stop.
+`tools/test-globe.js` fails if the loop merely goes quiet and keeps repainting
+an identical frame.
+
+A sector whose airports are not in `AMV_DATA.airports` is listed in the table
+and left off the globe, and the hint under it says how many. Do not add
+coordinates you have not looked up.
 
 **The home page and the calendar read the same feed, and only that feed.** Both
 call `AMV_CREW.events()` and render what it returns: a waiting state while the
