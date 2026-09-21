@@ -24,9 +24,11 @@ assets/js/data.js  Identity, staff, fleet, hubs, network, ranks, events — from
 assets/js/site.js  Nav, footer, mark, icons, theme, reveal, counters, rank arithmetic
 assets/js/map.js   Draws the route map: great circles, dots, label placement
 assets/js/world.js GENERATED coastlines — see tools/make-worldmap.py
+assets/js/globe.js Draws the dot globe above it: same sectors, on a sphere
+assets/js/globe-land.js GENERATED land grid — see tools/make-globe.py
 assets/js/live.js  Mounts the live-traffic embed
 assets/js/crew.js  Read-only client for the crew center's public feeds
-tools/             Regenerate mark.svg, the ruled device and world.js from source
+tools/             Regenerate mark.svg, the ruled device, world.js and globe-land.js
 assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
 
@@ -440,6 +442,7 @@ the path is `$PLAYWRIGHT_CHROMIUM`, or `/opt/pw-browsers/chromium`).
 node tools/test-events-page.js     # the calendar, and what must not reach it
 node tools/test-network-sync.js    # the network, counted off the crew centre
 node tools/test-motion.js          # nothing stranded invisible; the seams
+node tools/test-globe.js           # the globe turns, and stops when asked to
 ```
 
 ## Deploying
@@ -758,6 +761,41 @@ pan to be had.
 A sector whose airports are not in `AMV_DATA.airports` is listed by the network
 page and left off the map, and the legend says how many. Do not add coordinates
 you have not looked up.
+
+**The globe above it is generated too, and it is an addition, not a
+replacement.** `assets/js/globe-land.js` is the same Natural Earth 1:110m land,
+sampled onto a 1.7-degree lat/lon grid by `tools/make-globe.py` and shipped as
+one bit per cell — 7,466 land points in about 4 kB, which as explicit
+coordinate pairs would be nearer 30 kB. `assets/js/globe.js` expands it to unit
+vectors once and rotates them on a canvas. To regenerate it:
+
+```sh
+curl -O https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson
+python3 tools/make-globe.py ne_110m_land.geojson
+```
+
+Why both views exist: Robinson answers *where* the airline flies and cannot
+answer *how far*, because no flat map can. The globe answers the second and
+cannot carry twenty-three labels, because no turning sphere can at the size
+that fits a phone. So the globe leads the page and the flat map keeps the tier
+filter, the placed labels and the pannable detail underneath it. The globe has
+no labels at all — pointing at a dot writes into the same live region the flat
+map already uses to name one.
+
+Three things in `globe.js` are load-bearing. The dots crowd towards the poles
+because the grid is angular in both axes; that is the graticule, not a texture,
+and evening it out would make the sphere read as a flat circle of confetti. The
+arcs are lifted off the surface in proportion to the distance flown, so a
+sector stays legible when it crosses the limb instead of disappearing over the
+horizon halfway through. And an arc is hidden exactly where it is behind the
+sphere *and* inside the disc — which is the whole of the occlusion test an
+orthographic projection needs, and the reason a sector to Tokyo dives behind
+the planet and comes out the other side.
+
+Under `prefers-reduced-motion` the globe is still drawn and can still be turned
+by hand, but the drift, the travelling arc heads and the frame loop itself all
+stop — `tools/test-globe.js` fails if the loop merely goes quiet and keeps
+repainting an identical frame.
 
 **The home page and the calendar read the same feed, and only that feed.** Both
 call `AMV_CREW.events()` and render what it returns: a waiting state while the

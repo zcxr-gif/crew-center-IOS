@@ -1974,6 +1974,52 @@ main > .hero--live:first-child {
    round: the map scrolls perfectly well without being told to. */
 .map-host:has(.has-pan) + .map-hint { display: flex; }
 
+/* ---- The globe (globe.js) --------------------------------------------------
+   The same network on a sphere, above the flat map. It carries no chrome of
+   its own: the disc IS the artwork, painted on whatever the page behind it is,
+   the way a photograph of the Earth sits on a white page. Nothing here paints
+   a background, a frame or a shadow — globe.js draws its own limb and its own
+   atmosphere, and both have to meet the page cleanly at any width.
+
+   Square by aspect-ratio rather than by a fixed height: the canvas has to be
+   square for the planet to be round, and the width is the dimension the layout
+   actually controls. */
+.globe-host {
+    position: relative;
+    width: 100%;
+    max-width: 36rem;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+}
+.globe__canvas {
+    display: block;
+    width: 100%; height: 100%;
+    border-radius: 50%;          /* shapes the focus ring, not the painting */
+    cursor: grab;
+    /* A horizontal drag turns the globe; a vertical one scrolls the page past
+       it. On a phone this square is most of the viewport, and trapping a
+       downward swipe inside it would strand the reader partway down the page.
+       The tilt is not worth that, and the arrow keys still give both axes. */
+    touch-action: pan-y;
+    outline-offset: 6px;
+}
+.globe-host.is-turning .globe__canvas { cursor: grabbing; }
+.globe__canvas:focus-visible { outline: 2px solid var(--accent); }
+
+/* The canvas is square, so there is already a band of empty page under the
+   sphere; the hint needs no top margin of its own, and it does need room
+   before the tier filters or it reads as a label for them. */
+.globe-hint {
+    display: flex; align-items: center; justify-content: center; gap: .45rem;
+    margin: 0 0 1.75rem; font-size: .76rem; color: var(--faint);
+    text-transform: uppercase; letter-spacing: .1em; font-weight: 700;
+}
+.globe-hint svg { width: 1rem; height: 1rem; }
+
+/* Reduced motion: globe.js already stops the drift and the moving heads. The
+   globe stays, because a still globe is a picture of the network and removing
+   it would take information away rather than motion. */
+
 .map__land {
     fill: #E7ECF4;
     stroke: #CFD8E6;
