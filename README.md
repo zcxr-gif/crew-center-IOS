@@ -9,7 +9,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 ```
 index.html         Home — the flight deck hero, the counted figures, a glimpse of
                    each page, the next event, what the airline has been doing
-fleet.html         The six operated types, what each one flies, and the two liveries
+fleet.html         The six operated types and what each one flies
 network.html       The route map, the flagship destinations, then every published sector
 ranks.html         The ladder: insignia, hours, aircraft released, sector limits, privileges
 events.html        The calendar, the programme, and what has been flown
@@ -57,10 +57,10 @@ of that within a month.
 A320, an A321 and a heritage 757; its own closing checklist has those liveries
 down as still to be confirmed against Infinite Flight. They are in
 `fleet` on the day someone confirms the livery — not before. This site does not
-publish a paper fleet, and as of the livery work it does not publish a planned
-one either: the "What comes next" section on `/fleet` and the `fleetPlanned`
-array it read are **gone**, at the VA's instruction. A page about a fleet is
-better spent on the aeroplanes that exist than on the ones that might.
+publish a paper fleet, and it no longer publishes a planned one either: the
+"What comes next" section on `/fleet` and the `fleetPlanned` array it read are
+**gone**, at the VA's instruction. A page about a fleet is better spent on the
+aeroplanes that exist than on the ones that might.
 
 ---
 
@@ -129,8 +129,6 @@ motifs sharing a section, not that device.
 | `assets/img/view-cabin-row.svg` | five apertures receding down a wall | `/about` |
 | `assets/img/view-tail.svg` | a fin, and the fuselage it stands on | `/staff` |
 | `assets/img/view-door.svg` | a door-shaped hole in a wall | `/apply` |
-| `assets/img/livery-swoosh.svg` | the sweep that rises across the rear body | the livery bands on `/fleet` |
-| `assets/img/livery-fin.svg` | the block it rises into | the livery bands on `/fleet` |
 | the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
@@ -160,7 +158,6 @@ python3 tools/make-serpent.py    # (parameters only)      -> serpent.svg
 python3 tools/make-flightdeck.py # (parameters only)      -> the hero's cabin window and flight deck
 python3 tools/make-cloudbank.py  # (seeded, reproducible) -> the cloud decks
 python3 tools/make-views.py      # (parameters + seed)    -> the seven page views
-python3 tools/make-livery.py     # (parameters only)      -> the livery sweep and fin
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
@@ -748,41 +745,6 @@ Three more things are deliberate:
   same flight deck and under the same lockup — it changes the **view**, not the
   hero. The note in `data.js` says what the clip should be and why the poster is
   not optional.
-
-## The livery, and the alliance
-
-**The paint is geometry too.** `tools/make-livery.py` emits the one thing
-anybody recognises about Aeroméxico's scheme without being told the name: a long
-shallow sweep that starts thin low and forward, rises aft, widens, and runs up
-into the fin. `/fleet` carries it as two bands, one per scheme, because `livery`
-in `data.js` is either `Aeromexico` or `Aeromexico Connect` on every type and a
-third variant would be a scheme nobody flies.
-
-**There is no aeroplane in it.** No fuselage, no nose, no window line, no wing.
-A side elevation of an airframe is a likeness, and a likeness is the one thing
-the generators here are written to refuse. What a band carries is the *colour
-architecture* — the order and shape of the fields, the way a scheme is set out
-on a paint drawing before anybody draws the body it goes on. The Caballero
-Águila sits on the fin as a separate layer, because that is the airline's own
-artwork used as artwork; the generated shapes stay clean of it.
-
-**The SkyTeam mark is deliberately absent, and this is the reasoning.**
-Aeroméxico is a SkyTeam carrier and this airline flies its network, so the
-alliance is stated — on `/fleet`, in the footer of every page, and in
-`data.js` where it always was. What is *not* here is the alliance's artwork. It
-is a third party's registered trademark: not Aeroméxico's, and not this VA's.
-The note above `.brandmark` already refuses the real AEROMÉXICO CONNECT lockup
-on exactly those grounds while allowing the VA's own lockup, and an alliance
-logo belonging to neither party is a step further out than that.
-
-Naming an alliance is a statement of fact and costs nothing. Reproducing its
-artwork is a claim on someone else's. The name is also set in **one colour** for
-the same reason: a first pass set it two-tone, which is the styling of the real
-wordmark, and imitating the styling of a mark you have just declined to
-reproduce is the same claim made quietly.
-
-If the VA ever holds written permission, the mark drops into `.alliance__mark`
-and nothing else changes.
 
 ## Every other page opens on the same aeroplane
 
