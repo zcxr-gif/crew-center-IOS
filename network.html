@@ -294,6 +294,19 @@
     const views = ['globe', 'routes', 'bases'];
     let view = 'globe';
 
+    /* The pill is one element that travels, so its size and position are
+       measured off whichever tab is selected rather than assumed. Called on
+       every switch, on resize because the labels reflow, and once fonts have
+       loaded — the tabs are set in a webfont, and measuring them in the
+       fallback face puts the pill a few pixels wrong until something else
+       happens to re-measure it. */
+    function placePill() {
+        const on = strip.querySelector('[aria-selected="true"]');
+        if (!on) return;
+        strip.style.setProperty('--pill-x', on.offsetLeft + 'px');
+        strip.style.setProperty('--pill-w', on.offsetWidth + 'px');
+    }
+
     function show(next) {
         if (!views.includes(next) || next === view) return;
         view = next;
@@ -305,6 +318,15 @@
             tab.setAttribute('aria-selected', String(on));
             tab.tabIndex = on ? 0 : -1;
         });
+        placePill();
+        // Restart the panel's entry animation. Removing the class and reading
+        // offsetWidth forces the style to flush, which is what makes the
+        // animation run again on the second and every later switch — without
+        // it the class is already there and nothing replays.
+        const open = document.getElementById('view-' + view);
+        open.classList.remove('is-entering');
+        void open.offsetWidth;
+        open.classList.add('is-entering');
         // The globe was measured while it was display:none, so it has to be
         // told the panel is open — otherwise it paints into a zero-width
         // canvas and the reader gets a blank square.
@@ -649,7 +671,10 @@
 
     // The card is positioned by CSS, so anything that can move it has to
     // re-measure: the viewport, and the switch between side panel and sheet.
-    window.addEventListener('resize', placeCard);
+    // The pill is measured for the same reason and on the same events.
+    window.addEventListener('resize', () => { placeCard(); placePill(); });
+    placePill();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePill);
     if (wide.addEventListener) wide.addEventListener('change', () => {
         if (cardEl.hidden) return;
         window.AMV_GLOBE.offset(globeHost, wide.matches ? -0.16 : 0, wide.matches ? 0 : -0.13);

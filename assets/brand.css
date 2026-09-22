@@ -1865,19 +1865,61 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
 }
 .viewswitch__tab svg { width: 1.05rem; height: 1.05rem; }
 .viewswitch__tab:hover { color: var(--ink); }
-.viewswitch__tab[aria-selected="true"] {
-    background: var(--am-blue); color: #fff;
+/* THE SELECTED PILL IS ONE ELEMENT THAT MOVES, not a background that appears
+   on one tab and disappears from another. Those two look identical in a still
+   and completely different in use: a colour crossfading between two pills
+   reads as two things blinking, and a pill that travels reads as one control
+   being operated. It is the ::before of the strip, sized and placed from the
+   selected tab's own box by `placePill()` in network.html, so nothing here
+   assumes how many tabs there are or how wide their labels set.
+
+   It lives INSIDE the scrolling box on purpose: the strip scrolls sideways on
+   a phone, `offsetLeft` is measured against it, and a pill positioned against
+   anything else would drift away from its tab as you scrolled. */
+.viewswitch { position: relative; }
+.viewswitch::before {
+    content: ""; position: absolute; z-index: 0;
+    top: .3rem; bottom: .3rem; left: 0;
+    width: var(--pill-w, 0); translate: var(--pill-x, 0) 0;
+    background: var(--am-blue); border-radius: 999px;
     box-shadow: 0 1px 3px rgba(10, 29, 59, .22);
+    transition: translate .38s var(--ease), width .38s var(--ease);
 }
+/* Until the first measurement there is no pill — better nothing for one frame
+   than a full-width bar sliding in from the left on load. */
+.viewswitch:not([style*="--pill-w"])::before { opacity: 0; }
+.viewswitch__tab { position: relative; z-index: 1; }
+.viewswitch__tab[aria-selected="true"] { color: #fff; }
 /* The count rides inside the tab rather than sitting under a heading, which
    is the whole of what "23 sectors" needs to be. */
 .viewswitch__n {
     font-family: var(--font-mono); font-size: .76rem; font-weight: 700;
     opacity: .72;
 }
-:root[data-theme="dark"] .viewswitch__tab[aria-selected="true"] { background: var(--am-blue-300); color: var(--am-navy); }
+:root[data-theme="dark"] .viewswitch::before { background: var(--am-blue-300); }
+:root[data-theme="dark"] .viewswitch__tab[aria-selected="true"] { color: var(--am-navy); }
 @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .viewswitch__tab[aria-selected="true"] { background: var(--am-blue-300); color: var(--am-navy); }
+    :root:not([data-theme="light"]) .viewswitch::before { background: var(--am-blue-300); }
+    :root:not([data-theme="light"]) .viewswitch__tab[aria-selected="true"] { color: var(--am-navy); }
+}
+
+/* ---- The panel underneath -------------------------------------------------
+   `show()` swaps `hidden` on three panels, which is the right thing for a
+   tablist and, on its own, reads as a snap: the globe is simply gone and a
+   table is simply there. One animation on the panel that just appeared turns
+   the swap into a hand-over, and it is keyed off a class rather than off
+   `:not([hidden])` so it re-runs on every switch instead of once. */
+.view.is-entering { animation: viewIn .34s var(--ease-rise) both; }
+@keyframes viewIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Asked for less motion: the pill is simply where it belongs and the panel is
+   simply there. Not a shorter slide — none. */
+@media (prefers-reduced-motion: reduce) {
+    .viewswitch::before { transition: none; }
+    .view.is-entering { animation: none; }
 }
 
 /* ---- The globe (globe.js) -------------------------------------------------
