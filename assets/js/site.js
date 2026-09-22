@@ -210,6 +210,12 @@
                         ${LOCKUP}
                         <p>An Infinite Flight virtual airline flying the Aeroméxico network from
                            Mexico City.</p>
+                        <!-- The alliance, on every page, because that is where an
+                             airline states it. SET and not drawn: the SkyTeam mark
+                             is a third party's registered trademark and is
+                             deliberately absent — see THE ALLIANCE in brand.css. -->
+                        <p class="footer__alliance">Flying the network of a
+                           <b>SkyTeam</b> carrier</p>
                         <p class="footer__origin"><span class="flag" aria-hidden="true"></span> Hecho en México</p>
                     </div>
                     <div class="footer__cols">

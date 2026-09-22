@@ -337,31 +337,6 @@ window.AMV_DATA = {
        page and it downloads before anyone has decided to stay. */
     video: null,
 
-    /* ---- Fleet development (plan §5, §14) ---------------------------------
-       Types the Operations Plan names and the airline has not put into service.
-       They are listed as planned, NOT as fleet, because the plan's own closing
-       checklist has "fleet liveries confirmed against the current Infinite
-       Flight aircraft list — particularly the Boeing 757 heritage scheme and
-       the A320 / A321" as an open item. This site does not publish a paper
-       fleet: a type moves into `fleet` above on the day someone confirms the
-       livery exists in the sim, and not before. */
-    fleetPlanned: [
-        {
-            type: 'Airbus A320', short: '320', releasedAt: 'Second Officer',
-            operation: 'Domestic and regional, codeshare',
-            status: 'Livery to be confirmed in Infinite Flight',
-        },
-        {
-            type: 'Airbus A321', short: '321', releasedAt: 'Second Officer',
-            operation: 'High-density domestic, codeshare',
-            status: 'Livery to be confirmed in Infinite Flight',
-        },
-        {
-            type: 'Boeing 757', short: '757', releasedAt: 'First Officer',
-            operation: 'Retro operations, anniversary flights and events',
-            status: 'Heritage colours — livery to be confirmed in Infinite Flight',
-        },
-    ],
 
     /* ---- Route tiers (plan §6) --------------------------------------------
        The network is published in five tiers, each with its own flight-number

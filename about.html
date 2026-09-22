@@ -358,7 +358,7 @@
             ['Platform',         `${esc(a.platform)} — ${esc(a.server)} only`],
             ['Primary hub',      `${esc(hub.city)} <b>${esc(hub.icao)}</b>`],
             ['Bases',            bases.map(h => `${esc(h.city)} <b>${esc(h.icao)}</b>`).join(' · ')],
-            ['Fleet',            `${D.fleet.length} types in service, ${D.fleetPlanned.length} planned`],
+            ['Fleet',            `${D.fleet.length} types in service`],
             // Tiers are the ones actually flown, not the five the plan defines:
             // a tier with nothing in it is a heading, not a piece of network.
             ['Network',          esc(networkLine(rows))],

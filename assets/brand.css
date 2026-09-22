@@ -1658,6 +1658,15 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
     display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.3rem;
     font-size: .78rem; font-weight: 700; letter-spacing: .04em; color: var(--ink);
 }
+/* The alliance line in the footer's brand column. Quiet, and on every page. */
+.footer__alliance {
+    margin-top: 1.1rem; font-size: .82rem; color: var(--muted);
+}
+.footer__alliance b {
+    font-family: var(--font-display); font-weight: 700;
+    letter-spacing: -.01em; color: var(--ink);
+}
+
 .footer__base {
     margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid var(--line);
     display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
@@ -1666,6 +1675,122 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
 
 /* The disclaimer is not decoration — keep it legible. */
 .disclaimer { font-size: .78rem; line-height: 1.6; color: var(--muted); max-width: 68ch; }
+
+/* ============================== THE LIVERY ===============================
+   THE PAINT, AS GEOMETRY. Aeroméxico's scheme has one signature anybody reads
+   without being told the name: a long shallow sweep that starts thin low and
+   forward, rises aft, widens, and runs up into the fin. tools/make-livery.py
+   emits that sweep and that fin as masks, and everything below is the colour.
+
+   WHAT THIS IS NOT IS A PICTURE OF AN AEROPLANE. There is no fuselage, no nose,
+   no window line and no wing, because a side elevation of an airframe is a
+   likeness and a likeness is what the generators in this repo are written to
+   refuse. What a band carries is the COLOUR ARCHITECTURE — the order and the
+   shape of the fields, the way a scheme is set out on a paint drawing before
+   anybody draws the body it goes on. Read across a card it says Aeroméxico;
+   read as a picture it says nothing, because it is not one.
+
+   TWO SCHEMES, BECAUSE THE AIRLINE FLIES TWO. `livery` in data.js is either
+   "Aeromexico" or "Aeromexico Connect" on every type, and those are the only
+   two variants here — a third would be a scheme nobody flies.
+
+   The fin is painted OVER the sweep. On the aeroplane the sweep runs up to the
+   tail and the tail is in front of it; stacked the other way the sweep crosses
+   the fin and the whole thing stops reading as paint. */
+.livery {
+    position: relative; isolation: isolate;
+    aspect-ratio: 1200 / 300;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: linear-gradient(176deg,
+        var(--liv-sky, #1B5FC1) 0%, var(--liv-body, #123F8C) 38%,
+        var(--liv-belly, #0A1D3B) 74%, #04101F 100%);
+    box-shadow: var(--shadow);
+}
+.livery::before, .livery::after {
+    content: ""; position: absolute; inset: 0;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+}
+.livery::before {
+    -webkit-mask-image: url('/assets/img/livery-swoosh.svg');
+            mask-image: url('/assets/img/livery-swoosh.svg');
+    background: linear-gradient(100deg, var(--liv-a, var(--am-red)) 0%, var(--liv-b, var(--am-rosa)) 100%);
+}
+.livery::after {
+    -webkit-mask-image: url('/assets/img/livery-fin.svg');
+            mask-image: url('/assets/img/livery-fin.svg');
+    background: linear-gradient(200deg,
+        color-mix(in srgb, var(--liv-sky, #1B5FC1) 82%, #FFF) 0%,
+        var(--liv-belly, #0A1D3B) 100%);
+}
+/* The mark sits on the fin, which is where it sits on the aeroplane. It is the
+   airline's own artwork used as artwork — the generated shapes stay clean of
+   it, and this is the layer that is allowed to carry it. */
+.livery__crest {
+    position: absolute; z-index: 1;
+    right: 4.5%; bottom: 16%; width: 9%;
+    color: color-mix(in srgb, #FFF 92%, transparent);
+    filter: drop-shadow(0 2px 8px rgba(2, 8, 18, .5));
+}
+.livery--connect {
+    --liv-sky: #2472D8; --liv-body: #1B5FC1; --liv-belly: #0C2C64;
+    --liv-a: var(--am-clay); --liv-b: var(--am-marigold);
+}
+
+/* The caption under a band. The scheme's name, and what wears it. */
+.livery-set { display: grid; gap: clamp(1.2rem, 3vw, 1.8rem); }
+.livery-set figure { margin: 0; }
+.livery-set figcaption {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .1rem .7rem;
+    margin-top: .75rem;
+}
+.livery-set figcaption b {
+    font-family: var(--font-display); font-weight: 600; font-size: 1.05rem;
+    letter-spacing: -.01em; color: var(--ink);
+}
+.livery-set figcaption span { font-size: .88rem; color: var(--muted); }
+
+/* ============================== THE ALLIANCE ============================
+   Aeroméxico is a SkyTeam carrier and this airline flies its network, which is
+   a fact about the operation rather than a badge — so it is SET, in the
+   airline's own display face, and not drawn.
+
+   THE SKYTEAM MARK IS NOT HERE, ON PURPOSE. It is a third party's registered
+   trademark: not Aeroméxico's, and not this VA's. The note above `.brandmark`
+   refuses to ship the real AEROMÉXICO CONNECT lockup on exactly those grounds
+   while allowing the VA's own, and an alliance logo belonging to neither is a
+   step further out than that. Naming the alliance is a statement of fact and
+   costs nothing; reproducing its artwork is a claim on someone else's. If the
+   VA ever holds written permission, the mark drops into `.alliance__mark` and
+   nothing else here changes. */
+.alliance {
+    display: grid; gap: .9rem;
+    padding: clamp(1.3rem, 3vw, 1.9rem) clamp(1.4rem, 3.2vw, 2.1rem);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--am-blue);
+    border-radius: var(--radius);
+}
+.alliance p { margin: 0; font-size: .95rem; line-height: 1.6; color: var(--muted); }
+/* Both of these have to out-rank `.alliance p` above, because they ARE
+   paragraphs — same specificity, and source order alone would leave the name
+   set at body size, which is the one thing it must not be. */
+.alliance p.alliance__mark {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(1.5rem, 3.6vw, 2.1rem); letter-spacing: -.02em;
+    line-height: 1; color: var(--ink);
+}
+/* SET IN ONE COLOUR, and that is a decision rather than a default. A first
+   pass set it two-tone — "Sky" in ink and "Team" in the accent — which is the
+   styling of the real wordmark, and imitating the styling of a mark you have
+   just declined to reproduce is the same claim made quietly. The alliance is
+   named here; it is not branded here. */
+.alliance p.alliance__series {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-family: var(--font-mono); font-size: .8rem; font-weight: 700;
+    letter-spacing: .06em; color: var(--accent);
+}
 
 /* ============================ PAGE TRANSITIONS ===========================
    Every link on this site is a real navigation to a real document — there is
