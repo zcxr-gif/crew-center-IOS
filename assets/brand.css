@@ -806,9 +806,19 @@ h3 { font-size: clamp(1.18rem, 1.8vw, 1.42rem); }
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
     box-shadow: inset 0 0 0 1px rgba(15, 27, 46, .18);
 }
-:root[data-theme="dark"] .rule,
-/* Nothing on this site sits on a dark ground any more, so .rule keeps the
-   hairline that stops its white middle band vanishing into the page. */
+/* A DANGLING SELECTOR LIVED HERE and was a real bug, not untidiness: the line
+   read `:root[data-theme="dark"] .rule,` with a trailing comma and no block,
+   so the parser joined it to the next rule in the file. Every `.rule` in dark
+   mode was getting `.table-scroll`'s surface, border, radius and shadow, and
+   rendering as a faint grey box instead of the flag. It was invisible while no
+   `.rule` sat anywhere you would notice; the page headers put one on a
+   picture, and there it was.
+
+   What it was left over from is the note that used to follow it: nothing on
+   this site sat on a dark ground any more, so the dark override was dropped
+   and only its selector survived. Something does again — every page header —
+   and that case is handled in PAGE HEADERS rather than by theme, because a
+   header is dark in BOTH themes. */
 
 /* --- Table --- */
 /* Now a framed panel, on the same instruction as the cards, and this is the
@@ -1129,17 +1139,21 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     }
 }
 
-/* THE ISLAND FLOATS OVER THE PHOTOGRAPH. The hero is pulled up by the height
-   of the sticky block and given it back as padding, so nothing inside the hero
+/* THE ISLAND FLOATS OVER THE PICTURE. The opening picture is pulled up by the
+   height of the sticky block and given it back as padding, so nothing inside it
    moves — only the picture grows upward, under the bar.
 
-   Scoped to a .hero--live that is the FIRST thing in main. Every other page
-   keeps the island on its own ground, where its border and shadow have a white
-   edge to read against. */
-main > .hero--live:first-child {
+   EVERY PAGE HAS ONE NOW: the home page's hero, and the sky header on the other
+   seven. Both are matched here, and both must be, because `.is-over-hero` puts
+   white type in the bar the moment either exists — a page whose picture was not
+   pulled up leaves that white type on the white page above it, which is a bar
+   with no links in it. Anything that becomes a third opening picture goes in
+   this selector on the day it is written. */
+main > :is(.hero--live, .skyhead):first-child {
     margin-top: calc(var(--header-h) * -1);
-    padding-top: calc(var(--header-h) + clamp(4rem, 9vw, 6rem));
 }
+main > .hero--live:first-child { padding-top: calc(var(--header-h) + clamp(4rem, 9vw, 6rem)); }
+main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 6vw, 4rem)); }
 
 /* ---- The bar, while it is ON the photograph -------------------------------
    Glass rather than paper: barely there, so the aeroplane runs behind it, and
@@ -2462,6 +2476,307 @@ main > .hero--live:first-child {
     .table-scroll { padding-block: .2rem; }
 }
 
+/* ================================ THE SKY ================================
+   ONE PICTURE SYSTEM, USED BY EVERY PAGE ON THE SITE.
+
+   The home page opens at a cabin window and flies forward into the flight
+   deck. Every other page opens on a different view out of the same aeroplane —
+   over the wing, a city at night, trails climbing, an airfield in lights, a row
+   of cabin windows, a fin at dusk, the door. They are not eight designs. They
+   are one atmosphere, one set of switches and one coordinate frame, with a
+   different generated mask laid into it and a different time of day.
+
+   WHAT IS IN A SKY, back to front:
+
+     .sky           the box. Clips, and is the container the frame measures.
+     .sky__frame      ONE 1600x1000 frame, sized to COVER the box.
+       .sky__air        the gradient, the sun and the two cloud decks
+       .sky__geo        the page's view, as a mask
+       .sky__geo--lit   a second mask for anything that emits rather than blocks
+     .sky::after      the vignette, and the foot that hands over to the page
+
+   THE FRAME IS THE WHOLE TRICK, and it is worth understanding before touching
+   any number below. A gradient's horizon is a percentage of its own element. A
+   mask mounted at `cover` is cropped to the box's ratio. Those two agree only
+   when the box happens to be 1.6:1 — and a page header is a wide, shallow band
+   nowhere near it. Measured on the first build of the home page: at 2560x864
+   the flight deck's glareshield sat 4.3% below its own sunrise.
+
+   So nothing is mounted on the box. Everything is mounted inside `.sky__frame`,
+   which is 1600x1000 scaled to cover the box and centred, exactly as
+   `object-fit: cover` would size a photograph — and every layer inside it is a
+   plain `inset: 0` child at `mask-size: 100% 100%`. One coordinate system, no
+   cropping maths, and the generators can place a runway's vanishing point on
+   the horizon by putting it at y=550 and trusting it. The clipping is done by
+   `overflow: hidden` on the box.
+
+   That is also why the cloud tiles are sized in PERCENT here and not in `svh`
+   as a first pass had them: inside the frame, a tile's aspect ratio is a fixed
+   fraction of a fixed box, so it is right at every viewport by construction
+   rather than by a number tuned per component.
+
+   NOTHING IN ANY SKY IS DRAWN. brand.css's standing rule is that no pictorial
+   artwork may be invented and that geometry emitted from parameters is the one
+   exception. Every mask is emitted:
+
+     tools/make-flightdeck.py   the cabin window and the flight deck
+     tools/make-cloudbank.py    the two cumulus decks
+     tools/make-views.py        the seven page views
+
+   All are MONOCHROME MASKS, like mark.svg and greca.svg, so whether a view is
+   a dark interior or a lit exterior is decided here. Read those three script
+   headers before changing a shape; do not edit the SVGs.
+
+   TWO SWITCHES, `--sky-t` AND `--sky-loop`, AND NO SECOND COPY OF THE END
+   STATE. `--sky-t` multiplies every duration and delay in every arrival. At 1
+   it runs; at 0 every animation is 0s long and `fill-mode: both` lands it on
+   its last frame instantly. `--sky-loop` parks the ambient loops — the cloud
+   drift, the instrument glow, the view's float — at their first keyframe,
+   which every one of them is written to make its resting state. Reduced motion
+   sets both, and so does `[data-still]` (a page opened already scrolled) and
+   `[data-away]` (scrolled past, or a background tab), from site.js and
+   hero.js. A still sky is therefore the same rules with two numbers changed,
+   not a second set of declarations that can drift out of step.
+   ========================================================================= */
+
+.sky {
+    position: absolute; inset: 0; z-index: -1;
+    overflow: hidden; pointer-events: none;
+    /* The frame measures itself against this box, in cqw/cqh. */
+    container-type: size;
+    --sky-t: 1;
+    --sky-loop: running;
+}
+
+/* `object-fit: cover`, written out. The larger of "as wide as the box" and
+   "as wide as 1.6 times its height" on each axis, then centred by offsetting
+   half the overhang — with `left`/`top` rather than a transform, because
+   `transform`, `scale` and `translate` are all spoken for by the animations
+   that run on the layers inside. */
+.sky__frame {
+    --fw: max(100cqw, calc(100cqh * 1.6));
+    --fh: max(100cqh, calc(100cqw / 1.6));
+    position: absolute;
+    width: var(--fw); height: var(--fh);
+    left: calc((100cqw - var(--fw)) / 2);
+    top: calc((100cqh - var(--fh)) / 2);
+}
+.sky__frame > *, .sky__air > * { position: absolute; inset: 0; }
+
+/* ---- The atmosphere -------------------------------------------------------
+   A single vertical ramp through the whole sky, and every stop is a token so
+   one set of rules serves dawn, day, dusk and night. THE HORIZON IS AT 55% and
+   the generators hard-code it as y=550 of 1000; move it here and the runway,
+   the city and the wing tip all come off it at once.
+
+   It carries a little overscan so the float below can move it without opening
+   a gap along the edge the frame happens to fit exactly. */
+.sky__air {
+    inset: -12px;
+    background: linear-gradient(180deg,
+        var(--sky-void) 0%, var(--sky-night) 9%, var(--sky-high) 20%,
+        var(--sky-mid) 31%, var(--sky-low) 40%, var(--sky-haze) 46.5%,
+        var(--sky-blush) 51%, var(--sky-ember) 53.4%, var(--sky-sun) 54.8%,
+        var(--sky-flare) 55.8%, var(--sky-pale) 56.8%, var(--sky-deep) 65%,
+        var(--sky-dusk) 80%, var(--sky-abyss) 100%);
+}
+
+/* The sun. Kept TIGHT: screened over the whole lower sky it stops being a sun
+   and becomes haze, and the cloud deck loses the dark it needs to sit on.
+   `--sun-x` moves it along the horizon, which is most of what separates one
+   time of day from another once the ramp above has been re-tinted. */
+.sky__sun {
+    background: radial-gradient(var(--sun-w, 42%) var(--sun-h, 13%)
+        at var(--sun-x, 50%) 55.2%,
+        color-mix(in srgb, var(--sun-core) 82%, transparent) 0,
+        color-mix(in srgb, var(--sun-halo) 34%, transparent) 38%,
+        transparent 76%);
+    mix-blend-mode: screen;
+}
+
+/* ---- The weather ----------------------------------------------------------
+   Two decks off the same generator, at two scales and two speeds: one layer
+   drifting is a moving picture, two at different rates is distance. Both start
+   at the horizon and hang below it, because that is where a deck seen from
+   above goes; the tiles are trimmed to their own cloud tops by the generator,
+   so the top edge of the element IS the top of the weather.
+
+   THE TILE WIDTHS ARE DERIVED. Each is the emitted tile's aspect ratio times
+   the band's height, expressed as a fraction of the frame's width — a 6.35:1
+   tile in a band 20% of a 1.6:1 frame is 6.35 x 0.20 / 1.6 = 79.4% of the
+   frame wide. tools/make-cloudbank.py prints that aspect every time it runs,
+   because it MEASURES the tile height off the geometry. Retune the clouds,
+   carry the number here, or the deck starts stretching.
+
+   The element holds four tiles and the drift moves it by exactly one, which
+   lands on a tile boundary so the loop has no seam. Animating `mask-position`
+   instead would repaint the mask every frame. */
+.sky__cloud {
+    inset: auto auto 23.5% 0; height: 20%;
+    width: calc(var(--tile) * 4);
+    -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+    -webkit-mask-size: 25% 100%; mask-size: 25% 100%;
+    animation: skyDrift linear infinite;
+    animation-play-state: var(--sky-loop);
+    will-change: transform;
+}
+.sky__cloud--near {
+    --tile: 79.4%;                       /* 6.35 x 0.200 / 1.6 */
+    -webkit-mask-image: url('/assets/img/cloudbank.svg');
+            mask-image: url('/assets/img/cloudbank.svg');
+    background: linear-gradient(180deg, var(--cloud-lit) 0, var(--cloud-warm) 19%,
+                var(--cloud-mid) 48%, var(--cloud-shade) 100%);
+    animation-duration: 96s;
+}
+/* Further off: a smaller tile, so the same geometry comes out as smaller
+   cloud. Its lumps sit in the top third of a tile with a long skirt, so it
+   starts on the same horizon and runs on down past 73% — under the lowest
+   glass in the flight deck and under the foot of a window. Its own bottom edge
+   is a straight horizontal cut and the near deck in front of it has gaps. */
+.sky__cloud--far {
+    inset: auto auto 27% 0; height: 16.5%;
+    --tile: 47.9%;                       /* 4.64 x 0.165 / 1.6 */
+    -webkit-mask-image: url('/assets/img/cloudbank-far.svg');
+            mask-image: url('/assets/img/cloudbank-far.svg');
+    background: linear-gradient(180deg, var(--cloud-far-lit) 0, var(--cloud-far-mid) 22%,
+                var(--cloud-far-shade) 38%, var(--sky-deep) 100%);
+    opacity: .46;
+    animation-duration: 182s;
+}
+
+/* ---- The view -------------------------------------------------------------
+   The page's own geometry. `--geo` is the file and `--geo-paint` is what it is
+   made of, which is the whole reason these are masks: a wing lit from above at
+   dawn and a cabin wall at almost no light are the same kind of object here. */
+/* A view that BLOCKS light — a wing, a wall, a fin. Masked and painted. */
+.sky__geo {
+    -webkit-mask: var(--geo) no-repeat center / 100% 100%;
+            mask: var(--geo) no-repeat center / 100% 100%;
+    background: var(--geo-paint);
+}
+/* A view that EMITS it — a city, a runway's lights, a trail catching the sun.
+   THE BLUR IS ON THIS ELEMENT AND THE MASK IS ON ITS ::before, and that order
+   is load-bearing rather than tidy: a filter is applied BEFORE the mask clips,
+   so a masked element that blurs itself has the glow clipped straight back to
+   the shape it came from and there is no glow left at all. Masking the pseudo
+   and blurring the parent lets the light spread past its own edge, which is
+   what light does.
+   `background` on the element itself is therefore free, and is the diffuse
+   haze a city or an approach throws up around the points of it. */
+.sky__glow {
+    filter: blur(var(--glow-blur, 7px));
+    opacity: var(--glow-opacity, 1);
+}
+.sky__glow::before {
+    content: ""; position: absolute; inset: 0;
+    -webkit-mask: var(--geo) no-repeat center / 100% 100%;
+            mask: var(--geo) no-repeat center / 100% 100%;
+    background: var(--geo-paint);
+}
+
+/* ---- The close ------------------------------------------------------------
+   A vignette so the corners fall away, and a foot that goes to the airline's
+   navy — every sky on this site hands over to white paper on a crisp edge
+   under the tricolour, and that edge is asserted in tools/test-motion.js. */
+.sky::after {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background:
+        radial-gradient(128% 86% at 50% 42%, transparent 46%,
+            color-mix(in srgb, var(--sky-void) 82%, transparent) 100%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--sky-void) 62%, transparent) 0, transparent 20%,
+            transparent 74%, color-mix(in srgb, var(--am-navy) 70%, transparent) 93%,
+            var(--am-navy) 100%);
+}
+
+/* ---- The times of day -----------------------------------------------------
+   Four packs of the same fourteen stops. `--dawn` is the home page's, to the
+   value — it is the sky the hero was tuned against and the others are read off
+   it rather than invented separately.
+
+   A pack is COLOUR ONLY. The horizon does not move, the sun does not change
+   size, and no pack touches a layout number: a time of day that also re-framed
+   the picture would mean every generated view had to be checked against four
+   geometries instead of one. */
+.sky--dawn {
+    --sky-void: #02070E; --sky-night: #04101F; --sky-high: #0A1D3B;
+    --sky-mid: #0C2C64;  --sky-low: #17479A;   --sky-haze: #4A73A2;
+    --sky-blush: #98738C; --sky-ember: #D07D4C; --sky-sun: #F2A03D;
+    --sky-flare: #F9CB84; --sky-pale: #8A98B4;  --sky-deep: #46587A;
+    --sky-dusk: #1E2B45;  --sky-abyss: #101932;
+    --sun-core: #FFE6BC;  --sun-halo: var(--am-marigold);
+    --cloud-lit: #FFEBD2; --cloud-warm: #E4BEA2; --cloud-mid: #97899E;
+    --cloud-shade: #3B4767;
+    --cloud-far-lit: #EBD4C4; --cloud-far-mid: #A9A8BA; --cloud-far-shade: #6E7B95;
+}
+/* Midday at altitude: the sky above is the deepest blue there is, the warm
+   band all but closes up, and the cloud tops go white rather than gold. */
+.sky--day {
+    --sky-void: #020A1A; --sky-night: #05173A; --sky-high: #0B2A6B;
+    --sky-mid: #10409B;  --sky-low: #2064C4;   --sky-haze: #4E8ED8;
+    --sky-blush: #86B4DF; --sky-ember: #B9D4EA; --sky-sun: #E6F1F8;
+    --sky-flare: #F4FAFD; --sky-pale: #C3D2E2;  --sky-deep: #7E93AC;
+    --sky-dusk: #46586F;  --sky-abyss: #2B3B51;
+    --sun-core: #FFFFFF;  --sun-halo: #CFE4F6;
+    --cloud-lit: #FFFFFF; --cloud-warm: #EAF1F8; --cloud-mid: #B6C2D2;
+    --cloud-shade: #61748E;
+    --cloud-far-lit: #F1F5FA; --cloud-far-mid: #C5CEDB; --cloud-far-shade: #8D9BAF;
+}
+/* The other end of the day, and warmer for it: more rosa, less marigold, and
+   the blue above already gone to indigo. */
+.sky--dusk {
+    --sky-void: #050310; --sky-night: #0B0A22; --sky-high: #17163E;
+    --sky-mid: #262357;  --sky-low: #45336E;   --sky-haze: #74406F;
+    --sky-blush: #A8496A; --sky-ember: #D45D4E; --sky-sun: #F08A3C;
+    --sky-flare: #FFC178; --sky-pale: #9D8098;  --sky-deep: #4E4265;
+    --sky-dusk: #211C38;  --sky-abyss: #120F24;
+    --sun-core: #FFD7A0;  --sun-halo: var(--am-rosa);
+    --cloud-lit: #FFD9B4; --cloud-warm: #E0A08E; --cloud-mid: #8C6E8A;
+    --cloud-shade: #362F52;
+    --cloud-far-lit: #DFB9AE; --cloud-far-mid: #9A86A4; --cloud-far-shade: #5F5878;
+}
+/* Night, and the one pack with no warm band at all: the horizon is a cold
+   line and everything under it is the city's own light, which is why the only
+   view that uses this is the one that supplies its own. */
+.sky--night {
+    --sky-void: #01030A; --sky-night: #030716; --sky-high: #061026;
+    --sky-mid: #0A1938;  --sky-low: #10254B;   --sky-haze: #17325F;
+    --sky-blush: #1E3C6D; --sky-ember: #27497C; --sky-sun: #35598C;
+    --sky-flare: #4A6E9E; --sky-pale: #22385A;  --sky-deep: #101E36;
+    --sky-dusk: #080F1E;  --sky-abyss: #03060E;
+    --sun-core: #7FA6E8;  --sun-halo: #1B5FC1;
+    --cloud-lit: #2E4467; --cloud-warm: #253A5B; --cloud-mid: #172940;
+    --cloud-shade: #0A1322;
+    --cloud-far-lit: #26395A; --cloud-far-mid: #1A2A44; --cloud-far-shade: #101C2E;
+}
+
+/* ---- The loops ------------------------------------------------------------
+   The ones that never stop. Every one begins on its resting frame, so pausing
+   at 0% — which is what `--sky-loop: paused` does — is a still picture rather
+   than a half-finished one. A keyframe list that started at an extreme would
+   make the still version subtly wrong in a way nothing would catch. */
+@keyframes skyDrift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-25%); }
+}
+/* The aeroplane riding. Five frame-units either way over seventeen seconds —
+   small enough that you would not catch it holding still, and it is the whole
+   difference between a picture and being in one. Only the VIEW moves: the
+   structure does not shift relative to the seat, the horizon does. */
+@keyframes skyFloat {
+    0%, 100% { translate: 0 0; }
+    30%      { translate: 0 -0.5%; }
+    70%      { translate: 0 0.5%; }
+}
+.sky__air {
+    animation: skyFloat 17s ease-in-out infinite;
+    animation-play-state: var(--sky-loop);
+}
+@keyframes skyBreathe {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .74; }
+}
+
 /* =========================== FLIGHT DECK HERO ============================
    THE WINDOW, THEN THE FLIGHT DECK, THEN THE EAGLE. NO WORDS ON IT AT ALL.
 
@@ -2490,34 +2805,13 @@ main > .hero--live:first-child {
        concession. #5 was dark because white type needs a ground it stays
        legible on whatever the theme is doing. There is no type here. It is
        dark because it is a sunrise seen from the flight deck, which is dark.
-     * NOTHING IS CROPPED, because nothing here is a photograph. Every shape
-       below is generated to a common 1600x1000 frame and mounted with
-       `mask-size: cover`, so a narrow viewport cuts in from the sides and what
-       it cuts away is the outboard sliding windows — geometry that exists to
-       be lost. The two forward panes, the centre post, the roof and the
-       glareshield survive every ratio. The airframe photographs are not gone
-       from the site; they are on /fleet, uncropped, which is where a reader
-       who wants to look at an aeroplane goes.
+     * NOTHING IS CROPPED, because nothing here is a photograph. Everything is
+       generated into the shared 1600x1000 frame above, and a narrow viewport
+       cuts in from the sides — taking the outboard sliding windows, geometry
+       that exists to be lost. The airframe photographs are not gone from the
+       site; they are on /fleet, uncropped, which is where a reader who wants
+       to look at an aeroplane goes.
 
-   NOTHING HERE IS DRAWN. The standing rule at the top of this file is that no
-   pictorial artwork may be invented, and that geometry emitted from parameters
-   is the one exception. All of it is emitted:
-
-     cabin-window.svg / cabin-bezel.svg        tools/make-flightdeck.py
-     flightdeck.svg / -glare.svg / -glow.svg   tools/make-flightdeck.py
-     cloudbank.svg / cloudbank-far.svg         tools/make-cloudbank.py
-
-   Every one is a MONOCHROME MASK, like mark.svg and greca.svg, so the colour
-   of the cabin, the deck and the instrument glow is decided here and not in
-   the files. Retune the shapes in the scripts and re-run them; do not edit the
-   SVGs, and do not add a hand-drawn layer beside them.
-
-   THE MASKS SHARE ONE FRAME. Every deck layer is an element at `inset: 0`
-   wearing a 1600x1000 mask at `center / cover`. That is what keeps the bezel
-   inside its own aperture and the underglow on the glareshield's own lip at
-   every width. A layer given its own mask-size or its own box comes adrift.
-
-   ---------------------------------------------------------------------------
    THE MOVE. Three acts, once, and then it holds:
 
      0.0s  the sky comes up out of black
@@ -2530,25 +2824,13 @@ main > .hero--live:first-child {
 
    It runs ONCE on load and never again: a hero that re-animates every time you
    scroll back to the top is a hero you learn to scroll past. It is CSS, not
-   script — hero.js does not touch any of it, so scripting off still gets the
-   whole sequence.
-
-   HOW IT IS SWITCHED OFF. `--deck-t` is a unitless multiplier on every
-   duration and delay in the move. At 1 it runs. At 0 every animation is 0s
-   long and `both` lands it on its last frame instantly — the finished flight
-   deck, no motion, nothing to skip. `--deck-loop` pauses the things that
-   never stop — the cloud drift, the instruments, the float, the chevron — at
-   their first frame, which every one of them is written to make its resting
-   state. Two custom properties, and the still version needs no duplicated
-   end-state rules that could drift out of step with the animated one.
-
-   It is set to 0 by prefers-reduced-motion, and by hero.js when the page opens
-   already scrolled — coming back to the home page on a #hash or a restored
-   scroll position should not start a four-second film nobody can see.
+   script — hero.js does not start it, time it or step it, so scripting off
+   still gets the whole sequence. `--sky-t` and `--sky-loop` above are how it
+   is switched off.
 
    EVERY LAYER IS OPTIONAL. The hero's own ground is the airline's navy, so a
    mask that will not load, an SVG that 404s or a browser without `mask` leaves
-   the lockup on navy — quieter than intended, never broken, and no layer below
+   the lockup on navy — quieter than intended, never broken, and no layer
    renders a placeholder. */
 
 .hero--live {
@@ -2566,59 +2848,19 @@ main > .hero--live:first-child {
     padding-block: clamp(4rem, 9vw, 6rem) clamp(9rem, 18vw, 13rem);
     background: var(--am-navy); color: #FFF;
 }
+.hero--deck { --sky-run: 4.8s; }        /* the length of the whole move */
 
-/* The two switches. See HOW IT IS SWITCHED OFF above. */
-.hero--deck {
-    --deck-t: 1;              /* multiplies every duration and delay          */
-    --deck-loop: running;     /* the drift, the glow, the float, the chevron  */
-    --deck-run: 4.8s;         /* the length of the whole move                 */
-}
-
-/* ---- The frame ------------------------------------------------------------
-   Behind everything, edge to edge, under the nav as well. Scenery: it carries
-   aria-hidden in the markup and no pointer events here. */
-.deck {
-    position: absolute; inset: 0; z-index: -1;
-    overflow: hidden; pointer-events: none;
-    animation: deckWake calc(1s * var(--deck-t)) var(--ease) both;
-}
-.deck > *, .deck__sky > * { position: absolute; inset: 0; }
-
-/* ---- Outside --------------------------------------------------------------
-   A sunrise at cruise, as a single vertical ramp: black at the top of the sky,
-   down through the blue the tail is painted in, into the warm band, and out
-   the far side into the shadowed top of the cloud deck.
-
-   THE HORIZON IS AT 55%, and that number is set by two things at once, which
-   is why it is not simply "halfway". In the flight deck it has to sit clear
-   above the glareshield lip (74% of the emitted frame) or the sunrise is
-   behind the coaming. At the window it is scaled 1.26 about 47%, which lifts
-   it to 57% — the lower half of the aperture, which is where you would
-   actually see it from a seat. Move it and check both, or one of the two acts
-   looks at nothing.
-
-   It starts scaled UP and settles to 1. That is the field of view opening: a
-   window shows you a narrow patch of sky, a windshield shows you the sky. Run
-   the other way round it reads as a zoom, which is a camera move rather than
-   an aeroplane. */
-.deck__sky {
-    background: linear-gradient(180deg,
-        #02070E 0%, #04101F 9%, #0A1D3B 20%, #0C2C64 31%,
-        #17479A 40%, #4A73A2 46.5%, #98738C 51%,
-        #D07D4C 53.4%, #F2A03D 54.8%, #F9CB84 55.8%,
-        #8A98B4 56.8%, #46587A 65%, #1E2B45 80%, #101932 100%);
-    /* Ten pixels of overscan, so the float below can move the sky without
-       opening a gap at the edge of the frame. */
-    inset: -10px;
+/* The hero's own settle, on top of the shared float. TWO ANIMATIONS ON ONE
+   ELEMENT AND NEITHER IS `transform`: the settle is `scale` and the float is
+   `translate`, the individual transform properties, which compose. Written as
+   two `transform` animations the last would simply win. */
+.hero--deck .sky__air {
     transform-origin: 50% 47%;
-    /* TWO ANIMATIONS ON ONE ELEMENT, AND NEITHER IS `transform`. The settle is
-       `scale` and the float is `translate` — the individual transform
-       properties, which compose. Written as two `transform` animations the
-       last one would simply win and the other would never be seen. */
-    animation: deckSky calc(var(--deck-run) * var(--deck-t)) cubic-bezier(.5, 0, .18, 1) both,
-               deckFloat 17s ease-in-out infinite;
-    animation-play-state: running, var(--deck-loop);
+    animation: deckSky calc(var(--sky-run) * var(--sky-t)) cubic-bezier(.5, 0, .18, 1) both,
+               skyFloat 17s ease-in-out infinite;
+    animation-play-state: running, var(--sky-loop);
 }
+.hero--deck .sky { animation: deckWake calc(1s * var(--sky-t)) var(--ease) both; }
 
 /* THE VIEW CAN BE A FILM. AMV_DATA.video is empty as the site ships, and if
    the VA ever fills it hero.js drops the clip in here and adds this class. The
@@ -2626,99 +2868,10 @@ main > .hero--live:first-child {
    view still opens up as you come forward, and the deck, the glareshield and
    the lockup are untouched. `cover` on a black ground, because a clip and a
    viewport rarely share a ratio and a letterboxed hero is a bug. */
-.deck__sky--film { background: #02070E; }
-.deck__sky--film > .deck__sun,
-.deck__sky--film > .deck__cloud { display: none; }
+.sky__air--film { background: var(--sky-void); }
+.sky__air--film > .sky__sun,
+.sky__air--film > .sky__cloud { display: none; }
 .deck__film { width: 100%; height: 100%; object-fit: cover; }
-
-/* The sun. One soft radial sat on the horizon, screened so it lifts the band
-   it is sitting in rather than painting a disc on top of it. */
-.deck__sun {
-    /* Kept TIGHT. Screened over the whole lower sky it stops being a sun and
-       becomes haze, and the cloud deck loses the dark it needs to sit on. */
-    background: radial-gradient(42% 13% at 50% 55.2%,
-        color-mix(in srgb, #FFE6BC 82%, transparent) 0,
-        color-mix(in srgb, var(--am-marigold) 34%, transparent) 38%,
-        transparent 76%);
-    mix-blend-mode: screen;
-}
-
-/* The deck below, twice. Two tiles off the same generator, at two scales and
-   two speeds — one layer drifting is a moving picture, two at different rates
-   is distance.
-
-   THE TILE IS SIZED OFF THE VIEWPORT HEIGHT, which looks like the wrong axis
-   and is the right one. These tiles are painted with `preserveAspectRatio:
-   none`, so the element's box decides their proportions — and the element's
-   HEIGHT is a fraction of the hero while its width is the whole viewport. Size
-   the tile as a fraction of the width and a phone squashes a 5.76:1 tile into
-   2.3:1, which turns round cloud tops into spikes. Sized off the height, the
-   squash is the same at every ratio, which is to say there is none.
-
-   `max(…vw, …svh)` is the floor under that: three tiles have to be able to
-   cover the frame after the drift has moved one of them off, and on a very
-   wide, very short viewport a tile scaled purely off the height would not.
-
-   THE svh FIGURES BELOW ARE DERIVED, NOT CHOSEN: each is the emitted tile's
-   own aspect ratio times the band's height in this file. tools/make-cloudbank.py
-   prints that ratio every time it runs, because it MEASURES the tile height off
-   the geometry — retune the clouds and the number here has to follow, or the
-   deck starts stretching again on a phone.
-
-   The drift itself is a transform on an element four tiles wide, moved by
-   exactly one tile. That lands on a tile boundary, so the loop has no seam;
-   animating `mask-position` instead would repaint the mask every frame. */
-.deck__cloud {
-    /* Both decks start AT the horizon (56.5%) and hang below it, because that
-       is where a deck seen from above goes. The tiles are trimmed to their own
-       cloud tops by the generator, so the top edge of the element IS the top
-       of the weather — that is why one `bottom`/`height` pair puts the deck on
-       the horizon, and why a retune there does not open a gap here.
-
-       Anything below about 74% is behind the glareshield once the flight deck
-       arrives; it is there for the window, where the 1.26 scale drags it up
-       into view. */
-    inset: auto auto 23.5% 0; height: 20%;
-    width: calc(var(--tile, 127svh) * 4);
-    -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
-    -webkit-mask-size: var(--tile, 127svh) 100%; mask-size: var(--tile, 127svh) 100%;
-    animation: deckDrift linear infinite;
-    animation-play-state: var(--deck-loop);
-    will-change: transform;
-}
-.deck__cloud--near {
-    /* 6.35 (the tile) x 0.20 (the band) = 1.27. */
-    --tile: max(60vw, 127svh);
-    -webkit-mask-image: url('/assets/img/cloudbank.svg');
-            mask-image: url('/assets/img/cloudbank.svg');
-    /* Lit tops, shadowed flanks, and a long way between them. A deck painted
-       in one pale tone is fog; the whole of it reading as cloud is this ramp. */
-    background: linear-gradient(180deg, #FFEBD2 0, #E4BEA2 19%, #97899E 48%, #3B4767 100%);
-    animation-duration: 96s;
-}
-/* Further off: a smaller tile, so the same geometry comes out as smaller
-   cloud, and hazed toward the sky colour rather than merely made
-   transparent. It starts on the same horizon as the near deck. */
-.deck__cloud--far {
-    /* Its lumps are in the top third of a tile with a long skirt, so it starts
-       on the horizon like the near deck but runs on down past 73% — under the
-       lowest glass in the flight deck, and under the foot of the window.
-       Its own bottom edge is a straight horizontal cut, and the near deck in
-       front of it has gaps. */
-    inset: auto auto 27% 0; height: 16.5%;
-    /* 4.64 (the tile) x 0.165 (the band) = 0.77. Its lumps then come out at
-       about four tenths the size of the near deck's, which is the distance
-       between the two stated as a number rather than as an opacity. */
-    --tile: max(40vw, 77svh);
-    -webkit-mask-image: url('/assets/img/cloudbank-far.svg');
-            mask-image: url('/assets/img/cloudbank-far.svg');
-    /* It ends on the sky's own below-horizon colour rather than on a cloud
-       grey, so the skirt reads as distance rather than as a grey band wherever
-       the near deck leaves it showing. */
-    background: linear-gradient(180deg, #EBD4C4 0, #A9A8BA 22%, #6E7B95 38%, #46587A 100%);
-    opacity: .46;
-    animation-duration: 182s;
-}
 
 /* ---- Act one: the cabin ---------------------------------------------------
    A wall with one window in it. The paint is a radial centred on the aperture,
@@ -2726,28 +2879,26 @@ main > .hero--live:first-child {
    edges — which is what a cabin at dawn with the lights down actually looks
    like, and is the whole reason the wall is not a flat fill. */
 .deck__cabin {
-    -webkit-mask: url('/assets/img/cabin-window.svg') no-repeat center / cover;
-            mask: url('/assets/img/cabin-window.svg') no-repeat center / cover;
+    -webkit-mask: url('/assets/img/cabin-window.svg') no-repeat center / 100% 100%;
+            mask: url('/assets/img/cabin-window.svg') no-repeat center / 100% 100%;
     background: radial-gradient(54% 42% at 50% 45%,
         #222E3C 0, #141C28 32%, #080D16 64%, #03060B 100%);
     transform-origin: 50% 45%;
-    animation: deckPush calc(var(--deck-run) * var(--deck-t)) cubic-bezier(.5, 0, .18, 1) both;
+    animation: deckPush calc(var(--sky-run) * var(--sky-t)) cubic-bezier(.5, 0, .18, 1) both;
 }
 /* The reveal: the depth of wall you see around the aperture, lit from outside.
-   One detail, and without it the window reads as a shape cut out of a
-   rectangle rather than as a hole through something. */
+   Brightest at the FOOT, because the light in this scene comes off a horizon
+   below the middle of the aperture — a reveal lit from the top is lit from the
+   one direction there is nothing to light it from. */
 .deck__bezel {
-    -webkit-mask: url('/assets/img/cabin-bezel.svg') no-repeat center / cover;
-            mask: url('/assets/img/cabin-bezel.svg') no-repeat center / cover;
-    /* Brightest at the FOOT. The light in this scene comes off a horizon that
-       is below the middle of the aperture, so a reveal lit from the top is lit
-       from the one direction there is nothing to light it from. */
+    -webkit-mask: url('/assets/img/cabin-bezel.svg') no-repeat center / 100% 100%;
+            mask: url('/assets/img/cabin-bezel.svg') no-repeat center / 100% 100%;
     background: linear-gradient(180deg,
         color-mix(in srgb, #4A5B76 46%, transparent) 0,
         color-mix(in srgb, #8FA6C6 34%, transparent) 46%,
         color-mix(in srgb, #FFE0B4 58%, transparent) 100%);
     transform-origin: 50% 45%;
-    animation: deckPush calc(var(--deck-run) * var(--deck-t)) cubic-bezier(.5, 0, .18, 1) both;
+    animation: deckPush calc(var(--sky-run) * var(--sky-t)) cubic-bezier(.5, 0, .18, 1) both;
 }
 
 /* ---- Act two: the flight deck ---------------------------------------------
@@ -2756,50 +2907,42 @@ main > .hero--live:first-child {
    of any flight deck, the posts catch a little of the sky, the sills go back
    down. Flat would read as a stencil. */
 .deck__frame {
-    -webkit-mask: url('/assets/img/flightdeck.svg') no-repeat center / cover;
-            mask: url('/assets/img/flightdeck.svg') no-repeat center / cover;
+    -webkit-mask: url('/assets/img/flightdeck.svg') no-repeat center / 100% 100%;
+            mask: url('/assets/img/flightdeck.svg') no-repeat center / 100% 100%;
     background: linear-gradient(180deg,
         #03060C 0, #0A121E 22%, #16202F 46%, #0D1520 68%, #05080F 100%);
-    animation: deckArrive calc(var(--deck-run) * var(--deck-t)) cubic-bezier(.16, 1, .3, 1) both;
+    animation: deckArrive calc(var(--sky-run) * var(--sky-t)) cubic-bezier(.16, 1, .3, 1) both;
 }
 /* The glareshield over it, darker. Two tones is the difference between a
    flight deck and a cut-out of one. */
 .deck__glare {
-    -webkit-mask: url('/assets/img/flightdeck-glare.svg') no-repeat center / cover;
-            mask: url('/assets/img/flightdeck-glare.svg') no-repeat center / cover;
+    -webkit-mask: url('/assets/img/flightdeck-glare.svg') no-repeat center / 100% 100%;
+            mask: url('/assets/img/flightdeck-glare.svg') no-repeat center / 100% 100%;
     background: linear-gradient(180deg, #0B1320 0, #05080E 38%, #010306 100%);
-    animation: deckArrive calc(var(--deck-run) * var(--deck-t)) cubic-bezier(.16, 1, .3, 1) both;
+    animation: deckArrive calc(var(--sky-run) * var(--sky-t)) cubic-bezier(.16, 1, .3, 1) both;
 }
 
 /* The instruments, stated as the only thing you can see of them from this
-   angle: a line of light along the lip, thrown up onto the glass.
-
-   The BLUR IS ON THE ELEMENT AND THE MASK IS ON ITS ::before, and that order
-   is load-bearing. A filter is applied before the mask clips, so blurring a
-   masked element clips the glow back to the 9px stroke it came from and there
-   is no glow left. Masking the pseudo and blurring the parent lets the light
-   spread past its own edge, which is what light does. */
+   angle: a line of light along the lip, thrown up onto the glass. It is a
+   `.sky__glow`, so the blur is on this element and the mask is on its
+   ::before — see THE VIEW above for why that order matters. */
 .deck__glow {
-    filter: blur(8px);
-    background: radial-gradient(64% 20% at 50% 67%,
-        color-mix(in srgb, var(--am-marigold) 24%, transparent) 0, transparent 72%);
-    animation: deckGlow calc(var(--deck-run) * var(--deck-t)) var(--ease) both,
-               deckBreathe 7.5s ease-in-out calc(var(--deck-run) * var(--deck-t)) infinite;
-    animation-play-state: running, var(--deck-loop);
-}
-.deck__glow::before {
-    content: ""; position: absolute; inset: 0;
-    -webkit-mask: url('/assets/img/flightdeck-glow.svg') no-repeat center / cover;
-            mask: url('/assets/img/flightdeck-glow.svg') no-repeat center / cover;
+    --geo: url('/assets/img/flightdeck-glow.svg');
     /* Warm in the middle where the primary displays are, falling to the
-       airline's own red at the outboard ends — and then out to transparent at
-       both ends rather than out to a colour: the lip
-       runs past the edge of the frame, and a stroke that is still lit where it
-       leaves reads as a rule drawn across the page. */
-    background: linear-gradient(90deg,
+       airline's own red at the outboard ends, and out to transparent beyond
+       them: the lip runs past the edge of the frame, and a stroke still lit
+       where it leaves reads as a rule drawn across the page. */
+    --geo-paint: linear-gradient(90deg,
         transparent 0, color-mix(in srgb, var(--am-red) 60%, transparent) 9%,
         var(--am-marigold) 24%, #FFE6BE 50%, var(--am-marigold) 76%,
         color-mix(in srgb, var(--am-red) 60%, transparent) 91%, transparent 100%);
+    --glow-blur: 8px;
+    /* The bloom, unmasked, so it spreads onto the glass. */
+    background: radial-gradient(64% 20% at 50% 67%,
+        color-mix(in srgb, var(--am-marigold) 24%, transparent) 0, transparent 72%);
+    animation: skyIn calc(var(--sky-run) * var(--sky-t)) var(--ease) both,
+               skyBreathe 7.5s ease-in-out calc(var(--sky-run) * var(--sky-t)) infinite;
+    animation-play-state: running, var(--sky-loop);
 }
 
 /* Two rakes of light across the glass. Nothing is masked — it runs over posts
@@ -2812,25 +2955,12 @@ main > .hero--live:first-child {
         linear-gradient(104deg, transparent 47%,
             color-mix(in srgb, #FFF 4%, transparent) 53%, transparent 60%);
     mix-blend-mode: screen;
-    animation: deckGlow calc(var(--deck-run) * var(--deck-t)) var(--ease) both;
+    animation: skyIn calc(var(--sky-run) * var(--sky-t)) var(--ease) both;
 }
 
-/* The close. A vignette so the corners fall away, and a foot that goes to the
-   airline's navy — the hero hands over to the counted figures on a crisp edge
-   under the tricolour, and that edge is asserted in tools/test-motion.js. */
-.deck::after {
-    content: ""; position: absolute; inset: 0; z-index: 1;
-    background:
-        radial-gradient(128% 86% at 50% 42%, transparent 46%, rgba(1, 4, 9, .62) 100%),
-        linear-gradient(180deg,
-            rgba(2, 6, 13, .55) 0, transparent 20%,
-            transparent 74%, color-mix(in srgb, var(--am-navy) 70%, transparent) 93%,
-            var(--am-navy) 100%);
-}
-
-/* The tricolour closes the frame on the airline's own flag rather than on a
+/* The tricolour closes every sky on the airline's own flag rather than on a
    gradient — the same device the nav island wears along its top edge. */
-.hero--live::after {
+.hero--live::after, .skyhead::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
     background: linear-gradient(90deg,
         var(--mx-green) 0 33.333%, #FFF 0 66.666%, var(--mx-red) 0);
@@ -2855,8 +2985,8 @@ main > .hero--live:first-child {
     color: #FFF;
     filter: drop-shadow(0 0 46px rgba(255, 214, 158, .34))
             drop-shadow(0 8px 34px rgba(2, 6, 14, .75));
-    animation: deckLogo calc(1.3s * var(--deck-t)) var(--ease-rise)
-               calc(3.55s * var(--deck-t)) both;
+    animation: deckLogo calc(1.3s * var(--sky-t)) var(--ease-rise)
+               calc(3.55s * var(--sky-t)) both;
 }
 
 /* ---- Where to go next -----------------------------------------------------
@@ -2870,10 +3000,11 @@ main > .hero--live:first-child {
     display: grid; place-items: center;
     color: color-mix(in srgb, #FFF 58%, transparent);
     transition: color .25s var(--ease);
-    animation: deckNextIn calc(.9s * var(--deck-t)) var(--ease)
-               calc(4.5s * var(--deck-t)) both,
-               deckBob 2.6s ease-in-out calc(5.4s * var(--deck-t)) infinite;
-    animation-play-state: running, var(--deck-loop);
+    transform: translateX(-50%);
+    animation: skyIn calc(.9s * var(--sky-t)) var(--ease)
+               calc(4.5s * var(--sky-t)) both,
+               deckBob 2.6s ease-in-out calc(5.4s * var(--sky-t)) infinite;
+    animation-play-state: running, var(--sky-loop);
 }
 .deck__next::before {
     content: ""; width: .72rem; height: .72rem;
@@ -2885,11 +3016,10 @@ main > .hero--live:first-child {
 .deck__next:focus-visible { outline: 2px solid var(--am-marigold); outline-offset: 3px; }
 
 /* ---- The move -------------------------------------------------------------
-   Every one of these is written against the same 4.8s master so the acts can
-   be read off the percentages, and every one carries `both` so the first frame
-   holds before its segment starts and the last frame holds forever after.
-   That fill is what makes `--deck-t: 0` a complete still version rather than a
-   blank screen. */
+   Written against the same 4.8s master so the acts can be read off the
+   percentages, and every one carries `both` so the first frame holds before
+   its segment starts and the last frame holds forever after. That fill is what
+   makes `--sky-t: 0` a complete still version rather than a blank screen. */
 @keyframes deckWake { from { opacity: 0; } to { opacity: 1; } }
 
 /* The field of view opening up. Held while you are still at the window. */
@@ -2914,8 +3044,9 @@ main > .hero--live:first-child {
     100%     { opacity: 1; transform: scale(1); }
 }
 
-/* Anything that only has to be absent until the deck is there. */
-@keyframes deckGlow {
+/* Anything that only has to be absent until the deck is there. Shared with the
+   page headers, which use it on its own. */
+@keyframes skyIn {
     0%, 62%  { opacity: 0; }
     100%     { opacity: 1; }
 }
@@ -2925,33 +3056,6 @@ main > .hero--live:first-child {
     to   { opacity: 1; transform: none; }
 }
 
-@keyframes deckNextIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* The ones that never stop: the drift, the instruments, the float, the
-   chevron. Every one of them begins on its resting frame, so pausing at 0% —
-   which is what `--deck-loop: paused` does — is a still flight deck rather
-   than a half-finished one. A keyframe list that started at an extreme would
-   make the still version subtly wrong in a way nothing would catch. */
-/* Exactly one tile of the four the element holds. Any other number and the
-   loop restart is a visible jump. */
-@keyframes deckDrift {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-25%); }
-}
-@keyframes deckBreathe {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: .74; }
-}
-/* The aeroplane riding. Ten seconds up, seven down, five pixels either way —
-   small enough that you would not catch it holding still, and it is the whole
-   difference between a picture of a flight deck and sitting in one. Only the
-   VIEW moves: the deck does not shift relative to the seat, the horizon does.
-   It starts and ends at zero so pausing it at 0% is the settled frame. */
-@keyframes deckFloat {
-    0%, 100% { translate: 0 0; }
-    30%      { translate: 0 -5px; }
-    70%      { translate: 0 5px; }
-}
 @keyframes deckBob {
     0%, 100% { transform: translate(-50%, 0); }
     50%      { transform: translate(-50%, 5px); }
@@ -2959,38 +3063,212 @@ main > .hero--live:first-child {
 /* deckBob carries the centring translate through every frame. Any animated
    element with a transform of its own has to, or `both` persists the
    keyframe's transform and throws it half a screen to the right. */
-.deck__next { transform: translateX(-50%); }
+
+/* ============================= PAGE HEADERS ==============================
+   EVERY OTHER PAGE OPENS ON THE SAME AEROPLANE, LOOKING SOMEWHERE ELSE.
+
+   The home page is the exception that carries no words. These do: they are
+   pages about information, and a page whose heading is a picture is a page
+   nobody can scan. So the band is short, the type sits on it, and the lede
+   stays below on the page's own paper where long copy belongs — which is the
+   one rule that keeps this from becoming hero #5 seven more times.
+
+   WHAT IS SHARED AND WHAT IS NOT. Every header is the sky system above with a
+   `--geo` and a time of day. Nothing below is page-specific except those two
+   and the paint, which is the point: adding an eighth page is a class, a mask
+   and four declarations, not a new design.
+
+   THE BAND IS SHALLOW ON PURPOSE. About half a screen: enough to be a picture,
+   not so much that the fleet table starts below the fold. The frame above is
+   what makes a shallow band safe — at this ratio a `cover`-mounted mask would
+   sit several percent off its own horizon. */
+.skyhead {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: grid; align-content: end;
+    min-height: clamp(19rem, 54svh, 30rem);
+    /* The top padding is set with the pull-up, in the NAV block; this is the
+       foot, which is what sits the heading off the tricolour. */
+    padding-bottom: clamp(2.4rem, 5vw, 3.6rem);
+    background: var(--am-navy); color: #FFF;
+}
+
+.skyhead__inner { position: relative; z-index: 1; }
+.skyhead .eyebrow { color: color-mix(in srgb, #FFF 72%, transparent); }
+.skyhead h1 {
+    margin: .7rem 0 0;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    color: #FFF; text-wrap: balance;
+    text-shadow: 0 2px 26px rgba(2, 6, 14, .6);
+}
+/* The rule under the heading. Its hairline is an INSET DARK one everywhere
+   else, because everywhere else it sits on white and the flag's middle third
+   is white too. Here the ground is a picture, so the hairline flips: a dark
+   one against a dark sky is the band vanishing all over again. Stated rather
+   than themed, because a header is dark in both themes. */
+.skyhead .rule {
+    margin-top: 1.1rem;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #FFF 26%, transparent),
+                0 2px 12px rgba(2, 6, 14, .5);
+}
+
+/* One stagger, once, on load — the same `--sky-t` switch as the hero, so a
+   page opened already scrolled and a reader who asked for stillness both get
+   the finished header with no motion and no second set of rules. */
+.skyhead__inner > * { animation: skyRise .7s var(--ease-rise) both; }
+.skyhead .eyebrow { animation-duration: calc(.7s * var(--sky-t)); animation-delay: calc(.12s * var(--sky-t)); }
+.skyhead h1       { animation-duration: calc(.8s * var(--sky-t)); animation-delay: calc(.22s * var(--sky-t)); }
+.skyhead .rule    { animation-duration: calc(.7s * var(--sky-t)); animation-delay: calc(.4s * var(--sky-t)); }
+@keyframes skyRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* The band under a header, which is where its lede lives. */
+.skyhead-under { padding-top: clamp(1.8rem, 4vw, 2.8rem); }
+
+/* CLOUD ONLY WHERE YOU ARE AT CRUISE, and this is the rule the views are
+   sorted by rather than a per-page taste. A cloud deck sits BELOW the horizon,
+   which is where you see it from thirty thousand feet and nowhere else. Three
+   of these views are of the ground — a city at night, an airfield on final, a
+   fin on stand — and one is the door standing open, which does not happen in
+   the air. Leaving the deck under them put an aeroplane on a stand on top of a
+   cloud, which is the sort of thing nobody can name and everybody can see.
+
+   What is left under the horizon on those four is the sky's own ramp, which at
+   dusk and at night is ground. */
+.skyhead--city .sky__cloud,
+.skyhead--field .sky__cloud,
+.skyhead--tail .sky__cloud,
+.skyhead--door .sky__cloud { display: none; }
+
+/* ---- The type's ground ----------------------------------------------------
+   The home page carries no words, so its scrim only has to close the frame. A
+   page header carries a heading, and a heading needs a ground it is legible on
+   whatever the view behind it is doing — a lit wing, a bright cloud top, a
+   row of windows. So the foot goes dark earlier and harder here, which is the
+   same device the hero's scrim uses, tuned for a band with type on it. */
+.skyhead .sky::after {
+    background:
+        radial-gradient(128% 92% at 50% 34%, transparent 42%,
+            color-mix(in srgb, var(--sky-void) 76%, transparent) 100%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--sky-void) 58%, transparent) 0, transparent 22%,
+            transparent 38%, color-mix(in srgb, var(--sky-void) 52%, transparent) 70%,
+            color-mix(in srgb, var(--am-navy) 86%, transparent) 92%,
+            var(--am-navy) 100%);
+}
+
+/* ---- The seven views ------------------------------------------------------
+   A class, a mask and the paint it is made of. The comment on each is what the
+   picture IS, because the class name cannot say it and the mask is a path.
+
+   Lit or dark is the whole decision here. A wing at dawn is outside and catches
+   the sun along its leading edge; a cabin wall is inside and catches almost
+   nothing. Both come out of the same generator as the same white shape. */
+
+/* /fleet — over the wing. The top surface takes the light along the leading
+   edge and falls away aft into the shadow the fuselage throws. */
+.skyhead--wing {
+    --geo: url('/assets/img/view-wing.svg');
+    --geo-paint: linear-gradient(168deg,
+        #E9D9C8 0%, #BFB0AC 26%, #6E6E86 58%, #333a57 82%, #1B2138 100%);
+}
+/* /network — a city at night, under the wing. It emits rather than blocks, so
+   it is a glow: warm sodium in the mass of it, cooler where the avenues run. */
+.skyhead--city {
+    --geo: url('/assets/img/view-city.svg');
+    --geo-paint: radial-gradient(70% 130% at 50% 108%,
+        #FFE7C0 0%, #FFC275 30%, #F0904E 58%, #A96BB0 100%);
+    /* Barely any: the lamps ARE the picture here, and a blur wide enough to
+       make them glow is a blur wide enough to erase them. The haze below does
+       the glowing. */
+    --glow-blur: 1.4px;
+    /* The light a city throws into the air above itself. Unmasked, so it is
+       not points — it is the reason you can see there is one from sixty miles
+       out, before any single light resolves. */
+    background: radial-gradient(64% 40% at 50% 74%,
+        color-mix(in srgb, #FF9F4A 46%, transparent) 0,
+        color-mix(in srgb, #C4613F 18%, transparent) 46%, transparent 78%);
+}
+/* The one view whose SUBJECT is under the horizon, so the foot of the scrim
+   that gives every other header's type its ground would be sitting on top of
+   the picture. It keeps the vignette and gives up most of the foot; the
+   heading has the city's own dark to read against. */
+.skyhead--city .sky::after {
+    background:
+        radial-gradient(128% 92% at 50% 34%, transparent 46%,
+            color-mix(in srgb, var(--sky-void) 62%, transparent) 100%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--sky-void) 58%, transparent) 0, transparent 24%,
+            transparent 82%, color-mix(in srgb, var(--am-navy) 62%, transparent) 95%,
+            var(--am-navy) 100%);
+}
+/* /ranks — trails climbing out of the deck. Thin, and the blur is most of the
+   width you see: a contrail is an edge, not a stripe. */
+.skyhead--climb {
+    --geo: url('/assets/img/view-contrails.svg');
+    --geo-paint: linear-gradient(74deg,
+        color-mix(in srgb, #FFE9CC 30%, transparent) 0%,
+        color-mix(in srgb, #FFF4E4 76%, transparent) 46%,
+        color-mix(in srgb, #FFFFFF 92%, transparent) 100%);
+    --glow-blur: 6px;
+    --glow-opacity: .8;
+}
+/* /events — an airfield in lights, lined up. No surface: see the note in
+   tools/make-views.py about what a runway does to a shallow band. */
+.skyhead--field {
+    --geo: url('/assets/img/view-runway.svg');
+    --geo-paint: linear-gradient(180deg, #FFF6E2 0%, #FFD089 40%, #F5A04A 100%);
+    --glow-blur: 2px;
+    /* What the approach throws into the air around itself, the same device the
+       city uses — unmasked, so it is not lamps. */
+    background: radial-gradient(34% 34% at 50% 72%,
+        color-mix(in srgb, #FFC078 26%, transparent) 0, transparent 76%);
+}
+/* /about — a row of cabin windows, receding. The wall is the darkest thing on
+   the site and is lit only by what comes through the apertures. */
+.skyhead--cabin {
+    --geo: url('/assets/img/view-cabin-row.svg');
+    --geo-paint: radial-gradient(74% 60% at 30% 48%,
+        #232F3E 0%, #151D29 34%, #0A0F18 68%, #04070C 100%);
+}
+/* /staff — a fin against a dusk sky. A silhouette, and deliberately not a
+   livery: see the note in tools/make-views.py about the mark. */
+.skyhead--tail {
+    --geo: url('/assets/img/view-tail.svg');
+    --geo-paint: linear-gradient(180deg, #2A2140 0%, #171331 46%, #0B0918 100%);
+}
+/* /apply — the door, open on the morning. */
+.skyhead--door {
+    --geo: url('/assets/img/view-door.svg');
+    --geo-paint: radial-gradient(70% 62% at 46% 50%,
+        #27313F 0%, #171F2B 34%, #0A0F17 70%, #03060A 100%);
+}
 
 /* ---- Phones ---------------------------------------------------------------
-   `cover` cuts in from the sides, which takes the outboard sliding windows
-   first — geometry that exists to be lost. Nothing else changes: there are no
-   controls to shrink and no copy to reflow. */
+   The frame cuts in from the sides, which is what these views are built to
+   survive. The band comes down a little so a heading and a lede are not most
+   of a first screen. */
 @media (max-width: 47.99rem) {
-    /* Deeper again in portrait. `cover` crops the sides on a phone, so the
-       horizon and the cloud tops fill more of the frame and the lockup has to
-       clear more of them. */
     .hero--live { padding-bottom: clamp(10rem, 30vw, 13rem); }
     .hero__logo { width: min(80vw, 22rem); }
+    .skyhead { min-height: clamp(16rem, 44svh, 22rem); }
 }
 
-/* Asked for less motion, there is none: `--deck-t: 0` collapses every duration
-   and delay to zero, so the page opens ON the finished flight deck, and
-   `--deck-loop` parks the drift, the glow and the float at their resting frame. Not a
-   shorter sequence — none, and nothing that depends on one having run. */
+/* Asked for less motion, there is none: `--sky-t: 0` collapses every duration
+   and delay to zero, so the page opens ON the finished picture, and
+   `--sky-loop` parks the drift, the glow and the float at their resting frame.
+   Not a shorter sequence — none, and nothing that depends on one having run. */
 @media (prefers-reduced-motion: reduce) {
-    .hero--deck { --deck-t: 0; --deck-loop: paused; }
+    .sky, .hero--deck, .skyhead { --sky-t: 0; --sky-loop: paused; }
 }
-/* The same stillness, for a page that opens already scrolled — a #hash or a
-   restored position. hero.js sets it before first paint. */
-.hero--deck[data-still] { --deck-t: 0; --deck-loop: paused; }
-
-/* SCROLLED PAST, NOTHING MOVES. The move itself is over by then and holds on
-   its last frame either way; this is about the four that never stop. A cloud
-   deck drifting behind a page nobody is looking at is work nobody asked for on
-   a battery nobody is charging — the same reason the rotation this hero
-   replaced was wired to an IntersectionObserver. hero.js sets the attribute;
-   it does not touch `--deck-t`, so coming back does not replay the sequence. */
-.hero--deck[data-away] { --deck-loop: paused; }
+/* The same stillness for a page that opens already scrolled — a #hash or a
+   restored position — and for one scrolled past or in a background tab, where
+   a cloud deck drifting is work nobody asked for on a battery nobody is
+   charging. site.js sets both attributes; neither touches `--sky-t` on its
+   own, so coming back to a picture does not replay its arrival. */
+[data-still] { --sky-t: 0; --sky-loop: paused; }
+[data-away] { --sky-loop: paused; }
 
 /* The band under the hero carries the counted figures and the flown strip. */
 .hero-under { padding-top: clamp(1.8rem, 4vw, 2.8rem); }

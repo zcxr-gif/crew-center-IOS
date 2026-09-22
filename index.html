@@ -95,36 +95,44 @@
              reader should be handed the <h1> below, not a list of empty divs.
              Order is back to front and that is load-bearing — the sky is behind
              the cabin wall, which is behind the structure that replaces it. -->
-        <div class="deck" aria-hidden="true">
-            <!-- Outside. A dawn at altitude: the gradient is the sky, the sun
-                 is a single soft radial low in it, and the two cloud decks
-                 are the same geometry at two scales and two speeds, which is
-                 what makes the distance between them read. -->
-            <div class="deck__sky">
-                <div class="deck__sun"></div>
-                <div class="deck__cloud deck__cloud--far"></div>
-                <div class="deck__cloud deck__cloud--near"></div>
+        <div class="sky sky--dawn deck" aria-hidden="true">
+            <!-- ONE FRAME, and everything in the picture is inside it. See THE
+                 SKY in brand.css: a gradient's horizon is a percentage of its
+                 own element and a mask is cropped to the box, and on a box that
+                 is not 1.6:1 those two stop agreeing. -->
+            <div class="sky__frame">
+                <!-- Outside. A dawn at altitude: the gradient is the sky, the
+                     sun is a single soft radial low in it, and the two cloud
+                     decks are the same generator at two scales and two speeds,
+                     which is what makes the distance between them read. -->
+                <div class="sky__air">
+                    <div class="sky__sun"></div>
+                    <div class="sky__cloud sky__cloud--far"></div>
+                    <div class="sky__cloud sky__cloud--near"></div>
+                </div>
+
+                <!-- ACT ONE: the cabin. A wall with one window in it, lit only
+                     by what comes through the hole. The bezel is the depth of
+                     the reveal — the single detail that stops the aperture
+                     reading as a shape cut out of a rectangle. -->
+                <div class="deck__cabin"></div>
+                <div class="deck__bezel"></div>
+
+                <!-- ACT TWO: the flight deck, arriving as the wall rushes past —
+                     the push has no element of its own, it is what these two
+                     doing opposite things at the same moment look like. The
+                     glareshield is a second, darker mass over the structure, so
+                     the deck reads as a room rather than a stencil; the glow is
+                     the instruments, which is all you can see of them from this
+                     angle. -->
+                <div class="deck__frame"></div>
+                <div class="deck__glare"></div>
+                <div class="sky__glow deck__glow"></div>
+                <!-- Two rakes of light across the glass. Nothing is masked here
+                     — it is what tells you there is glass between you and the
+                     sky. -->
+                <div class="deck__glass"></div>
             </div>
-
-            <!-- ACT ONE: the cabin. A wall with one window in it, lit only by
-                 what comes through the hole. The bezel is the depth of the
-                 reveal — the single detail that stops the aperture reading as
-                 a shape cut out of a rectangle. -->
-            <div class="deck__cabin"></div>
-            <div class="deck__bezel"></div>
-
-            <!-- ACT TWO: the flight deck, arriving as the wall rushes past —
-                 the push has no element of its own, it is what these two doing
-                 opposite things at the same moment look like. The glareshield
-                 is a second, darker mass over the structure, so the deck reads
-                 as a room rather than a stencil; the glow is the instruments,
-                 which is all you can see of them from this angle. -->
-            <div class="deck__frame"></div>
-            <div class="deck__glare"></div>
-            <div class="deck__glow"></div>
-            <!-- Two rakes of light across the glass. Nothing is masked here —
-                 it is what tells you there is glass between you and the sky. -->
-            <div class="deck__glass"></div>
         </div>
 
         <div class="wrap hero__content">

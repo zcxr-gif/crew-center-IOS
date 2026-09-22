@@ -27,8 +27,8 @@ assets/js/globe.js The route map: the network on a turning globe, and its card
 assets/js/globe-land.js GENERATED land grid — see tools/make-globe.py
 assets/js/live.js  Mounts the live-traffic embed
 assets/js/crew.js  Read-only client for the crew center's public feeds
-tools/             Regenerate mark.svg, the ruled device, the hero's geometry
-                   and globe-land.js
+tools/             Regenerate mark.svg, the ruled device, every page's sky
+                   geometry and globe-land.js
 assets/img/        Supplied artwork, and what is generated from it. See below.
 ```
 
@@ -119,7 +119,14 @@ motifs sharing a section, not that device.
 | `assets/img/flightdeck-glare.svg` | the glareshield, as its own darker mass | act three of the home page hero |
 | `assets/img/flightdeck-glow.svg` | the lip of the glareshield, blurred into the instrument underglow | act three of the home page hero |
 | `assets/img/cloudbank.svg` | a seamless cumulus deck, unioned out of seeded circles | the weather, at both ends of the hero |
-| `assets/img/cloudbank-far.svg` | the same, flatter, for the layer behind | the weather, at both ends of the hero |
+| `assets/img/cloudbank-far.svg` | the same, flatter, for the layer behind | the weather, wherever a view is at cruise |
+| `assets/img/view-wing.svg` | a swept wing, a nacelle and a winglet | `/fleet` |
+| `assets/img/view-city.svg` | a field of lights whose size follows depth | `/network` |
+| `assets/img/view-contrails.svg` | four tapered ribbons on bowed chords | `/ranks` |
+| `assets/img/view-runway.svg` | an airfield's edges, centreline and threshold | `/events` |
+| `assets/img/view-cabin-row.svg` | five apertures receding down a wall | `/about` |
+| `assets/img/view-tail.svg` | a fin, and the fuselage it stands on | `/staff` |
+| `assets/img/view-door.svg` | a door-shaped hole in a wall | `/apply` |
 | the community-aircraft gallery | the VA's own airframes, shot in the sim | the fleet cards (`data.js` → `fleet[].photo`) |
 | the tricolour | real flag colours, hard stops | flagline, eyebrows, active nav item, `.rule` |
 
@@ -147,7 +154,8 @@ python3 tools/make-stripes.py    # full-logo.webp         -> stripes.svg + strip
 python3 tools/make-greca.py      # (parameters only)      -> greca.svg + greca-tile.svg
 python3 tools/make-serpent.py    # (parameters only)      -> serpent.svg
 python3 tools/make-flightdeck.py # (parameters only)      -> the hero's cabin window and flight deck
-python3 tools/make-cloudbank.py  # (seeded, reproducible) -> the hero's cloud decks
+python3 tools/make-cloudbank.py  # (seeded, reproducible) -> the cloud decks
+python3 tools/make-views.py      # (parameters + seed)    -> the seven page views
 ```
 
 `trace-mark.py` composites the transparent source onto white, crops to the ink
@@ -631,6 +639,7 @@ parameters is the one exception. All of it is emitted:
 | `cabin-window.svg`, `cabin-bezel.svg` | `tools/make-flightdeck.py` |
 | `flightdeck.svg`, `-glare.svg`, `-glow.svg` | `tools/make-flightdeck.py` |
 | `cloudbank.svg`, `cloudbank-far.svg` | `tools/make-cloudbank.py` |
+| `view-*.svg` (the seven page headers) | `tools/make-views.py` |
 
 Every one is a monochrome **mask**, like `mark.svg` and `greca.svg`, so the
 colour of the cabin, the deck and the instrument glow is decided in `brand.css`
@@ -639,10 +648,23 @@ deck's forward glass is four flat panes between structural posts — both are
 sets of coordinates, and both are in those scripts. Retune there and re-run;
 do not edit the SVGs, and do not add a hand-drawn layer beside them.
 
-**The masks share one frame.** Every layer is an element at `inset: 0` wearing
-a 1600×1000 mask at `center / cover`. That is what keeps the bezel inside its
-own aperture and the underglow on the glareshield's own lip at every width. A
-layer given its own `mask-size` or its own box comes adrift from the rest.
+**Every layer lives in one frame, and that is the whole trick.** A gradient's
+horizon is a percentage of its own element; a mask mounted at `cover` is
+cropped to the box's ratio. Those two agree only when the box happens to be
+1.6:1 — measured on the first build of this hero, at 2560×864 the glareshield
+sat **4.3% below its own sunrise**, and a page header is a wide shallow band
+nowhere near 1.6:1.
+
+So nothing is mounted on the box. Everything is mounted inside `.sky__frame`,
+which is 1600×1000 scaled to cover the box and centred, exactly as
+`object-fit: cover` would size a photograph, with the clipping done by
+`overflow: hidden`. Every layer inside it is a plain `inset: 0` child at
+`mask-size: 100% 100%`: one coordinate system, no cropping maths, and the
+generators can put a runway's vanishing point on the horizon by writing
+`y = 550` and trusting it. It is also why the cloud tiles are sized in **percent**
+and not in `svh` as a first pass had them — inside the frame a tile's aspect is
+a fixed fraction of a fixed box, so it is right at every viewport by
+construction rather than by a number tuned per component.
 
 **The move, in three acts, and all of it CSS.** The sky comes up out of black
 and you are at the window; at 2.1s the camera goes through it — the wall rushes
@@ -684,10 +706,19 @@ own cloud tops** by the generator: the top edge of the file is the top of the
 weather, so one `bottom`/`height` pair in CSS puts the deck on the horizon and
 a retune of the geometry cannot silently open a gap.
 
-**The blur is on the element and the mask is on its `::before`**, on
-`.deck__glow`, and that order is load-bearing. A filter is applied *before* the
-mask clips, so blurring a masked element clips the glow back to the 9px stroke
-it came from and there is no glow left.
+**The blur is on the element and the mask is on its `::before`**, on every
+`.sky__glow`, and that order is load-bearing. A filter is applied *before* the
+mask clips, so blurring a masked element clips the glow straight back to the
+shape it came from and there is no glow left. This was got wrong once while
+building the page headers — the city's lamps came out as hard dots — which is
+why `.sky__geo` (a view that blocks light) and `.sky__glow` (one that emits it)
+are two different rules rather than one with a modifier.
+
+**A feature has to be about as wide as the blur that softens it.** The same
+mistake in both directions cost three passes: the city's lamps at r≈1 under a
+3px blur vanished, and the contrails thin enough to look like threads vanished
+under 14px. Both numbers are now set against each other, and both scripts say
+so where the constant is.
 
 **The bar goes to glass while it is on the hero.** `site.js` adds
 `.is-over-hero` to the nav host while the hero is still behind it, measured
@@ -712,6 +743,54 @@ Three more things are deliberate:
   same flight deck and under the same lockup — it changes the **view**, not the
   hero. The note in `data.js` says what the clip should be and why the poster is
   not optional.
+
+## Every other page opens on the same aeroplane
+
+Seven page headers, one per page, all of them the same sky system with a
+different generated mask and a different time of day. They are not seven
+designs: adding an eighth page is a class, a mask and four declarations.
+
+| page | view | time |
+| --- | --- | --- |
+| `/fleet` | over the wing at cruise | day |
+| `/network` | a city under the wing | night |
+| `/ranks` | trails climbing out of the deck | dawn |
+| `/events` | an airfield in lights, lined up | dusk |
+| `/about` | a row of cabin windows, receding | day |
+| `/staff` | a fin on stand | dusk |
+| `/apply` | the door, open on the morning | dawn |
+
+**The lede stays on the paper.** The header carries the eyebrow, the `h1` and
+the rule, and nothing else; the lede and everything under it sit on the page's
+own ground below. That one rule is what keeps this from being hero #5 seven more
+times — the fight this site kept losing was always type laid over a picture, and
+a heading is the most a picture can carry.
+
+**Cloud only where you are at cruise.** A deck sits *below* the horizon, which
+is what you see from thirty thousand feet and nowhere else. Four of the views
+are of the ground — a city at night, an airfield on final, a fin on stand, a
+door standing open — so they have no deck at all. Leaving it under them put an
+aeroplane on a stand on top of a cloud, which is the sort of thing nobody can
+name and everybody can see.
+
+**A runway has no surface.** From short final a runway is a trapezoid between a
+vanishing point on the horizon and a near edge; fit that into a band half a
+screen tall and you get a wedge with its apex on the horizon, which reads as a
+hill. Two passes went that way. What is left is the lights — edges, centreline
+and threshold — because a converging constellation needs no height to read.
+
+**Four times of day, colour only.** `.sky--dawn` is the home page's, to the
+value; the others are read off it. A pack never touches a layout number: the
+horizon does not move and the sun does not change size, because a time of day
+that also re-framed the picture would mean checking every generated view
+against four geometries instead of one.
+
+**The bar goes to glass over all of them.** `main > :is(.hero--live,
+.skyhead):first-child` is what pulls the picture up under the floating header,
+and both have to be in it: `.is-over-hero` puts white type in the bar the
+moment either exists, so a picture that was not pulled up leaves that white
+type on the white page above it — a bar with no links in it. Anything that
+becomes a third opening picture goes in that selector on the day it is written.
 
 **The one box on this site is `.panel`.** The rule in `brand.css` is that prose
 is opened by a hairline, never wrapped in a card, and that still holds. But that

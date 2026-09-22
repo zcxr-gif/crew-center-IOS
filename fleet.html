@@ -54,13 +54,39 @@
 
 <main id="main">
 
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+    <!-- ==================== HEADER ====================
+         Over the wing at cruise, on the left-hand side.
+
+         Every page on this site opens on the same aeroplane looking somewhere
+         else — see PAGE HEADERS in brand.css and tools/make-views.py. The
+         picture is a generated mask over a generated sky; nothing in it is
+         drawn, and the only words on it are the two lines below, because a
+         page about information needs a heading you can scan. The lede stays on
+         the page's own paper underneath, which is the rule that keeps this
+         from becoming a headline over a photograph seven more times. -->
+    <header class="skyhead skyhead--wing">
+        <div class="sky sky--day" aria-hidden="true">
+            <div class="sky__frame">
+                <div class="sky__air">
+                    <div class="sky__sun"></div>
+                    <div class="sky__cloud sky__cloud--far"></div>
+                    <div class="sky__cloud sky__cloud--near"></div>
+                </div>
+                <div class="sky__geo"></div>
+            </div>
+        </div>
+        <div class="wrap skyhead__inner">
+            <span class="eyebrow">The fleet</span>
+            <h1>Six types, and a job for each</h1>
+            <div class="rule"></div>
+        </div>
+    </header>
+
+
+    <section class="section section--tight skyhead-under">
         <div class="wrap">
             <div class="head">
-                <span class="eyebrow">The fleet</span>
-                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Six types, and a job for each</h1>
-                <div class="rule"></div>
-                <p class="lede" style="margin-top:1.4rem">
+                <p class="lede">
                     The fleet is drawn from the real Aeroméxico operation and limited to types
                     available in Infinite Flight in an Aeroméxico livery. No paper fleet, and no
                     types you cannot load into the sim tonight.

@@ -14,20 +14,18 @@
    times it or steps it, which means the whole sequence still runs with
    scripting off. That is the point, and it is why this file got small.
 
-   Four things are left, in the order they appear below:
+   NOR ARE THE SWITCHES. `[data-still]` and `[data-away]` — skip the arrival on
+   a page opened already scrolled, park the loops when the picture is off
+   screen — moved to `wireSky()` in site.js when every other page got a sky of
+   its own. They were never about the hero; they are about any picture.
 
-     1. THE STILL SWITCH. A page that opens already scrolled — a #hash, a
-        restored position, a back button — should not start a four-second film
-        nobody can see. One attribute, read by CSS, and the hero is simply
-        already finished. Reduced motion is handled in the stylesheet and needs
-        nothing here.
-     2. THE PAUSE. The move ends; the weather does not. Scrolled past or in a
-        background tab, another attribute stops the four loops that never do.
-     3. THE CABIN FILM, if the VA ever shoots one. AMV_DATA.video is still an
+   Two things are left, and neither is the picture:
+
+     1. THE CABIN FILM, if the VA ever shoots one. AMV_DATA.video is still an
         escape hatch: fill it in and the clip becomes what you see through the
         glass, in place of the generated sky. The flight deck, the glareshield
         and the lockup are unchanged — the film is the view, not the hero.
-     4. WHO HAS BEEN FLYING IT. Approved sectors off the crew centre, under the
+     2. WHO HAS BEEN FLYING IT. Approved sectors off the crew centre, under the
         hero on the page's own paper. This is the only part of the home page
         that can honestly say the airline is running today, and it is the one
         piece of this file that was never about the picture.
@@ -50,36 +48,7 @@
 
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    /* ---- 1. The still switch ------------------------------------------------
-       Set as the first thing this file does, because every frame spent
-       deciding is a frame of a sequence that should not be playing. CSS does
-       the rest: `[data-still]` zeroes every duration and delay in the move, so
-       the hero is on its last frame rather than skipping to it. */
-    if (root && (window.scrollY || window.pageYOffset || 0) > 40) {
-        root.setAttribute('data-still', '');
-    }
-
-    /* ---- 2. Nothing moves behind a scrolled page ---------------------------
-       The move is over in under five seconds and holds on its last frame; this
-       is for the four that never stop — the cloud drift, the instrument glow,
-       the view's float and the chevron. Off screen or in a background tab they
-       are work nobody asked for on a battery nobody is charging, which is the
-       same reason the rotation this hero replaced was observed.
-
-       It sets an attribute and CSS does the pausing, so nothing here knows
-       what is animating: add a fifth loop to the hero and it is covered. And
-       it pauses rather than cancelling, so coming back picks the drift up
-       where it left off rather than replaying the sequence. */
-    if (root && 'IntersectionObserver' in window) {
-        let onScreen = true;
-        const sync = () => root.toggleAttribute(
-            'data-away', document.hidden || !onScreen);
-        new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); },
-                                 { threshold: 0.02 }).observe(root);
-        document.addEventListener('visibilitychange', sync);
-    }
-
-    /* ---- 3. The cabin film --------------------------------------------------
+    /* ---- 1. The cabin film --------------------------------------------------
        AMV_DATA.video, when it is filled in, is THE VIEW: the clip goes where
        the generated sky is, behind the same flight deck, under the same
        lockup. It replaces the weather and nothing else.
@@ -91,10 +60,10 @@
        ASKED FOR LESS MOTION, IT DOES NOT PLAY, and the poster stands in —
        which is why the note in data.js says the poster is not optional. A hero
        that ignores that setting is worse than a hero with no film in it. */
-    const sky = root && root.querySelector('.deck__sky');
+    const sky = root && root.querySelector('.sky__air');
     const film = D.video;
     if (sky && film && film.src) {
-        sky.classList.add('deck__sky--film');
+        sky.classList.add('sky__air--film');
         const v = document.createElement('video');
         v.className = 'deck__film';
         v.muted = true;            // property, not attribute: Safari reads this
@@ -120,7 +89,7 @@
     }
 
     /* =========================================================================
-       4. WHO HAS BEEN FLYING IT
+       2. WHO HAS BEEN FLYING IT
        A random handful of approved sectors off the crew centre's flight log —
        the same log the crew centre publishes, and the same one the pilots on
        this roster fill in by flying.

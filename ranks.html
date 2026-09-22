@@ -54,13 +54,39 @@
 
 <main id="main">
 
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+    <!-- ==================== HEADER ====================
+         Trails climbing out of the deck at first light.
+
+         Every page on this site opens on the same aeroplane looking somewhere
+         else — see PAGE HEADERS in brand.css and tools/make-views.py. The
+         picture is a generated mask over a generated sky; nothing in it is
+         drawn, and the only words on it are the two lines below, because a
+         page about information needs a heading you can scan. The lede stays on
+         the page's own paper underneath, which is the rule that keeps this
+         from becoming a headline over a photograph seven more times. -->
+    <header class="skyhead skyhead--climb">
+        <div class="sky sky--dawn" aria-hidden="true">
+            <div class="sky__frame">
+                <div class="sky__air">
+                    <div class="sky__sun"></div>
+                    <div class="sky__cloud sky__cloud--far"></div>
+                    <div class="sky__cloud sky__cloud--near"></div>
+                </div>
+                <div class="sky__glow"></div>
+            </div>
+        </div>
+        <div class="wrap skyhead__inner">
+            <span class="eyebrow">Progression</span>
+            <h1>From Cadet to the left seat</h1>
+            <div class="rule"></div>
+        </div>
+    </header>
+
+
+    <section class="section section--tight skyhead-under">
         <div class="wrap">
             <div class="head">
-                <span class="eyebrow">Progression</span>
-                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">From Cadet to the left seat</h1>
-                <div class="rule"></div>
-                <p class="lede" style="margin-top:1.4rem">
+                <p class="lede">
                     Rank does two things here. It releases more of the fleet, and it raises the
                     longest sector you are allowed to file. That second one is the part that makes
                     the ladder mean something: a Cadet flies Guadalajara, and Tokyo is a sector no
