@@ -71,6 +71,35 @@
 
 <main id="main">
 
+    <!-- ==================== HEADER ====================
+         The valley at night, from the descent.
+
+         Every page on this site opens on the same aeroplane looking somewhere
+         else — see PAGE HEADERS in brand.css and tools/make-views.py. The
+         picture is a generated mask over a generated sky; nothing in it is
+         drawn, and the only words on it are the two lines below, because a
+         page about information needs a heading you can scan. The lede stays on
+         the page's own paper underneath, which is the rule that keeps this
+         from becoming a headline over a photograph seven more times. -->
+    <header class="skyhead skyhead--city">
+        <div class="sky sky--night" aria-hidden="true">
+            <div class="sky__frame">
+                <div class="sky__air">
+                    <div class="sky__sun"></div>
+                    <div class="sky__cloud sky__cloud--far"></div>
+                    <div class="sky__cloud sky__cloud--near"></div>
+                </div>
+                <div class="sky__glow"></div>
+            </div>
+        </div>
+        <div class="wrap skyhead__inner">
+            <span class="eyebrow">The network</span>
+            <h1>Out of the Valley of Mexico</h1>
+            <div class="rule"></div>
+        </div>
+    </header>
+
+
     <!-- ==================== THE NETWORK ====================
          One section, three ways in, and as little prose as the page can get
          away with. It used to open with a four-line lede, then a strip of six
@@ -83,14 +112,8 @@
          dropped except the words: every figure the flagship strip carried is
          on the card that opens when you pick a destination, and every sector
          it ranked is in the table. -->
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4rem)">
+    <section class="section section--tight skyhead-under">
         <div class="wrap">
-            <div class="head" style="margin-bottom:1.4rem">
-                <span class="eyebrow">The network</span>
-                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Out of the Valley of Mexico</h1>
-                <div class="rule"></div>
-            </div>
-
             <div class="viewswitch" role="tablist" aria-label="How to read the network">
                 <button class="viewswitch__tab" type="button" role="tab" id="tab-globe"
                         aria-controls="view-globe" aria-selected="true" data-view="globe">
@@ -271,6 +294,19 @@
     const views = ['globe', 'routes', 'bases'];
     let view = 'globe';
 
+    /* The pill is one element that travels, so its size and position are
+       measured off whichever tab is selected rather than assumed. Called on
+       every switch, on resize because the labels reflow, and once fonts have
+       loaded — the tabs are set in a webfont, and measuring them in the
+       fallback face puts the pill a few pixels wrong until something else
+       happens to re-measure it. */
+    function placePill() {
+        const on = strip.querySelector('[aria-selected="true"]');
+        if (!on) return;
+        strip.style.setProperty('--pill-x', on.offsetLeft + 'px');
+        strip.style.setProperty('--pill-w', on.offsetWidth + 'px');
+    }
+
     function show(next) {
         if (!views.includes(next) || next === view) return;
         view = next;
@@ -282,6 +318,15 @@
             tab.setAttribute('aria-selected', String(on));
             tab.tabIndex = on ? 0 : -1;
         });
+        placePill();
+        // Restart the panel's entry animation. Removing the class and reading
+        // offsetWidth forces the style to flush, which is what makes the
+        // animation run again on the second and every later switch — without
+        // it the class is already there and nothing replays.
+        const open = document.getElementById('view-' + view);
+        open.classList.remove('is-entering');
+        void open.offsetWidth;
+        open.classList.add('is-entering');
         // The globe was measured while it was display:none, so it has to be
         // told the panel is open — otherwise it paints into a zero-width
         // canvas and the reader gets a blank square.
@@ -626,7 +671,10 @@
 
     // The card is positioned by CSS, so anything that can move it has to
     // re-measure: the viewport, and the switch between side panel and sheet.
-    window.addEventListener('resize', placeCard);
+    // The pill is measured for the same reason and on the same events.
+    window.addEventListener('resize', () => { placeCard(); placePill(); });
+    placePill();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePill);
     if (wide.addEventListener) wide.addEventListener('change', () => {
         if (cardEl.hidden) return;
         window.AMV_GLOBE.offset(globeHost, wide.matches ? -0.16 : 0, wide.matches ? 0 : -0.13);

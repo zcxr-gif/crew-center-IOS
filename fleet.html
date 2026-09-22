@@ -54,13 +54,39 @@
 
 <main id="main">
 
-    <section class="section section--tight" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+    <!-- ==================== HEADER ====================
+         Over the wing at cruise, on the left-hand side.
+
+         Every page on this site opens on the same aeroplane looking somewhere
+         else — see PAGE HEADERS in brand.css and tools/make-views.py. The
+         picture is a generated mask over a generated sky; nothing in it is
+         drawn, and the only words on it are the two lines below, because a
+         page about information needs a heading you can scan. The lede stays on
+         the page's own paper underneath, which is the rule that keeps this
+         from becoming a headline over a photograph seven more times. -->
+    <header class="skyhead skyhead--wing">
+        <div class="sky sky--day" aria-hidden="true">
+            <div class="sky__frame">
+                <div class="sky__air">
+                    <div class="sky__sun"></div>
+                    <div class="sky__cloud sky__cloud--far"></div>
+                    <div class="sky__cloud sky__cloud--near"></div>
+                </div>
+                <div class="sky__geo"></div>
+            </div>
+        </div>
+        <div class="wrap skyhead__inner">
+            <span class="eyebrow">The fleet</span>
+            <h1>Six types, and a job for each</h1>
+            <div class="rule"></div>
+        </div>
+    </header>
+
+
+    <section class="section section--tight skyhead-under">
         <div class="wrap">
             <div class="head">
-                <span class="eyebrow">The fleet</span>
-                <h1 style="font-size:clamp(2rem,5vw,3.4rem);margin:.9rem 0">Six types, and a job for each</h1>
-                <div class="rule"></div>
-                <p class="lede" style="margin-top:1.4rem">
+                <p class="lede">
                     The fleet is drawn from the real Aeroméxico operation and limited to types
                     available in Infinite Flight in an Aeroméxico livery. No paper fleet, and no
                     types you cannot load into the sim tonight.
@@ -109,36 +135,6 @@
         </div>
     </section>
 
-    <!-- ==================== FLEET DEVELOPMENT ====================
-         Types the Operations Plan names and the airline has not put into
-         service. Listed as planned rather than as fleet: the plan's own closing
-         checklist has these liveries down as still to be confirmed against
-         Infinite Flight, and this site does not publish a paper fleet. -->
-    <section class="section">
-        <div class="wrap">
-            <div class="grid grid-2" style="gap:clamp(2rem,5vw,4rem);align-items:start">
-                <div data-reveal>
-                    <span class="eyebrow">Fleet development</span>
-                    <h2 style="margin:.9rem 0">What comes next</h2>
-                    <div class="rule"></div>
-                    <p class="lede" style="margin-top:1.4rem">
-                        Types are added only where Aeroméxico operated them in reality and Infinite
-                        Flight carries the livery. These three are in the Operations Plan and are not
-                        in service: each one enters the fleet on the day its livery is confirmed in
-                        the sim, and not before.
-                    </p>
-                    <p style="margin-top:1.2rem;font-size:.94rem" class="muted">
-                        The network is reviewed each quarter against the real airline's timetable,
-                        and the fleet with it. Routes the real carrier drops are retired.
-                    </p>
-                </div>
-                <div data-reveal data-reveal-delay="80">
-                    <dl class="facts" id="fleetPlanned"></dl>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="band">
         <div class="band__wash"></div>
         <div class="wrap band__inner">
@@ -175,7 +171,6 @@
         `${D.fleet.length} types in service`,
         `${wide} widebody, ${D.fleet.length - wide} narrowbody and regional`,
         `${Math.min(...seats)}–${Math.max(...seats)} seats`,
-        `${D.fleetPlanned.length} more planned`,
     ].map(t => `<span>${esc(t)}</span>`).join('');
 
     document.getElementById('fleetGrid').innerHTML = D.fleet.map((a, i) => `
@@ -204,12 +199,6 @@
             <td class="mono" data-th="Seats">${a.seats}</td>
         </tr>`).join('');
 
-    document.getElementById('fleetPlanned').innerHTML = D.fleetPlanned.map(a => `
-        <div class="facts__row">
-            <dt>${esc(a.type)}</dt>
-            <dd>${esc(a.operation)}. Releases at <b>${esc(a.releasedAt)}</b>.
-                <span style="display:block;margin-top:.3rem;font-size:.86rem" class="faint">${esc(a.status)}</span></dd>
-        </div>`).join('');
 
     A.refresh();
 })();

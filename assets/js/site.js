@@ -175,7 +175,9 @@
         //
         // offsetHeight is read once per scroll and only while a hero exists —
         // on every other page `hero` is null and this costs one null check.
-        const hero = document.querySelector('.hero--live');
+        // Any page's opening picture, not just the home page's hero: every
+        // page has one now and the bar has to go to glass over all of them.
+        const hero = document.querySelector('.hero--live, .skyhead');
         const onScroll = () => {
             const stuck = scrollY > 8;
             nav.classList.toggle('is-stuck', stuck);
@@ -578,6 +580,44 @@
         return out;
     }
 
+    /* ---- The sky's two switches ---------------------------------------------
+       Every page on this site opens on a generated picture — the home page's
+       flight deck, or one of the seven page views. The pictures are entirely
+       CSS and nothing here starts, times or steps them; this sets the two
+       attributes the stylesheet reads, and only ever turns things OFF.
+
+         [data-still]  the page opened already scrolled — a #hash, a restored
+                       position, a back button — so the arrival is skipped and
+                       the picture is simply already finished. Set once, before
+                       anything else, because every frame spent deciding is a
+                       frame of a sequence that should not be playing.
+         [data-away]   scrolled past, or the tab is in the background, so the
+                       loops that never stop (the cloud drift, the instrument
+                       glow, the float) are parked. A deck drifting behind a
+                       page nobody is looking at is work nobody asked for on a
+                       battery nobody is charging.
+
+       Both set an attribute and let CSS do the rest, so nothing here knows what
+       is animating: add a loop to a picture and it is covered. `[data-away]`
+       PAUSES rather than cancels, so coming back to a picture picks its drift
+       up where it left off instead of replaying its arrival.
+
+       See THE SKY in brand.css. Reduced motion is handled entirely there and
+       needs nothing from this file. */
+    function wireSky() {
+        const sky = document.querySelector('.hero--live, .skyhead');
+        if (!sky) return;
+        if ((window.scrollY || window.pageYOffset || 0) > 40) {
+            sky.setAttribute('data-still', '');
+        }
+        if (!('IntersectionObserver' in window)) return;
+        let onScreen = true;
+        const sync = () => sky.toggleAttribute('data-away', document.hidden || !onScreen);
+        new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); },
+                                 { threshold: 0.02 }).observe(sky);
+        document.addEventListener('visibilitychange', sync);
+    }
+
     // ---- Boot ---------------------------------------------------------------
     // refresh() is the same pass boot() runs, minus the chrome. Page scripts that
     // inject markup call AMV.refresh() afterwards so their [data-reveal] /
@@ -677,6 +717,9 @@
     }
 
     function boot() {
+        // First, and before the chrome: it only ever turns a running sequence
+        // off, and a sequence turned off two frames late has already been seen.
+        wireSky();
         document.querySelectorAll('[data-site-nav]').forEach(renderNav);
         document.querySelectorAll('[data-site-footer]').forEach(renderFooter);
         renderApplyTab();

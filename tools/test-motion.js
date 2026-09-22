@@ -90,7 +90,16 @@ async function stillFrame(page, budgetMs = 4000) {
     let quiet = 0;
     while (Date.now() < until && quiet < 2) {
         const running = await page.evaluate(async () => {
-            const a = document.getAnimations();
+            // INFINITE ANIMATIONS ARE NOT WAITED ON, and cannot be: `finished`
+            // on one never resolves, so a single `animation-iteration-count:
+            // infinite` anywhere on the page hangs this helper forever rather
+            // than failing. The home page has four — the hero's cloud drift,
+            // its instrument glow, the view's float and the chevron's bob —
+            // and none of them is near a section seam: they are all inside the
+            // hero, well above the join this probe reads, and none of them
+            // moves a section's ground colour.
+            const a = document.getAnimations().filter(
+                x => x.effect && x.effect.getComputedTiming().iterations !== Infinity);
             await Promise.all(a.map(x => x.finished.catch(() => {})));
             return a.length;
         });
