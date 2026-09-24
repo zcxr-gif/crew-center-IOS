@@ -1,0 +1,264 @@
+<!doctype html>
+<!--
+  banners.html — the Infinite Flight Community thread graphics.
+
+  One page, one banner at a time: ?b=header, or ?b=<section id> from SECTIONS
+  below. tools/make-banners.js screenshots each into banners/*.png.
+
+  Everything is the site's own: the palette from brand.css, Fraunces / Karla /
+  JetBrains Mono, the Caballero Águila and the ruled device painted through
+  their masks. Edit copy here, re-run the
+  script, re-upload.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AMV Thread Banners</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=block">
+<link rel="stylesheet" href="../assets/brand.css">
+<style>
+    html, body { margin: 0; background: transparent; }
+    body { width: var(--w); height: var(--h); overflow: hidden; }
+
+    /* Every banner is a white flag. The cloth is a run of soft vertical folds,
+       leaned over like fabric streaming in wind; everything printed on it sits
+       in .bn-wave, warped by the same wave (#wave), and the fold shadows are
+       laid over the lot on multiply, so it reads as printed on the cloth. */
+    .bn-banner {
+        position: relative; width: var(--w); height: var(--h); overflow: hidden;
+        background: #F3F5F8; color: var(--am-blue);
+        font-family: var(--font-body);
+        border-radius: 28px; isolation: isolate;
+    }
+    .bn-cloth, .bn-shade {
+        position: absolute; inset: -20% -15%;
+        transform: skewX(-14deg);
+    }
+    .bn-cloth {
+        background:
+            linear-gradient(180deg, rgba(255,255,255,.7), transparent 40%, rgba(180,190,205,.25) 100%),
+            linear-gradient(90deg,
+                #E4E8EE 0%, #FFFFFF 7%, #F6F7F9 13%, #D5DAE2 19%, #FAFBFC 26%,
+                #FFFFFF 36%, #EEF0F4 45%, #CDD3DC 52%, #F4F6F8 58%, #FFFFFF 66%,
+                #F1F3F6 74%, #C6CDD7 81%, #E9ECF1 86%, #FFFFFF 92%, #DDE2E9 100%);
+    }
+    /* Only the dark of the folds, laid over what is printed. */
+    .bn-shade {
+        mix-blend-mode: multiply; opacity: .55;
+        background: linear-gradient(90deg,
+            #fff 0%, #fff 15%, #C9CFD8 19%, #fff 24%, #fff 46%, #BCC3CE 52%, #fff 57%,
+            #fff 76%, #B5BDC9 81%, #fff 86%, #fff 100%);
+    }
+    .bn-wave { position: absolute; inset: 0; filter: url(#wave); }
+
+    /* The ruled device, flush right, red to rosa — as in the livery. */
+    .bn-stripes {
+        position: absolute; top: 0; right: 0; bottom: 0; width: 24%;
+        background: linear-gradient(180deg, var(--am-red), var(--am-rosa));
+        -webkit-mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+                mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+    }
+    /* The Quetzalcóatl bands and glyphs fade out before the stripes. */
+    .bn-quetzal {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        -webkit-mask: linear-gradient(90deg, #000 64%, transparent 76%);
+                mask: linear-gradient(90deg, #000 64%, transparent 76%);
+    }
+    .bn-mark {
+        position: absolute; background: var(--am-blue);
+        aspect-ratio: 2778 / 2118;
+        -webkit-mask: url('../assets/img/mark.svg') no-repeat center / contain;
+                mask: url('../assets/img/mark.svg') no-repeat center / contain;
+    }
+
+    /* ---- header ---- */
+    .bn-lockup {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        height: 150px; aspect-ratio: 938 / 225; background: var(--am-blue);
+        -webkit-mask: url('../assets/img/lockup.png') no-repeat center / contain;
+                mask: url('../assets/img/lockup.png') no-repeat center / contain;
+    }
+    /* Hecho en México: the flag with rounded corners, and the words. */
+    .bn-hecho { position: absolute; left: 40px; top: 30px; display: flex; align-items: center; gap: 14px; }
+    .bn-hecho svg { width: 60px; height: 38px; display: block; }
+    .bn-hecho span {
+        font-family: var(--font-body); font-weight: 800; font-size: 19px; line-height: 1.05;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--am-blue);
+    }
+
+    /* ---- section divider ---- */
+    .bn-copy { position: absolute; left: 96px; top: 50%; transform: translateY(-50%); }
+    h1 {
+        font-family: var(--font-display); font-weight: 700; margin: 0; line-height: .95;
+        font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -.02em;
+    }
+    .is-section h1 { font-size: 100px; }
+    .bn-en {
+        font-family: var(--font-mono); font-size: 24px; letter-spacing: .22em; font-weight: 600;
+        text-transform: uppercase; color: color-mix(in srgb, var(--hue) 78%, #0C2C64); margin: 18px 0 0;
+    }
+    /* ---- quick facts ---- */
+    .bn-facts {
+        position: absolute; left: 80px; right: 27%; top: 50%; transform: translateY(-50%);
+        display: grid; grid-template-columns: 1.15fr .95fr 1.4fr; column-gap: 28px; row-gap: 40px; align-items: start;
+    }
+    .bn-fact dt {
+        font-family: var(--font-mono); font-size: 17px; font-weight: 600; letter-spacing: .2em;
+        text-transform: uppercase; color: var(--c); margin: 0 0 8px;
+    }
+    .bn-fact dd {
+        margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 42px; line-height: 1;
+        font-variation-settings: 'opsz' 144, 'SOFT' 50; letter-spacing: -.01em; color: var(--am-blue); white-space: nowrap;
+    }
+    .bn-fact dd small { display: block; font-family: var(--font-body); font-weight: 600; font-size: 17px; color: #5A6478; margin-top: 8px; letter-spacing: 0; }
+    .is-facts .bn-mark { right: 6%; top: 50%; height: 40%; transform: translateY(-50%); }
+    .is-section .bn-mark { right: 6%; top: 50%; height: 46%; transform: translateY(-50%); }
+</style>
+</head>
+<body>
+<script src="../assets/js/data.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, A = D.airline;
+
+    /* Each section: the Spanish title leads, the English sits under it. */
+    const SECTIONS = [
+        { id: 'about',   es: 'Quiénes somos', en: 'About',       hue: 'var(--am-jade)' },
+        { id: 'fleet',   es: 'Flota',         en: 'Fleet',       hue: 'var(--am-cobalt)' },
+        { id: 'network', es: 'Red de rutas',  en: 'Network',     hue: 'var(--am-turquoise)' },
+        { id: 'ranks',   es: 'Rangos',        en: 'Ranks',       hue: 'var(--am-marigold)' },
+        { id: 'events',  es: 'Eventos',       en: 'Events',      hue: 'var(--am-rosa)' },
+        { id: 'staff',   es: 'Equipo',        en: 'Staff',       hue: 'var(--am-clay)' },
+        { id: 'join',    es: 'Únete',         en: 'How to Join', hue: 'var(--am-red)' },
+    ];
+    window.AMV_BANNERS = ['header', 'facts', ...SECTIONS.map((s) => s.id)];
+
+    /* Quetzalcóatl, after the 787 livery but drawn from scratch: two serpent
+       bands — a row of green teeth riding a wave, a clay line beside it —
+       above and below the logo, the teeth facing in, and a scatter of glyphs
+       in the palette outside them. Seeded, so every render matches. */
+    function quetzal(W, H, top, bot, amp, avoid) {
+        let seed = 11;
+        const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+        const PAL = ['#0E8C5A', '#0E9BAA', '#1B5FC1', '#D6337E', '#F2A03D', '#C05A2E', '#0C2C64'];
+        const wave = (x, base, amp, ph) => base + amp * Math.sin((x / W) * Math.PI * 2 * 1.1 + ph);
+        const f = (n) => n.toFixed(1);
+        let out = '';
+
+        function band(base, dir, ph) {
+            // Teeth: green triangles standing on the wave, pointing toward the logo.
+            let teeth = '';
+            for (let x = -10; x < W + 20; x += 26) {
+                const a = x - 11, b = x + 11;
+                teeth += `M${f(a)} ${f(wave(a, base, amp, ph))}L${f(b)} ${f(wave(b, base, amp, ph))}L${f(x)} ${f(wave(x, base, amp, ph) + dir * amp * .7)}Z`;
+            }
+            out += `<path d="${teeth}" fill="#0E8C5A"/>`;
+            // A green rule under the teeth, and the clay line outside it.
+            for (const [off, col, w, a2, p2] of [[0, '#0E8C5A', 4, amp, ph], [-dir * amp * .7, '#C05A2E', 5, amp, ph + .25]]) {
+                let d = '';
+                for (let x = 0; x <= W; x += 10) d += (x ? 'L' : 'M') + f(x) + ' ' + f(wave(x, base + off, a2, p2));
+                out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+            }
+        }
+
+        function glyph(x, y, r, c) {
+            switch (Math.floor(rnd() * 6)) {
+                case 0: return `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="none" stroke="${c}" stroke-width="${f(r * .35)}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .3)}" fill="${c}"/>`;
+                case 1: return `<path d="M${f(x - r)} ${f(y - r)}L${f(x + r)} ${f(y + r)}M${f(x + r)} ${f(y - r)}L${f(x - r)} ${f(y + r)}" stroke="${c}" stroke-width="${f(r * .45)}" stroke-linecap="round"/>`;
+                case 2: return `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .55)}" fill="${c}"/>`;
+                case 3: return `<path d="M${f(x)} ${f(y - r)}L${f(x + r)} ${f(y)}L${f(x)} ${f(y + r)}L${f(x - r)} ${f(y)}Z" fill="none" stroke="${c}" stroke-width="${f(r * .3)}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .22)}" fill="${c}"/>`;
+                case 4: { // spiral
+                    let d = '';
+                    for (let t = 0; t <= 14; t++) { const a = t * .7, rr = r * (t / 14); d += (t ? 'L' : 'M') + f(x + rr * Math.cos(a)) + ' ' + f(y + rr * Math.sin(a)); }
+                    return `<path d="${d}" fill="none" stroke="${c}" stroke-width="${f(r * .28)}" stroke-linecap="round"/>`;
+                }
+                default: return [0, 1, 2].map((i) => `<circle cx="${f(x - r + i * r)}" cy="${f(y)}" r="${f(r * .22)}" fill="${c}"/>`).join('');
+            }
+        }
+
+        band(top, 1, 0);
+        band(bot, -1, Math.PI);
+        // Glyphs in the margins, thinning toward the centre so the logo has air.
+        const placed = [];
+        for (let i = 0; i < 160; i++) {
+            const up = i % 2 === 0;
+            const x = 30 + rnd() * (W - 60);
+            const edge = up ? wave(x, top, amp, .25) - amp * 1.5 : wave(x, bot, amp, Math.PI + .25) + amp * 1.5;
+            const y = up ? 14 + rnd() * Math.max(0, edge - 24) : edge + 10 + rnd() * Math.max(0, H - 14 - edge - 10);
+            const mid = 1 - Math.abs(x - W / 2) / (W / 2);
+            if (rnd() < mid * .55) continue;
+            const r = (7 + rnd() * 9) * Math.min(1, H / 560 + .25);
+            if (avoid && x < avoid[0] && y < avoid[1]) continue;
+            if (placed.some(([px, py, pr]) => Math.hypot(px - x, py - y) < pr + r + 26)) continue;
+            placed.push([x, y, r]);
+            out += glyph(x, y, r, PAL[Math.floor(rnd() * PAL.length)]);
+        }
+        return `<svg class="bn-quetzal" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${out}</svg>`;
+    }
+
+    const id = new URLSearchParams(location.search).get('b') || 'header';
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const root = document.documentElement;
+
+    const WAVE = `<svg width="0" height="0" style="position:absolute"><filter id="wave" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0016 0.004" numOctaves="1" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+        <feGaussianBlur stdDeviation="0.5"/>
+    </filter></svg>`;
+    const flag = (cls, printed) => `<div class="bn-banner ${cls}">${WAVE}
+        <div class="bn-cloth"></div>
+        <div class="bn-wave">${printed}</div>
+        <div class="bn-shade"></div></div>`;
+
+    /* The Mexican flag, rounded: green, white, red, and a small emblem —
+       a brown eagle-on-cactus reduced to what reads at badge size. */
+    const MX = `<svg viewBox="0 0 60 38" aria-hidden="true">
+        <defs><clipPath id="mxr"><rect width="60" height="38" rx="8"/></clipPath></defs>
+        <g clip-path="url(#mxr)">
+            <rect width="20" height="38" fill="#006847"/><rect x="20" width="20" height="38" fill="#fff"/><rect x="40" width="20" height="38" fill="#CE1126"/>
+            <path d="M24.5 22.5 q5.5 5 11 0" fill="none" stroke="#3B7A3A" stroke-width="1.6" stroke-linecap="round"/>
+            <ellipse cx="30" cy="18" rx="4.2" ry="5" fill="#8A5A2B"/><circle cx="31.5" cy="13.6" r="2" fill="#8A5A2B"/>
+        </g>
+        <rect x=".5" y=".5" width="59" height="37" rx="7.5" fill="none" stroke="rgba(12,44,100,.25)"/>
+    </svg>`;
+
+    let html;
+    if (id === 'header') {
+        root.style.cssText = '--w:1600px;--h:560px';
+        html = flag('is-header', `${quetzal(1600, 560, 118, 442, 26, [360, 90])}
+            <div class="bn-stripes"></div>
+            <div class="bn-hecho">${MX}<span>Hecho en<br>México</span></div>
+            <div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div>`);
+    } else if (id === 'facts') {
+        /* The quick facts, set as a card rather than a markdown table. */
+        root.style.cssText = '--w:1600px;--h:420px';
+        const fact = (label, value, sub, c) =>
+            `<div class="bn-fact" style="--c:${c}"><dt>${esc(label)}</dt><dd>${esc(value)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`;
+        const hub = D.hubs[0], bases = D.hubs.slice(1);
+        html = flag('is-facts', `${quetzal(1600, 420, 52, 368, 12)}
+            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <dl class="bn-facts">
+                ${fact('Callsign', A.callsign, '', '#0E8C5A')}
+                ${fact('IATA · ICAO', `${A.iata} · ${A.icao}`, '', '#1B5FC1')}
+                ${fact('Server', A.server.replace(' Server', ''), A.platform, '#C05A2E')}
+                ${fact('Hub', hub.icao, hub.city, '#0E9BAA')}
+                ${fact('Alliance', A.alliance, '', '#D6337E')}
+                ${fact('Bases', bases.map((b) => b.icao).join(' · '), bases.map((b) => b.city).join(' · '), '#E0892A')}
+            </dl>`);
+    } else {
+        const s = SECTIONS.find((x) => x.id === id);
+        if (!s) throw new Error('unknown banner ' + id);
+        root.style.cssText = `--w:1600px;--h:360px;--hue:${s.hue}`;
+        html = flag('is-section', `${quetzal(1600, 360, 62, 298, 14)}
+            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <div class="bn-copy">
+                <h1>${esc(s.es)}</h1>
+                <p class="bn-en">${esc(s.en)}</p>
+            </div>`);
+    }
+    document.body.innerHTML += html;
+
+})();
+</script>
+</body>
+</html>
