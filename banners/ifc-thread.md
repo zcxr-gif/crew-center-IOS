@@ -1,14 +1,14 @@
-![Aeromexico Virtual|690x241](https://aeromexicova.org/banners/header.png)
+![Aeromexico Virtual|690x241](https://amxva.netlify.app/banners/header.png)
 
 > **Bienvenidos a bordo.** Aeromexico Virtual flies Aeroméxico's network on the Infinite Flight Expert Server — Mexico City to Madrid, Monterrey to Miami, Cancún to everywhere — with real routes, real schedules and a crew that actually flies together.
 
-![Callsign AEROMEXICO · AM / AMX · SkyTeam · Expert Server · Hub MMMX · Bases MMMY, MMGL, MMUN|690x181](https://aeromexicova.org/banners/facts.png)
+![Callsign AEROMEXICO · AM / AMX · SkyTeam · Expert Server · Hub MMMX · Bases MMMY, MMGL, MMUN|690x181](https://amxva.netlify.app/banners/facts.png)
 
-:globe_with_meridians: **[aeromexicova.org](https://aeromexicova.org)** · :airplane: **[Crew Center](https://inflight.info/crew/aeromexico-virtual)** · :pencil: **[Apply](https://aeromexicova.org/apply)**
+:globe_with_meridians: **[amxva.netlify.app](https://amxva.netlify.app)** · :airplane: **[Crew Center](https://inflight.info/crew/aeromexico-virtual)** · :pencil: **[Apply](https://amxva.netlify.app/apply)**
 
 ---
 
-![Quiénes somos · About|690x155](https://aeromexicova.org/banners/about.png)
+![Quiénes somos · About|690x155](https://amxva.netlify.app/banners/about.png)
 
 Aeromexico Virtual is a virtual airline for Infinite Flight pilots who want to fly Aeroméxico the way it is actually flown. Our routes, aircraft and procedures follow the real airline wherever the simulator allows, and everything we publish comes from our Operations Plan — no invented numbers, no paper fleet.
 
@@ -30,7 +30,7 @@ Aeromexico Virtual is a virtual airline for Infinite Flight pilots who want to f
 
 ---
 
-![Flota · Fleet|690x155](https://aeromexicova.org/banners/fleet.png)
+![Flota · Fleet|690x155](https://amxva.netlify.app/banners/fleet.png)
 
 Six types, every one of them in Infinite Flight in Aeroméxico colours. Tap an aircraft to open it.
 
@@ -96,7 +96,7 @@ Reserved for event operations rather than the everyday schedule. Typical sector:
 
 ---
 
-![Red de rutas · Network|690x155](https://aeromexicova.org/banners/network.png)
+![Red de rutas · Network|690x155](https://amxva.netlify.app/banners/network.png)
 
 Everything departs from **Mexico City Benito Juárez (MMMX)**, with bases at Monterrey, Guadalajara and Cancún. Routes are grouped into tiers, and each tier has its own flight-number series.
 
@@ -150,7 +150,7 @@ Everything departs from **Mexico City Benito Juárez (MMMX)**, with bases at Mon
 
 ---
 
-![Rangos · Ranks|690x155](https://aeromexicova.org/banners/ranks.png)
+![Rangos · Ranks|690x155](https://amxva.netlify.app/banners/ranks.png)
 
 Hours unlock aircraft, and longer sectors come with them. Promotion is automatic: it is applied when the flight report that crosses the threshold is validated.
 
@@ -209,7 +209,7 @@ Hours unlock aircraft, and longer sectors come with them. Promotion is automatic
 
 ---
 
-![Eventos · Events|690x155](https://aeromexicova.org/banners/events.png)
+![Eventos · Events|690x155](https://amxva.netlify.app/banners/events.png)
 
 | Event | What it is | How often |
 |---|---|---|
@@ -219,11 +219,11 @@ Hours unlock aircraft, and longer sectors come with them. Promotion is automatic
 | Joint event | Flown with a partner virtual airline, usually a city pair | Quarterly |
 | Anniversary | Full-network operation marking the airline's founding | Annually |
 
-Upcoming events are posted on [aeromexicova.org/events](https://aeromexicova.org/events) and announced in this thread. **Want to run a joint event with us? Send a PM to our staff below.**
+Upcoming events are posted on [amxva.netlify.app/events](https://amxva.netlify.app/events) and announced in this thread. **Want to run a joint event with us? Send a PM to our staff below.**
 
 ---
 
-![Equipo · Staff|690x155](https://aeromexicova.org/banners/staff.png)
+![Equipo · Staff|690x155](https://amxva.netlify.app/banners/staff.png)
 
 | Role | Pilot | Responsible for |
 |---|---|---|
@@ -240,7 +240,7 @@ Director posts and Line Trainer seats are open to pilots from **First Officer** 
 
 ---
 
-![Únete · How to Join|690x155](https://aeromexicova.org/banners/join.png)
+![Únete · How to Join|690x155](https://amxva.netlify.app/banners/join.png)
 
 **Requirements**
 
@@ -251,7 +251,7 @@ Director posts and Line Trainer seats are open to pilots from **First Officer** 
 * :white_check_mark: An Infinite Flight Community account.
 * :white_check_mark: Agreement to the Operations Plan and code of conduct.
 
-### :point_right: [Apply at aeromexicova.org/apply](https://aeromexicova.org/apply)
+### :point_right: [Apply at amxva.netlify.app/apply](https://amxva.netlify.app/apply)
 
 It takes about three minutes, and the Director of Personnel answers every application within **72 hours**.
 
@@ -266,6 +266,6 @@ It takes about three minutes, and the Director of Personnel answers every applic
 
 **¡Nos vemos en el cielo!** :mexico: :airplane:
 
-[Website](https://aeromexicova.org) · [Crew Center](https://inflight.info/crew/aeromexico-virtual) · [Apply](https://aeromexicova.org/apply)
+[Website](https://amxva.netlify.app) · [Crew Center](https://inflight.info/crew/aeromexico-virtual) · [Apply](https://amxva.netlify.app/apply)
 
 *Aeromexico Virtual is a virtual airline on Infinite Flight and is not affiliated with Aeroméxico.*
