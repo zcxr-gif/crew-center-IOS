@@ -2,16 +2,9 @@
 
 > **Bienvenidos a bordo.** Aeromexico Virtual flies Aeroméxico's network on the Infinite Flight Expert Server — Mexico City to Madrid, Monterrey to Miami, Cancún to everywhere — with real routes, real schedules and a crew that actually flies together.
 
-| | |
-|---|---|
-| **Callsign** | AEROMEXICO |
-| **IATA / ICAO** | AM / AMX |
-| **Alliance** | SkyTeam |
-| **Server** | Expert Server |
-| **Hub** | Mexico City (MMMX) |
-| **Bases** | Monterrey (MMMY) · Guadalajara (MMGL) · Cancún (MMUN) |
-| **Website** | [aeromexicova.org](https://aeromexicova.org) |
-| **Crew Center** | [inflight.info/crew/aeromexico-virtual](https://inflight.info/crew/aeromexico-virtual) |
+![Callsign AEROMEXICO · AM / AMX · SkyTeam · Expert Server · Hub MMMX · Bases MMMY, MMGL, MMUN|690x181](https://aeromexicova.org/banners/facts.png)
+
+:globe_with_meridians: **[aeromexicova.org](https://aeromexicova.org)** · :airplane: **[Crew Center](https://inflight.info/crew/aeromexico-virtual)** · :pencil: **[Apply](https://aeromexicova.org/apply)**
 
 ---
 

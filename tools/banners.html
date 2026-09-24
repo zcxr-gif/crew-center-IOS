@@ -96,6 +96,21 @@
         font-family: var(--font-mono); font-size: 24px; letter-spacing: .22em; font-weight: 600;
         text-transform: uppercase; color: color-mix(in srgb, var(--hue) 78%, #0C2C64); margin: 18px 0 0;
     }
+    /* ---- quick facts ---- */
+    .bn-facts {
+        position: absolute; left: 80px; right: 27%; top: 50%; transform: translateY(-50%);
+        display: grid; grid-template-columns: 1.15fr .95fr 1.4fr; column-gap: 28px; row-gap: 40px; align-items: start;
+    }
+    .bn-fact dt {
+        font-family: var(--font-mono); font-size: 17px; font-weight: 600; letter-spacing: .2em;
+        text-transform: uppercase; color: var(--c); margin: 0 0 8px;
+    }
+    .bn-fact dd {
+        margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 42px; line-height: 1;
+        font-variation-settings: 'opsz' 144, 'SOFT' 50; letter-spacing: -.01em; color: var(--am-blue); white-space: nowrap;
+    }
+    .bn-fact dd small { display: block; font-family: var(--font-body); font-weight: 600; font-size: 17px; color: #5A6478; margin-top: 8px; letter-spacing: 0; }
+    .is-facts .bn-mark { right: 6%; top: 50%; height: 40%; transform: translateY(-50%); }
     .is-section .bn-mark { right: 6%; top: 50%; height: 46%; transform: translateY(-50%); }
 </style>
 </head>
@@ -115,7 +130,7 @@
         { id: 'staff',   es: 'Equipo',        en: 'Staff',       hue: 'var(--am-clay)' },
         { id: 'join',    es: 'Únete',         en: 'How to Join', hue: 'var(--am-red)' },
     ];
-    window.AMV_BANNERS = ['header', ...SECTIONS.map((s) => s.id)];
+    window.AMV_BANNERS = ['header', 'facts', ...SECTIONS.map((s) => s.id)];
 
     /* Quetzalcóatl, after the 787 livery but drawn from scratch: two serpent
        bands — a row of green teeth riding a wave, a clay line beside it —
@@ -213,6 +228,22 @@
             <div class="bn-stripes"></div>
             <div class="bn-hecho">${MX}<span>Hecho en<br>México</span></div>
             <div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div>`);
+    } else if (id === 'facts') {
+        /* The quick facts, set as a card rather than a markdown table. */
+        root.style.cssText = '--w:1600px;--h:420px';
+        const fact = (label, value, sub, c) =>
+            `<div class="bn-fact" style="--c:${c}"><dt>${esc(label)}</dt><dd>${esc(value)}${sub ? `<small>${esc(sub)}</small>` : ''}</dd></div>`;
+        const hub = D.hubs[0], bases = D.hubs.slice(1);
+        html = flag('is-facts', `${quetzal(1600, 420, 52, 368, 12)}
+            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <dl class="bn-facts">
+                ${fact('Callsign', A.callsign, '', '#0E8C5A')}
+                ${fact('IATA · ICAO', `${A.iata} · ${A.icao}`, '', '#1B5FC1')}
+                ${fact('Server', A.server.replace(' Server', ''), A.platform, '#C05A2E')}
+                ${fact('Hub', hub.icao, hub.city, '#0E9BAA')}
+                ${fact('Alliance', A.alliance, '', '#D6337E')}
+                ${fact('Bases', bases.map((b) => b.icao).join(' · '), bases.map((b) => b.city).join(' · '), '#E0892A')}
+            </dl>`);
     } else {
         const s = SECTIONS.find((x) => x.id === id);
         if (!s) throw new Error('unknown banner ' + id);
