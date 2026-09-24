@@ -60,11 +60,6 @@
     }
 
     .bn-copy { position: absolute; left: 96px; top: 50%; transform: translateY(-54%); max-width: 62%; }
-    .bn-eyebrow {
-        font-family: var(--font-mono); font-size: 22px; letter-spacing: .22em;
-        text-transform: uppercase; color: var(--am-blue-300); margin: 0 0 18px;
-    }
-    .bn-eyebrow b { color: color-mix(in srgb, var(--hue) 70%, #fff); font-weight: 700; }
     h1 {
         font-family: var(--font-display); font-weight: 700; margin: 0; line-height: .95;
         font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -.02em;
@@ -75,48 +70,38 @@
     }
 
     /* ---- header ---- */
-    /* A night sky over Mexico City: void at the zenith, the city's sodium
-       glow bleeding up from the horizon, stars, two contrails, and the lamps
-       of the city itself along the foot. The crest and name sit centred in
-       the dark between them. */
-    .is-header { background: linear-gradient(180deg, #03081A 0%, #071335 38%, #0C2C64 66%, #3A2A6A 84%, #7A3B5C 100%); }
-    .is-header::before {
+    /* The header: the logo on a white flag. Cloth is a run of soft vertical
+       folds, leaned over like fabric streaming in wind; the logo is warped by
+       the same wave (#wave) and the fold shadows are laid over it on
+       multiply, so it reads as printed on the cloth rather than floating. */
+    .is-header { background: #F3F5F8; color: var(--am-blue); }
+    .is-header::before { display: none; }
+    .bn-cloth, .bn-shade {
+        position: absolute; inset: -20% -15%;
+        transform: skewX(-14deg);
+    }
+    .bn-cloth {
         background:
-            radial-gradient(70% 55% at 50% 108%, rgba(255, 159, 74, .55), rgba(196, 97, 63, .18) 50%, transparent 80%),
-            radial-gradient(40% 70% at 50% 0%, rgba(127, 166, 232, .10), transparent 70%);
+            linear-gradient(180deg, rgba(255,255,255,.7), transparent 40%, rgba(180,190,205,.25) 100%),
+            linear-gradient(90deg,
+                #E4E8EE 0%, #FFFFFF 7%, #F6F7F9 13%, #D5DAE2 19%, #FAFBFC 26%,
+                #FFFFFF 36%, #EEF0F4 45%, #CDD3DC 52%, #F4F6F8 58%, #FFFFFF 66%,
+                #F1F3F6 74%, #C6CDD7 81%, #E9ECF1 86%, #FFFFFF 92%, #DDE2E9 100%);
     }
-    .bn-stars { position: absolute; inset: 0; }
-    .bn-trails {
-        position: absolute; left: 46%; right: -10%; top: -36%; height: 80%; opacity: .4;
-        background: linear-gradient(74deg, transparent 10%, rgba(255, 244, 228, .8) 55%, #fff 100%);
-        -webkit-mask: url('../assets/img/view-contrails.svg') no-repeat center / 100% 100%;
-                mask: url('../assets/img/view-contrails.svg') no-repeat center / 100% 100%;
-        filter: blur(1.5px);
+    /* Only the dark of the folds, laid over the logo. */
+    .bn-shade {
+        mix-blend-mode: multiply; opacity: .55;
+        background: linear-gradient(90deg,
+            #fff 0%, #fff 15%, #C9CFD8 19%, #fff 24%, #fff 46%, #BCC3CE 52%, #fff 57%,
+            #fff 76%, #B5BDC9 81%, #fff 86%, #fff 100%);
     }
-    .bn-city {
-        position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
-        background: radial-gradient(70% 130% at 50% 108%, #FFE7C0 0%, #FFC275 30%, #F0904E 58%, #A96BB0 100%);
-        -webkit-mask: url('../assets/img/view-city.svg') no-repeat center bottom / 100% 160%;
-                mask: url('../assets/img/view-city.svg') no-repeat center bottom / 100% 160%;
-        filter: drop-shadow(0 0 3px rgba(255, 180, 100, .8));
+    .bn-lockup {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        height: 150px; aspect-ratio: 938 / 225; background: var(--am-blue);
+        -webkit-mask: url('../assets/img/lockup.png') no-repeat center / contain;
+                mask: url('../assets/img/lockup.png') no-repeat center / contain;
     }
-    /* Darken the middle so the name reads over the city. */
-    .bn-veil {
-        position: absolute; inset: 0;
-        background: radial-gradient(44% 46% at 50% 56%, rgba(3, 8, 26, .8), transparent 100%);
-    }
-    .is-header .bn-copy {
-        left: 0; right: 0; max-width: none; top: 50%; transform: translateY(-58%);
-        text-align: center; display: flex; flex-direction: column; align-items: center;
-    }
-    .is-header .bn-mark {
-        position: relative; height: 130px; aspect-ratio: 2778 / 2118; margin-bottom: 26px;
-        -webkit-mask-size: contain; mask-size: contain;
-        filter: drop-shadow(0 0 30px rgba(127, 166, 232, .45));
-    }
-    .is-header h1 { font-size: 116px; text-shadow: 0 4px 40px rgba(3, 8, 26, .8); }
-    .is-header .bn-eyebrow { margin: 26px 0 0; color: #E9D9C8; }
-    .is-header .bn-eyebrow b { color: var(--am-marigold); }
+    .bn-wave { position: absolute; inset: 0; filter: url(#wave); }
 
     /* ---- section divider ---- */
     .is-section h1 { font-size: 112px; }
@@ -151,13 +136,14 @@
     if (id === 'header') {
         root.style.cssText = '--w:1600px;--h:560px;--hue:var(--am-marigold)';
         html = `<div class="bn-banner is-header">
-            <canvas class="bn-stars" width="3200" height="1120"></canvas>
-            <div class="bn-trails"></div><div class="bn-city"></div><div class="bn-veil"></div>
-            <div class="bn-copy">
-                <div class="bn-mark"></div>
-                <h1>${esc(A.name)}</h1>
-                <p class="bn-eyebrow">${esc(A.platform)} · <b>${esc(A.server)}</b> · ${esc(A.alliance)}</p>
-            </div></div>`;
+            <svg width="0" height="0" style="position:absolute"><filter id="wave" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.0016 0.004" numOctaves="1" seed="4"/>
+                <feDisplacementMap in="SourceGraphic" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+                <feGaussianBlur stdDeviation="0.5"/>
+            </filter></svg>
+            <div class="bn-cloth"></div>
+            <div class="bn-wave"><div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div></div>
+            <div class="bn-shade"></div></div>`;
     } else {
         const s = SECTIONS.find((x) => x.id === id);
         if (!s) throw new Error('unknown banner ' + id);
@@ -172,23 +158,6 @@
     }
     document.body.innerHTML += html;
 
-    /* Stars: seeded, so every render is the same sky. Denser and brighter
-       toward the zenith, gone by the time the city glow takes over. */
-    const cv = document.querySelector('.bn-stars');
-    if (cv) {
-        const g = cv.getContext('2d');
-        let seed = 7;
-        const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-        for (let i = 0; i < 520; i++) {
-            const y = Math.pow(rnd(), 1.6) * cv.height * .72;
-            const x = rnd() * cv.width;
-            const fade = 1 - y / (cv.height * .72);
-            const r = rnd() < .06 ? 2.6 : .6 + rnd() * 1.4;
-            g.globalAlpha = (.25 + rnd() * .75) * fade;
-            g.fillStyle = rnd() < .15 ? '#FFE7C0' : '#fff';
-            g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
-        }
-    }
 })();
 </script>
 </body>
