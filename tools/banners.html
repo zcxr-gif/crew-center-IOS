@@ -17,65 +17,18 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=block">
 <link rel="stylesheet" href="../assets/brand.css">
 <style>
-    html, body { margin: 0; background: var(--am-navy); }
+    html, body { margin: 0; background: #F3F5F8; }
     body { width: var(--w); height: var(--h); overflow: hidden; }
 
+    /* Every banner is a white flag. The cloth is a run of soft vertical folds,
+       leaned over like fabric streaming in wind; everything printed on it sits
+       in .bn-wave, warped by the same wave (#wave), and the fold shadows are
+       laid over the lot on multiply, so it reads as printed on the cloth. */
     .bn-banner {
         position: relative; width: var(--w); height: var(--h); overflow: hidden;
-        background: var(--am-wash); color: #fff;
+        background: #F3F5F8; color: var(--am-blue);
         font-family: var(--font-body);
     }
-    /* A soft pool of the section's colour behind the type. */
-    .bn-banner::before {
-        content: ''; position: absolute; inset: 0;
-        background: radial-gradient(60% 120% at 18% 50%, color-mix(in srgb, var(--hue) 22%, transparent), transparent 70%);
-    }
-
-    /* The ruled device, flush right, red to rosa — as in the livery. */
-    .bn-stripes {
-        position: absolute; top: 0; right: 0; bottom: 0; width: 34%;
-        background: linear-gradient(180deg, var(--am-red), var(--am-rosa));
-        -webkit-mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
-                mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
-        opacity: .9;
-    }
-    .bn-mark {
-        position: absolute; background: #fff; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
-        -webkit-mask-image: url('../assets/img/mark.svg');
-                mask-image: url('../assets/img/mark.svg');
-    }
-
-    /* Greca along the foot, fading out before it reaches the stripes. The fade
-       is on a wrapper because the greca's own mask is already its shape. */
-    .bn-foot {
-        position: absolute; left: 0; bottom: 0; width: 58%; height: 24px;
-        -webkit-mask: linear-gradient(90deg, #000 70%, transparent);
-                mask: linear-gradient(90deg, #000 70%, transparent);
-    }
-    .bn-greca {
-        position: absolute; inset: 0;
-        background: var(--hue);
-        -webkit-mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
-                mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
-    }
-
-    .bn-copy { position: absolute; left: 96px; top: 50%; transform: translateY(-54%); max-width: 62%; }
-    h1 {
-        font-family: var(--font-display); font-weight: 700; margin: 0; line-height: .95;
-        font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -.02em;
-    }
-    .bn-en {
-        font-family: var(--font-mono); font-size: 26px; letter-spacing: .22em;
-        text-transform: uppercase; color: color-mix(in srgb, var(--hue) 70%, #fff); margin: 22px 0 0;
-    }
-
-    /* ---- header ---- */
-    /* The header: the logo on a white flag. Cloth is a run of soft vertical
-       folds, leaned over like fabric streaming in wind; the logo is warped by
-       the same wave (#wave) and the fold shadows are laid over it on
-       multiply, so it reads as printed on the cloth rather than floating. */
-    .is-header { background: #F3F5F8; color: var(--am-blue); }
-    .is-header::before { display: none; }
     .bn-cloth, .bn-shade {
         position: absolute; inset: -20% -15%;
         transform: skewX(-14deg);
@@ -88,25 +41,62 @@
                 #FFFFFF 36%, #EEF0F4 45%, #CDD3DC 52%, #F4F6F8 58%, #FFFFFF 66%,
                 #F1F3F6 74%, #C6CDD7 81%, #E9ECF1 86%, #FFFFFF 92%, #DDE2E9 100%);
     }
-    /* Only the dark of the folds, laid over the logo. */
+    /* Only the dark of the folds, laid over what is printed. */
     .bn-shade {
         mix-blend-mode: multiply; opacity: .55;
         background: linear-gradient(90deg,
             #fff 0%, #fff 15%, #C9CFD8 19%, #fff 24%, #fff 46%, #BCC3CE 52%, #fff 57%,
             #fff 76%, #B5BDC9 81%, #fff 86%, #fff 100%);
     }
+    .bn-wave { position: absolute; inset: 0; filter: url(#wave); }
+
+    /* The ruled device, flush right, red to rosa — as in the livery. */
+    .bn-stripes {
+        position: absolute; top: 0; right: 0; bottom: 0; width: 24%;
+        background: linear-gradient(180deg, var(--am-red), var(--am-rosa));
+        -webkit-mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+                mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+    }
+    /* The Quetzalcóatl bands and glyphs fade out before the stripes. */
+    .bn-quetzal {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        -webkit-mask: linear-gradient(90deg, #000 64%, transparent 76%);
+                mask: linear-gradient(90deg, #000 64%, transparent 76%);
+    }
+    .bn-mark {
+        position: absolute; background: var(--am-blue);
+        aspect-ratio: 2778 / 2118;
+        -webkit-mask: url('../assets/img/mark.svg') no-repeat center / contain;
+                mask: url('../assets/img/mark.svg') no-repeat center / contain;
+    }
+
+    /* ---- header ---- */
     .bn-lockup {
         position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
         height: 150px; aspect-ratio: 938 / 225; background: var(--am-blue);
         -webkit-mask: url('../assets/img/lockup.png') no-repeat center / contain;
                 mask: url('../assets/img/lockup.png') no-repeat center / contain;
     }
-    .bn-wave { position: absolute; inset: 0; filter: url(#wave); }
-    .bn-quetzal { position: absolute; inset: 0; width: 100%; height: 100%; }
+    /* Hecho en México: the flag with rounded corners, and the words. */
+    .bn-hecho { position: absolute; left: 40px; top: 30px; display: flex; align-items: center; gap: 14px; }
+    .bn-hecho svg { width: 60px; height: 38px; display: block; }
+    .bn-hecho span {
+        font-family: var(--font-body); font-weight: 800; font-size: 19px; line-height: 1.05;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--am-blue);
+    }
 
     /* ---- section divider ---- */
-    .is-section h1 { font-size: 112px; }
-    .is-section .bn-mark { right: 6%; top: 50%; height: 46%; aspect-ratio: 2778 / 2118; transform: translateY(-58%); -webkit-mask-size: contain; mask-size: contain; }
+    .bn-copy { position: absolute; left: 96px; top: 50%; transform: translateY(-50%); }
+    h1 {
+        font-family: var(--font-display); font-weight: 700; margin: 0; line-height: .95;
+        font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -.02em;
+    }
+    .is-section h1 { font-size: 100px; }
+    .bn-en {
+        font-family: var(--font-mono); font-size: 24px; letter-spacing: .22em; font-weight: 600;
+        text-transform: uppercase; color: color-mix(in srgb, var(--hue) 78%, #0C2C64); margin: 18px 0 0;
+    }
+    .is-section .bn-mark { right: 6%; top: 50%; height: 46%; transform: translateY(-50%); }
 </style>
 </head>
 <body>
@@ -131,10 +121,9 @@
        bands — a row of green teeth riding a wave, a clay line beside it —
        above and below the logo, the teeth facing in, and a scatter of glyphs
        in the palette outside them. Seeded, so every render matches. */
-    function quetzal() {
+    function quetzal(W, H, top, bot, amp, avoid) {
         let seed = 11;
         const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-        const W = 1600, H = 560;
         const PAL = ['#0E8C5A', '#0E9BAA', '#1B5FC1', '#D6337E', '#F2A03D', '#C05A2E', '#0C2C64'];
         const wave = (x, base, amp, ph) => base + amp * Math.sin((x / W) * Math.PI * 2 * 1.1 + ph);
         const f = (n) => n.toFixed(1);
@@ -145,13 +134,13 @@
             let teeth = '';
             for (let x = -10; x < W + 20; x += 26) {
                 const a = x - 11, b = x + 11;
-                teeth += `M${f(a)} ${f(wave(a, base, 26, ph))}L${f(b)} ${f(wave(b, base, 26, ph))}L${f(x)} ${f(wave(x, base, 26, ph) + dir * 18)}Z`;
+                teeth += `M${f(a)} ${f(wave(a, base, amp, ph))}L${f(b)} ${f(wave(b, base, amp, ph))}L${f(x)} ${f(wave(x, base, amp, ph) + dir * amp * .7)}Z`;
             }
             out += `<path d="${teeth}" fill="#0E8C5A"/>`;
             // A green rule under the teeth, and the clay line outside it.
-            for (const [off, col, w, amp, p2] of [[0, '#0E8C5A', 4, 26, ph], [-dir * 18, '#C05A2E', 5, 26, ph + .25]]) {
+            for (const [off, col, w, a2, p2] of [[0, '#0E8C5A', 4, amp, ph], [-dir * amp * .7, '#C05A2E', 5, amp, ph + .25]]) {
                 let d = '';
-                for (let x = 0; x <= W; x += 10) d += (x ? 'L' : 'M') + f(x) + ' ' + f(wave(x, base + off, amp, p2));
+                for (let x = 0; x <= W; x += 10) d += (x ? 'L' : 'M') + f(x) + ' ' + f(wave(x, base + off, a2, p2));
                 out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
             }
         }
@@ -171,18 +160,19 @@
             }
         }
 
-        band(118, 1, 0);
-        band(442, -1, Math.PI);
+        band(top, 1, 0);
+        band(bot, -1, Math.PI);
         // Glyphs in the margins, thinning toward the centre so the logo has air.
         const placed = [];
         for (let i = 0; i < 160; i++) {
-            const top = i % 2 === 0;
+            const up = i % 2 === 0;
             const x = 30 + rnd() * (W - 60);
-            const edge = top ? wave(x, 118, 26, .25) - 40 : wave(x, 442, 26, Math.PI + .25) + 40;
-            const y = top ? 18 + rnd() * Math.max(0, edge - 30) : edge + 12 + rnd() * Math.max(0, H - 18 - edge - 12);
+            const edge = up ? wave(x, top, amp, .25) - amp * 1.5 : wave(x, bot, amp, Math.PI + .25) + amp * 1.5;
+            const y = up ? 14 + rnd() * Math.max(0, edge - 24) : edge + 10 + rnd() * Math.max(0, H - 14 - edge - 10);
             const mid = 1 - Math.abs(x - W / 2) / (W / 2);
             if (rnd() < mid * .55) continue;
-            const r = 7 + rnd() * 9;
+            const r = (7 + rnd() * 9) * Math.min(1, H / 560 + .25);
+            if (avoid && x < avoid[0] && y < avoid[1]) continue;
             if (placed.some(([px, py, pr]) => Math.hypot(px - x, py - y) < pr + r + 26)) continue;
             placed.push([x, y, r]);
             out += glyph(x, y, r, PAL[Math.floor(rnd() * PAL.length)]);
@@ -190,35 +180,49 @@
         return `<svg class="bn-quetzal" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${out}</svg>`;
     }
 
-    const foot = '<div class="bn-foot"><div class="bn-greca"></div></div>';
-
     const id = new URLSearchParams(location.search).get('b') || 'header';
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
     const root = document.documentElement;
-    let html;
 
+    const WAVE = `<svg width="0" height="0" style="position:absolute"><filter id="wave" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0016 0.004" numOctaves="1" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" scale="26" xChannelSelector="R" yChannelSelector="G"/>
+        <feGaussianBlur stdDeviation="0.5"/>
+    </filter></svg>`;
+    const flag = (cls, printed) => `<div class="bn-banner ${cls}">${WAVE}
+        <div class="bn-cloth"></div>
+        <div class="bn-wave">${printed}</div>
+        <div class="bn-shade"></div></div>`;
+
+    /* The Mexican flag, rounded: green, white, red, and a small emblem —
+       a brown eagle-on-cactus reduced to what reads at badge size. */
+    const MX = `<svg viewBox="0 0 60 38" aria-hidden="true">
+        <defs><clipPath id="mxr"><rect width="60" height="38" rx="8"/></clipPath></defs>
+        <g clip-path="url(#mxr)">
+            <rect width="20" height="38" fill="#006847"/><rect x="20" width="20" height="38" fill="#fff"/><rect x="40" width="20" height="38" fill="#CE1126"/>
+            <path d="M24.5 22.5 q5.5 5 11 0" fill="none" stroke="#3B7A3A" stroke-width="1.6" stroke-linecap="round"/>
+            <ellipse cx="30" cy="18" rx="4.2" ry="5" fill="#8A5A2B"/><circle cx="31.5" cy="13.6" r="2" fill="#8A5A2B"/>
+        </g>
+        <rect x=".5" y=".5" width="59" height="37" rx="7.5" fill="none" stroke="rgba(12,44,100,.25)"/>
+    </svg>`;
+
+    let html;
     if (id === 'header') {
-        root.style.cssText = '--w:1600px;--h:560px;--hue:var(--am-marigold)';
-        html = `<div class="bn-banner is-header">
-            <svg width="0" height="0" style="position:absolute"><filter id="wave" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.0016 0.004" numOctaves="1" seed="4"/>
-                <feDisplacementMap in="SourceGraphic" scale="26" xChannelSelector="R" yChannelSelector="G"/>
-                <feGaussianBlur stdDeviation="0.5"/>
-            </filter></svg>
-            <div class="bn-cloth"></div>
-            <div class="bn-wave">${quetzal()}<div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div></div>
-            <div class="bn-shade"></div></div>`;
+        root.style.cssText = '--w:1600px;--h:560px';
+        html = flag('is-header', `${quetzal(1600, 560, 118, 442, 26, [360, 90])}
+            <div class="bn-stripes"></div>
+            <div class="bn-hecho">${MX}<span>Hecho en<br>México</span></div>
+            <div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div>`);
     } else {
         const s = SECTIONS.find((x) => x.id === id);
         if (!s) throw new Error('unknown banner ' + id);
         root.style.cssText = `--w:1600px;--h:360px;--hue:${s.hue}`;
-        html = `<div class="bn-banner is-section">
+        html = flag('is-section', `${quetzal(1600, 360, 62, 298, 14)}
             <div class="bn-stripes"></div><div class="bn-mark"></div>
             <div class="bn-copy">
                 <h1>${esc(s.es)}</h1>
                 <p class="bn-en">${esc(s.en)}</p>
-            </div>
-            ${foot}</div>`;
+            </div>`);
     }
     document.body.innerHTML += html;
 
