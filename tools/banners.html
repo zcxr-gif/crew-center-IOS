@@ -45,9 +45,28 @@
                 mask-image: url('../assets/img/mark.svg');
     }
 
-    /* Marigold greca along the foot. */
+    /* The tail: a swept fin rising out of the bottom edge, livery navy with
+       the eagle on it, standing in front of the stripes. The eagle sits in
+       percentages of the fin's own box so it scales with either banner. */
+    .bn-tail {
+        position: absolute; right: 3%; bottom: 0; height: 100%; aspect-ratio: 600 / 560;
+        filter: drop-shadow(-18px 0 40px rgba(4, 12, 28, .55));
+    }
+    .bn-tail svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .bn-tail .bn-mark {
+        left: 33%; top: 37%; width: 46%; aspect-ratio: 2778 / 2118;
+        -webkit-mask-size: contain; mask-size: contain;
+    }
+
+    /* Greca along the foot, fading out before it reaches the tail. The fade
+       is on a wrapper because the greca's own mask is already its shape. */
+    .bn-foot {
+        position: absolute; left: 0; bottom: 0; width: 58%; height: 24px;
+        -webkit-mask: linear-gradient(90deg, #000 70%, transparent);
+                mask: linear-gradient(90deg, #000 70%, transparent);
+    }
     .bn-greca {
-        position: absolute; left: 0; right: 0; bottom: 0; height: 24px;
+        position: absolute; inset: 0;
         background: var(--hue);
         -webkit-mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
                 mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
@@ -71,11 +90,9 @@
 
     /* ---- header ---- */
     .is-header h1 { font-size: 124px; }
-    .is-header .bn-mark { right: 7%; top: 50%; height: 64%; aspect-ratio: 2778 / 2118; transform: translateY(-54%); -webkit-mask-size: contain; mask-size: contain; }
 
     /* ---- section divider ---- */
     .is-section h1 { font-size: 112px; }
-    .is-section .bn-mark { right: 6%; top: 50%; height: 46%; aspect-ratio: 2778 / 2118; transform: translateY(-58%); -webkit-mask-size: contain; mask-size: contain; }
 </style>
 </head>
 <body>
@@ -96,6 +113,31 @@
     ];
     window.AMV_BANNERS = ['header', ...SECTIONS.map((s) => s.id)];
 
+    /* Fin outline in a 600 x 560 box: leading edge swept back from the root,
+       a short rounded tip, trailing edge swept back to the rudder. */
+    const FIN = 'M40 560 L318 46 Q330 24 354 24 L498 24 Q518 24 516 44 L468 560 Z';
+    const tail = `<div class="bn-tail">
+        <svg viewBox="0 0 600 560" aria-hidden="true">
+            <defs>
+                <linearGradient id="fin" x1="0" y1="0" x2=".7" y2="1">
+                    <stop offset="0" stop-color="#1A4C9E"/><stop offset=".45" stop-color="#0C2C64"/><stop offset="1" stop-color="#081630"/>
+                </linearGradient>
+                <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <clipPath id="finclip"><path d="${FIN}"/></clipPath>
+            </defs>
+            <path d="${FIN}" fill="url(#fin)"/>
+            <g clip-path="url(#finclip)">
+                <rect width="600" height="560" fill="url(#sheen)"/>
+                <path d="M494 110 L462 560" stroke="#fff" stroke-opacity=".14" stroke-width="3" fill="none"/>
+            </g>
+            <path d="M40 560 L318 46 Q330 24 354 24" stroke="#fff" stroke-opacity=".35" stroke-width="3" fill="none"/>
+        </svg>
+        <div class="bn-mark"></div>
+    </div>`;
+    const foot = '<div class="bn-foot"><div class="bn-greca"></div></div>';
+
     const id = new URLSearchParams(location.search).get('b') || 'header';
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
     const root = document.documentElement;
@@ -104,24 +146,24 @@
     if (id === 'header') {
         root.style.cssText = '--w:1600px;--h:560px;--hue:var(--am-marigold)';
         html = `<div class="bn-banner is-header">
-            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <div class="bn-stripes"></div>${tail}
             <div class="bn-copy">
                 <p class="bn-eyebrow">${esc(A.platform)} · <b>${esc(A.server)}</b> · ${esc(A.alliance)}</p>
                 <h1>${esc(A.name)}</h1>
                 <p class="bn-sub">Mexico’s flag carrier, flown properly. Callsign ${esc(A.callsign)}.</p>
             </div>
-            <div class="bn-greca"></div></div>`;
+            ${foot}</div>`;
     } else {
         const s = SECTIONS.find((x) => x.id === id);
         if (!s) throw new Error('unknown banner ' + id);
         root.style.cssText = `--w:1600px;--h:360px;--hue:${s.hue}`;
         html = `<div class="bn-banner is-section">
-            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <div class="bn-stripes"></div>${tail}
             <div class="bn-copy">
                 <h1>${esc(s.es)}</h1>
                 <p class="bn-en">${esc(s.en)}</p>
             </div>
-            <div class="bn-greca"></div></div>`;
+            ${foot}</div>`;
     }
     document.body.innerHTML += html;
 })();
