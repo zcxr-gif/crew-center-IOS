@@ -102,6 +102,7 @@
                 mask: url('../assets/img/lockup.png') no-repeat center / contain;
     }
     .bn-wave { position: absolute; inset: 0; filter: url(#wave); }
+    .bn-quetzal { position: absolute; inset: 0; width: 100%; height: 100%; }
 
     /* ---- section divider ---- */
     .is-section h1 { font-size: 112px; }
@@ -126,6 +127,69 @@
     ];
     window.AMV_BANNERS = ['header', ...SECTIONS.map((s) => s.id)];
 
+    /* Quetzalcóatl, after the 787 livery but drawn from scratch: two serpent
+       bands — a row of green teeth riding a wave, a clay line beside it —
+       above and below the logo, the teeth facing in, and a scatter of glyphs
+       in the palette outside them. Seeded, so every render matches. */
+    function quetzal() {
+        let seed = 11;
+        const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+        const W = 1600, H = 560;
+        const PAL = ['#0E8C5A', '#0E9BAA', '#1B5FC1', '#D6337E', '#F2A03D', '#C05A2E', '#0C2C64'];
+        const wave = (x, base, amp, ph) => base + amp * Math.sin((x / W) * Math.PI * 2 * 1.1 + ph);
+        const f = (n) => n.toFixed(1);
+        let out = '';
+
+        function band(base, dir, ph) {
+            // Teeth: green triangles standing on the wave, pointing toward the logo.
+            let teeth = '';
+            for (let x = -10; x < W + 20; x += 26) {
+                const a = x - 11, b = x + 11;
+                teeth += `M${f(a)} ${f(wave(a, base, 26, ph))}L${f(b)} ${f(wave(b, base, 26, ph))}L${f(x)} ${f(wave(x, base, 26, ph) + dir * 18)}Z`;
+            }
+            out += `<path d="${teeth}" fill="#0E8C5A"/>`;
+            // A green rule under the teeth, and the clay line outside it.
+            for (const [off, col, w, amp, p2] of [[0, '#0E8C5A', 4, 26, ph], [-dir * 18, '#C05A2E', 5, 26, ph + .25]]) {
+                let d = '';
+                for (let x = 0; x <= W; x += 10) d += (x ? 'L' : 'M') + f(x) + ' ' + f(wave(x, base + off, amp, p2));
+                out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+            }
+        }
+
+        function glyph(x, y, r, c) {
+            switch (Math.floor(rnd() * 6)) {
+                case 0: return `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="none" stroke="${c}" stroke-width="${f(r * .35)}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .3)}" fill="${c}"/>`;
+                case 1: return `<path d="M${f(x - r)} ${f(y - r)}L${f(x + r)} ${f(y + r)}M${f(x + r)} ${f(y - r)}L${f(x - r)} ${f(y + r)}" stroke="${c}" stroke-width="${f(r * .45)}" stroke-linecap="round"/>`;
+                case 2: return `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .55)}" fill="${c}"/>`;
+                case 3: return `<path d="M${f(x)} ${f(y - r)}L${f(x + r)} ${f(y)}L${f(x)} ${f(y + r)}L${f(x - r)} ${f(y)}Z" fill="none" stroke="${c}" stroke-width="${f(r * .3)}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r * .22)}" fill="${c}"/>`;
+                case 4: { // spiral
+                    let d = '';
+                    for (let t = 0; t <= 14; t++) { const a = t * .7, rr = r * (t / 14); d += (t ? 'L' : 'M') + f(x + rr * Math.cos(a)) + ' ' + f(y + rr * Math.sin(a)); }
+                    return `<path d="${d}" fill="none" stroke="${c}" stroke-width="${f(r * .28)}" stroke-linecap="round"/>`;
+                }
+                default: return [0, 1, 2].map((i) => `<circle cx="${f(x - r + i * r)}" cy="${f(y)}" r="${f(r * .22)}" fill="${c}"/>`).join('');
+            }
+        }
+
+        band(118, 1, 0);
+        band(442, -1, Math.PI);
+        // Glyphs in the margins, thinning toward the centre so the logo has air.
+        const placed = [];
+        for (let i = 0; i < 160; i++) {
+            const top = i % 2 === 0;
+            const x = 30 + rnd() * (W - 60);
+            const edge = top ? wave(x, 118, 26, .25) - 40 : wave(x, 442, 26, Math.PI + .25) + 40;
+            const y = top ? 18 + rnd() * Math.max(0, edge - 30) : edge + 12 + rnd() * Math.max(0, H - 18 - edge - 12);
+            const mid = 1 - Math.abs(x - W / 2) / (W / 2);
+            if (rnd() < mid * .55) continue;
+            const r = 7 + rnd() * 9;
+            if (placed.some(([px, py, pr]) => Math.hypot(px - x, py - y) < pr + r + 26)) continue;
+            placed.push([x, y, r]);
+            out += glyph(x, y, r, PAL[Math.floor(rnd() * PAL.length)]);
+        }
+        return `<svg class="bn-quetzal" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${out}</svg>`;
+    }
+
     const foot = '<div class="bn-foot"><div class="bn-greca"></div></div>';
 
     const id = new URLSearchParams(location.search).get('b') || 'header';
@@ -142,7 +206,7 @@
                 <feGaussianBlur stdDeviation="0.5"/>
             </filter></svg>
             <div class="bn-cloth"></div>
-            <div class="bn-wave"><div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div></div>
+            <div class="bn-wave">${quetzal()}<div class="bn-lockup" role="img" aria-label="${esc(A.name)}"></div></div>
             <div class="bn-shade"></div></div>`;
     } else {
         const s = SECTIONS.find((x) => x.id === id);
