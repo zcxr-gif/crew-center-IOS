@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=block">
 <link rel="stylesheet" href="../assets/brand.css">
 <style>
-    html, body { margin: 0; background: #F3F5F8; }
+    html, body { margin: 0; background: transparent; }
     body { width: var(--w); height: var(--h); overflow: hidden; }
 
     /* Every banner is a white flag. The cloth is a run of soft vertical folds,
@@ -28,6 +28,7 @@
         position: relative; width: var(--w); height: var(--h); overflow: hidden;
         background: #F3F5F8; color: var(--am-blue);
         font-family: var(--font-body);
+        border-radius: 28px; isolation: isolate;
     }
     .bn-cloth, .bn-shade {
         position: absolute; inset: -20% -15%;
