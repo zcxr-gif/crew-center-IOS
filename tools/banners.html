@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+  banners.html — the Infinite Flight Community thread graphics.
+
+  One page, one banner at a time: ?b=header, or ?b=<section id> from SECTIONS
+  below. tools/make-banners.js screenshots each into banners/*.png.
+
+  Everything is the site's own: the palette from brand.css, Fraunces / Karla /
+  JetBrains Mono, the Caballero Águila and the ruled device painted through
+  their masks, and the figures counted from data.js so a banner cannot say
+  "six types" after the fleet grows to seven. Edit copy here, re-run the
+  script, re-upload.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AMV Thread Banners</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..800,0..100,0..1&family=Karla:wght@400..800&family=JetBrains+Mono:wght@400..700&display=block">
+<link rel="stylesheet" href="../assets/brand.css">
+<style>
+    html, body { margin: 0; background: var(--am-navy); }
+    body { width: var(--w); height: var(--h); overflow: hidden; }
+
+    .bn-banner {
+        position: relative; width: var(--w); height: var(--h); overflow: hidden;
+        background: var(--am-wash); color: #fff;
+        font-family: var(--font-body);
+    }
+    /* A soft pool of the section's colour behind the type. */
+    .bn-banner::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(60% 120% at 18% 50%, color-mix(in srgb, var(--hue) 22%, transparent), transparent 70%);
+    }
+
+    /* The ruled device, flush right, red to rosa — as in the livery. */
+    .bn-stripes {
+        position: absolute; top: 0; right: 0; bottom: 0; width: 34%;
+        background: linear-gradient(180deg, var(--am-red), var(--am-rosa));
+        -webkit-mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+                mask: url('../assets/img/stripes.svg') no-repeat right center / 100% 100%;
+        opacity: .9;
+    }
+    .bn-mark {
+        position: absolute; background: #fff; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center;
+        -webkit-mask-image: url('../assets/img/mark.svg');
+                mask-image: url('../assets/img/mark.svg');
+    }
+
+    /* Marigold greca along the foot. */
+    .bn-greca {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 24px;
+        background: var(--hue);
+        -webkit-mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
+                mask: url('../assets/img/greca.svg') repeat-x left center / auto 100%;
+    }
+    .bn-rule {
+        position: absolute; left: 0; right: 0; bottom: 24px; height: 4px;
+        background: linear-gradient(90deg, var(--mx-green) 0 33.3%, #fff 33.3% 66.6%, var(--mx-red) 66.6%);
+    }
+
+    .bn-copy { position: absolute; left: 96px; top: 50%; transform: translateY(-54%); max-width: 62%; }
+    .bn-eyebrow {
+        font-family: var(--font-mono); font-size: 22px; letter-spacing: .22em;
+        text-transform: uppercase; color: var(--am-blue-300); margin: 0 0 18px;
+    }
+    .bn-eyebrow b { color: color-mix(in srgb, var(--hue) 70%, #fff); font-weight: 700; }
+    h1 {
+        font-family: var(--font-display); font-weight: 700; margin: 0; line-height: .95;
+        font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1; letter-spacing: -.02em;
+    }
+    .bn-sub { font-size: 30px; line-height: 1.3; color: rgba(255,255,255,.82); margin: 20px 0 0; }
+    .bn-facts { display: flex; gap: 14px; margin-top: 30px; }
+    .bn-facts span {
+        font-family: var(--font-mono); font-size: 20px; letter-spacing: .08em;
+        padding: 9px 16px; border-radius: 999px;
+        border: 1.5px solid rgba(255,255,255,.28); color: #fff;
+    }
+
+    /* ---- header ---- */
+    .is-header h1 { font-size: 124px; }
+    .is-header .bn-mark { right: 7%; top: 50%; height: 64%; aspect-ratio: 2778 / 2118; transform: translateY(-54%); -webkit-mask-size: contain; mask-size: contain; }
+
+    /* ---- section divider ---- */
+    .is-section h1 { font-size: 112px; }
+    .bn-num {
+        position: absolute; right: 38%; top: 50%; transform: translateY(-54%); margin: 0;
+        font-family: var(--font-display); font-weight: 800; font-size: 260px; line-height: 1;
+        color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,.16);
+    }
+    .is-section .bn-mark { right: 6%; top: 50%; height: 46%; aspect-ratio: 2778 / 2118; transform: translateY(-58%); -webkit-mask-size: contain; mask-size: contain; }
+</style>
+</head>
+<body>
+<script src="../assets/js/data.js"></script>
+<script>
+(function () {
+    const D = window.AMV_DATA, A = D.airline;
+    const n = (x) => (x || []).length;
+    const hubs = D.hubs.map((h) => h.iata).join(' · ');
+
+    /* Copy for each section. `es` is the Spanish subtitle; `facts` are the
+       chips under the title, counted from data.js where they can be. */
+    const SECTIONS = [
+        { id: 'about',   title: 'About',       es: 'Quiénes somos',   hue: 'var(--am-jade)',
+          sub: `${A.name} flies ${A.basedOn}’s network on the ${A.platform} ${A.server}.`,
+          facts: [`${A.iata} / ${A.icao}`, `Callsign ${A.callsign}`, A.alliance] },
+        { id: 'fleet',   title: 'Fleet',       es: 'Flota',           hue: 'var(--am-cobalt)',
+          sub: 'From the Connect E190 to the Dreamliner.',
+          facts: [`${n(D.fleet)} types`, D.fleet.map((f) => f.short).join(' · ')] },
+        { id: 'network', title: 'Network',     es: 'Red de rutas',    hue: 'var(--am-turquoise)',
+          sub: 'Four Mexican hubs, five route tiers, one map.',
+          facts: [hubs, `${n(D.routes)} sectors`] },
+        { id: 'ranks',   title: 'Ranks',       es: 'Rangos',          hue: 'var(--am-marigold)',
+          sub: 'Hours unlock aircraft, and longer sectors with them.',
+          facts: [`${n(D.ranks)} ranks`, `${D.ranks[0].name} → ${D.ranks[n(D.ranks) - 2].name}`] },
+        { id: 'events',  title: 'Events',      es: 'Eventos',         hue: 'var(--am-rosa)',
+          sub: 'Group flights, hub takeovers, fly-ins and joint events.',
+          facts: ['Fortnightly', 'Monthly', 'Quarterly'] },
+        { id: 'staff',   title: 'Staff',       es: 'Equipo',          hue: 'var(--am-clay)',
+          sub: 'The people who keep the operation running.',
+          facts: D.staff.filter((s) => s.name).slice(0, 3).map((s) => '@' + s.ifc) },
+        { id: 'join',    title: 'How to Join', es: 'Únete',           hue: 'var(--am-red)',
+          sub: 'Grade 2 and up. Apply at the crew center.',
+          facts: [`${n(D.requirements)} requirements`, 'Grade 2+ to apply'] },
+    ];
+    window.AMV_BANNERS = ['header', ...SECTIONS.map((s) => s.id)];
+
+    const id = new URLSearchParams(location.search).get('b') || 'header';
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const chips = (f) => `<div class="bn-facts">${f.map((x) => `<span>${esc(x)}</span>`).join('')}</div>`;
+    const root = document.documentElement;
+    let html;
+
+    if (id === 'header') {
+        root.style.cssText = '--w:1600px;--h:560px;--hue:var(--am-marigold)';
+        html = `<div class="bn-banner is-header">
+            <div class="bn-stripes"></div><div class="bn-mark"></div>
+            <div class="bn-copy">
+                <p class="bn-eyebrow">${esc(A.platform)} · <b>${esc(A.server)}</b> · ${esc(A.alliance)}</p>
+                <h1>${esc(A.name)}</h1>
+                <p class="bn-sub">Mexico’s flag carrier, flown properly. Callsign ${esc(A.callsign)}.</p>
+            </div>
+            <div class="bn-rule"></div><div class="bn-greca"></div></div>`;
+    } else {
+        const i = SECTIONS.findIndex((s) => s.id === id);
+        const s = SECTIONS[i];
+        if (!s) throw new Error('unknown banner ' + id);
+        root.style.cssText = `--w:1600px;--h:360px;--hue:${s.hue}`;
+        html = `<div class="bn-banner is-section">
+            <div class="bn-stripes"></div><div class="bn-num">${String(i + 1).padStart(2, '0')}</div><div class="bn-mark"></div>
+            <div class="bn-copy">
+                <p class="bn-eyebrow">${esc(A.name)} · <b>${esc(s.es)}</b></p>
+                <h1>${esc(s.title)}</h1>
+                ${chips(s.facts)}
+            </div>
+            <div class="bn-rule"></div><div class="bn-greca"></div></div>`;
+    }
+    document.body.innerHTML += html;
+})();
+</script>
+</body>
+</html>
