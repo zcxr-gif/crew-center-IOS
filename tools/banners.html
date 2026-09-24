@@ -131,6 +131,53 @@
        bands — a row of green teeth riding a wave, a clay line beside it —
        above and below the logo, the teeth facing in, and a scatter of glyphs
        in the palette outside them. Seeded, so every render matches. */
+    /* The feathered serpent as codex line art, head facing -x in a 420 x 240
+       box: a blocky open-jawed head with an eye scroll and a plume, a body of
+       four parallel lines (one path stroked in alternating clay and cloth,
+       widest first) sweeping back and up to a ring disk, and two curls hung
+       off it. `dir` -1 mirrors it so a pair can face each other. */
+    function serpent(x, y, dir) {
+        const C = '#B04A2A', P = '#F7F8FA', w = 3;
+        const body = 'M112 128 C 190 150, 280 170, 340 120 S 380 40, 372 22';
+        const layers = [[46, C], [40, P], [22, C], [16, P]]
+            .map(([sw, col]) => `<path d="${body}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="butt"/>`).join('');
+        const ring = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${P}" stroke="${C}" stroke-width="${w}"/>` +
+            `<circle cx="${cx}" cy="${cy}" r="${r * .45}" fill="none" stroke="${C}" stroke-width="${w}"/><circle cx="${cx}" cy="${cy}" r="${r * .14}" fill="${C}"/>`;
+        const curl = (d) => `<path d="${d}" fill="none" stroke="${C}" stroke-width="${w}" stroke-linecap="round"/>`;
+        const shape = (d) => `<path d="${d}" fill="${P}" stroke="${C}" stroke-width="${w}" stroke-linejoin="round"/>`;
+        const g = [
+            layers,
+            ring(372, 22, 24),
+            // curls hanging off the body
+            curl('M300 158 q 10 26 -8 32 q -16 4 -16 -10 q 2 -10 12 -6'),
+            curl('M210 150 q -4 24 14 28 q 14 2 14 -10 q -2 -8 -10 -6'),
+            // plume behind the head
+            shape('M104 66 q -6 -22 8 -30 q 12 10 6 30 Z'),
+            shape('M118 70 q 4 -24 22 -26 q 4 16 -12 32 Z'),
+            shape('M92 64 q -18 -14 -10 -30 q 16 4 18 26 Z'),
+            ring(112, 40, 8),
+            // ruff where head meets body
+            shape('M108 96 q 22 -8 30 12 q -10 20 -30 14 Z'),
+            shape('M108 118 q 24 4 26 26 q -20 8 -30 -8 Z'),
+            // upper jaw, lower jaw
+            shape('M118 70 L40 70 Q12 70 8 96 L8 106 L118 106 Z'),
+            shape('M118 128 L56 128 Q30 128 24 152 L70 150 L118 158 Z'),
+            // teeth
+            shape('M18 106 L26 120 L34 106 Z'), shape('M38 106 L45 118 L52 106 Z'), shape('M60 106 L66 116 L72 106 Z'),
+            shape('M40 128 L46 118 L52 128 Z'), shape('M62 128 L68 120 L74 128 Z'),
+            // forked tongue
+            curl('M30 118 q -22 2 -26 20 q -2 10 8 10'), curl('M30 118 q -26 -2 -30 -12'),
+            // nose curl and eye with its brow scroll
+            curl('M36 70 q -4 -16 10 -18 q 12 0 8 12 q -4 6 -10 2'),
+            ring(84, 88, 11),
+            curl('M64 70 q 6 -14 22 -14 q 16 2 18 14'),
+            // ear scroll at the back of the head
+            curl('M118 106 q 0 -14 -12 -14 q -10 2 -8 12 q 2 6 8 4'),
+        ].join('');
+        const t = dir === 1 ? `translate(${x} ${y})` : `translate(${x} ${y}) scale(-1 1)`;
+        return `<g transform="${t}">${g}</g>`;
+    }
+
     function quetzal() {
         let seed = 11;
         const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -172,6 +219,7 @@
         }
 
         band(118, 1, 0);
+        out += serpent(1160, 176, 1) + serpent(440, 176, -1);
         band(442, -1, Math.PI);
         // Glyphs in the margins, thinning toward the centre so the logo has air.
         const placed = [];
