@@ -7,7 +7,7 @@ Static HTML, CSS and vanilla JS. No build step, no framework, no bundler — ope
 `index.html` and it works.
 
 ```
-index.html         Home — the flight deck hero, the counted figures, a glimpse of
+index.html         Home — the ruled-stripe hero, the counted figures, a glimpse of
                    each page, the next event, what the airline has been doing
 fleet.html         The six operated types and what each one flies
 network.html       The route map, the flagship destinations, then every published sector
@@ -110,16 +110,11 @@ motifs sharing a section, not that device.
 |---|---|---|
 | `assets/img/lockup.png` | **the airline's own logo**, crest and wordmark in one piece, supplied by the VA | nav bar, footer |
 | `assets/img/mark.svg` | the Caballero Águila, traced from `Aeromexico-Symbol.webp` | favicon, fleet entries, staff plates, rank insignia, hub plates, `.band` crest |
-| `assets/img/stripes.svg` | the ruled-feather device off the mark | right edge of dark sections |
-| `assets/img/stripes-mirror.svg` | the same profile flipped | left edge of dark sections |
+| `assets/img/stripes.svg` | the ruled-feather device off the mark | the right side of the home page hero (turned round), faintly down the closing band and footer |
+| `assets/img/stripes-mirror.svg` | the same profile flipped | the left side of the home page hero, faintly down the closing band and footer |
 | `assets/img/greca.svg` | the stepped fret, generated from a grid | a band across the top of the footer |
 | `assets/img/greca-tile.svg` | the same fret over its mirror | a faint field across `.section--alt` |
 | `assets/img/serpent.svg` | a Quetzalcóatl frieze, generated from a grid | a band along the top of every `.band` |
-| `assets/img/cabin-window.svg` | a cabin wall with one window cut out of it, from coordinates | act one of the home page hero |
-| `assets/img/cabin-bezel.svg` | the lit reveal inside that aperture | act one of the home page hero |
-| `assets/img/flightdeck.svg` | the forward structure, with four panes cut out of it | act three of the home page hero |
-| `assets/img/flightdeck-glare.svg` | the glareshield, as its own darker mass | act three of the home page hero |
-| `assets/img/flightdeck-glow.svg` | the lip of the glareshield, blurred into the instrument underglow | act three of the home page hero |
 | `assets/img/cloudbank.svg` | a seamless cumulus deck, unioned out of seeded circles | the weather, at both ends of the hero |
 | `assets/img/cloudbank-far.svg` | the same, flatter, for the layer behind | the weather, wherever a view is at cruise |
 | `assets/img/view-wing.svg` | a swept wing, a nacelle and a winglet | `/fleet` |
@@ -155,7 +150,6 @@ python3 tools/trace-mark.py      # Aeromexico-Symbol.webp -> mark.svg   (potrace
 python3 tools/make-stripes.py    # full-logo.webp         -> stripes.svg + stripes-mirror.svg
 python3 tools/make-greca.py      # (parameters only)      -> greca.svg + greca-tile.svg
 python3 tools/make-serpent.py    # (parameters only)      -> serpent.svg
-python3 tools/make-flightdeck.py # (parameters only)      -> the hero's cabin window and flight deck
 python3 tools/make-cloudbank.py  # (seeded, reproducible) -> the cloud decks
 python3 tools/make-views.py      # (parameters + seed)    -> the seven page views
 ```
@@ -523,9 +517,9 @@ a real trademark, and that the disclaimer is what carries the distinction. The
 tricolour is used as a decorative device only — plain bands, never the national
 coat of arms.
 
-**The home page opens on a window, goes forward into the flight deck, and puts
-the lockup on the glass.** Nothing is written over it. Every shape in it is
-generated — `tools/make-flightdeck.py` and `tools/make-cloudbank.py` — and the
+**The home page opens on a sunrise, draws the logo's stripes in from both
+edges, and settles the lockup between them.** Nothing is written over it. Every
+shape in it is generated — `tools/make-stripes.py` and `tools/make-cloudbank.py` — and the
 whole move is CSS, so it runs with scripting off; see the hero section under
 *Design decisions* for how it is put together. Under it, a handful of approved
 sectors sampled at random off the crew centre's public flight log
@@ -609,28 +603,24 @@ island's top edge, and it carries a hairline underneath: the flag's middle
 third is white, and without that line it disappears into a light island and the
 flag reads as two disconnected bars.
 
-**The window, then the flight deck, then the eagle — and no words on it at
-all.** Seven heroes have been thrown out of this repo; the list and the
-reasoning are in `brand.css`, because the instinct that produced each one comes
-back. Every one of them was a fight between **type** and a **picture**, and
-every fix traded one for the other. The VA's call was to stop having the fight:
-the home page opens at a passenger window, goes forward through it into the
-flight deck, and settles the airline's lockup on the glass. Nothing is written
-on it.
+**The sky, then the stripes, then the eagle — and no words on it at all.**
+Eight heroes have been thrown out of this repo; the list and the reasoning are
+in `brand.css` (RULED HERO), because the instinct that produced each one comes
+back. The last to go opened at a passenger window and flew forward into the
+flight deck — the hero being about an aeroplane. What replaced it is about the
+airline: the ruled lines Aeroméxico is known for, drawn in from both sides of
+the screen towards the lockup.
 
-Taking the words off settles the two objections the old hero kept answering:
-
-- **It is dark in both themes, and now for a reason.** #5 was dark because
-  white type needs a ground it stays legible on whatever the theme is doing.
-  There is no type here. It is dark because it is a sunrise seen from the
-  flight deck, which is dark. The rest of the page still follows the theme.
-- **Nothing is cropped, because nothing here is a photograph.** Every shape is
-  generated to a common 1600×1000 frame and mounted at `mask-size: cover`, so a
-  narrow viewport cuts in from the sides — and what it takes is the outboard
-  sliding windows, geometry that exists to be lost. The two forward panes, the
-  centre post, the roof and the glareshield survive every ratio. The airframe
-  photographs are not gone from the site: they are on `/fleet`, uncropped,
-  which is where a reader who wants to look at an aeroplane goes.
+- **The stripes are measured, not drawn.** They are `stripes-mirror.svg`, whose
+  bar lengths `tools/make-stripes.py` reads off `full-logo.webp` — one block
+  per side, flush to the screen edge and ragged towards the lockup, the right
+  one turned round with `scale: -1 1`. They sit inside the lockup's own box,
+  so they centre on it at every viewport, and they are stretched to the gap
+  between the edge and the lockup so the rhythm is the logo's at any width.
+- **It is dark in both themes** because it is a sunrise at altitude and there
+  is no type on it that needs a particular ground.
+- **Nothing is cropped, because nothing here is a photograph.** The airframe
+  photographs are on `/fleet`, uncropped.
 
 **Nothing on screen is drawn.** The standing rule at the head of `brand.css` is
 that no pictorial artwork may be invented, and that geometry emitted from
@@ -638,75 +628,60 @@ parameters is the one exception. All of it is emitted:
 
 | file | from |
 | --- | --- |
-| `cabin-window.svg`, `cabin-bezel.svg` | `tools/make-flightdeck.py` |
-| `flightdeck.svg`, `-glare.svg`, `-glow.svg` | `tools/make-flightdeck.py` |
+| `stripes.svg`, `stripes-mirror.svg` | `tools/make-stripes.py` |
 | `cloudbank.svg`, `cloudbank-far.svg` | `tools/make-cloudbank.py` |
 | `view-*.svg` (the seven page headers) | `tools/make-views.py` |
 
-Every one is a monochrome **mask**, like `mark.svg` and `greca.svg`, so the
-colour of the cabin, the deck and the instrument glow is decided in `brand.css`
-and not in the files. A passenger window is a rounded rectangle and a flight
-deck's forward glass is four flat panes between structural posts — both are
-sets of coordinates, and both are in those scripts. Retune there and re-run;
-do not edit the SVGs, and do not add a hand-drawn layer beside them.
+Every one is a monochrome **mask**, like `mark.svg` and `greca.svg`, so its
+colour is decided in `brand.css` and not in the file. Retune the scripts and
+re-run; do not edit the SVGs, and do not add a hand-drawn layer beside them.
 
 **Every layer lives in one frame, and that is the whole trick.** A gradient's
 horizon is a percentage of its own element; a mask mounted at `cover` is
 cropped to the box's ratio. Those two agree only when the box happens to be
-1.6:1 — measured on the first build of this hero, at 2560×864 the glareshield
-sat **4.3% below its own sunrise**, and a page header is a wide shallow band
-nowhere near 1.6:1.
+1.6:1, and a page header is a wide shallow band nowhere near it. So nothing is
+mounted on the box. Everything is mounted inside `.sky__frame`, which is
+1600×1000 scaled to cover the box and centred, exactly as `object-fit: cover`
+would size a photograph, with the clipping done by `overflow: hidden`. Every
+layer inside it is a plain `inset: 0` child at `mask-size: 100% 100%`: one
+coordinate system, no cropping maths, and the generators can put a runway's
+vanishing point on the horizon by writing `y = 550` and trusting it.
 
-So nothing is mounted on the box. Everything is mounted inside `.sky__frame`,
-which is 1600×1000 scaled to cover the box and centred, exactly as
-`object-fit: cover` would size a photograph, with the clipping done by
-`overflow: hidden`. Every layer inside it is a plain `inset: 0` child at
-`mask-size: 100% 100%`: one coordinate system, no cropping maths, and the
-generators can put a runway's vanishing point on the horizon by writing
-`y = 550` and trusting it. It is also why the cloud tiles are sized in **percent**
-and not in `svh` as a first pass had them — inside the frame a tile's aspect is
-a fixed fraction of a fixed box, so it is right at every viewport by
-construction rather than by a number tuned per component.
-
-**The move, in three acts, and all of it CSS.** The sky comes up out of black
-and you are at the window; at 2.1s the camera goes through it — the wall rushes
-out past you while the sky settles back, which is the field of view opening up
-rather than a zoom; at 2.6s the flight deck arrives around the sky you were
-already looking at; at 3.6s the lockup settles. By 4.6s it is done and the only
-thing still moving is the weather. It runs **once on load and never again** — a
-hero that re-animates every time you scroll back to the top is one you learn to
-scroll past. `hero.js` does not start it, time it or step it, so the whole
-sequence still runs with scripting off.
+**The move, and all of it CSS.** The sky comes up out of black and settles
+back; from 0.45s the stripes draw in from both edges — a `clip-path` wipe from
+the flush side, so the short bars finish first and the long ones keep running
+in, and the logo's ragged profile *is* the stagger; at 1.55s the lockup
+settles between them. By about 3s it is done, and all that still moves is the
+weather and, every nine seconds, a glint of sunrise running in along the
+stripes. It runs **once on load and never again**. `hero.js` does not start it,
+time it or step it, so the whole sequence still runs with scripting off.
 
 **Two custom properties switch it off, and there is no second copy of the end
-state.** `--deck-t` multiplies every duration and delay in the move: at `1` it
+state.** `--sky-t` multiplies every duration and delay in the move: at `1` it
 runs, at `0` every animation is `0s` long and `fill-mode: both` lands it on its
-last frame instantly — the finished flight deck, nothing to skip.
-`--deck-loop` parks the two things that never stop (the cloud drift, the
-instrument breathe) at their first keyframe, which is written to be their
+last frame instantly — the finished picture, nothing to skip.
+`--sky-loop` parks the things that never stop (the cloud drift, the stripes'
+glint) at their first keyframe, which is written to be their
 resting state. `prefers-reduced-motion` sets both, and `hero.js` sets them
 through `[data-still]` when the page opens already scrolled, because a `#hash`
 or a restored position should not start a four-second film nobody can see.
 
 **Scrolled past, nothing moves.** `hero.js` sets `[data-away]` from an
 `IntersectionObserver` and a `visibilitychange` listener, and CSS pauses the
-four ambient loops — the cloud drift, the instrument glow, the view's float and
-the chevron. It pauses rather than cancels, so coming back picks the drift up
+ambient loops — the cloud drift, the stripes' glint, the view's float and the
+chevron. It pauses rather than cancels, so coming back picks the drift up
 where it left off instead of replaying anything. Nothing in the script knows
 what is animating: add a fifth loop and it is covered. One consequence lands in
 `tools/test-motion.js` — `stillFrame()` waits on `getAnimations()`, and an
 infinite animation's `finished` never resolves, so it filters them out rather
 than hanging forever.
 
-**The horizon is at 55%, and that number is set twice over.** In the flight
-deck it has to sit clear above the glareshield lip (74% of the emitted frame)
-or the sunrise is behind the coaming. At the window it is scaled 1.26 about
-47%, which lifts it to 57% — the lower half of the aperture, which is where you
-would see it from a seat. Move it and check both acts, or one of them ends up
-looking at nothing. For the same reason the cloud tiles are **trimmed to their
-own cloud tops** by the generator: the top edge of the file is the top of the
-weather, so one `bottom`/`height` pair in CSS puts the deck on the horizon and
-a retune of the geometry cannot silently open a gap.
+**The horizon is at 55%.** The page views are generated against it, and the
+lockup is lifted to about 43% of the frame by the hero's deeper bottom padding
+so it clears the brightest band rather than sitting across it. The cloud tiles
+are **trimmed to their own cloud tops** by the generator: the top edge of the
+file is the top of the weather, so one `bottom`/`height` pair in CSS puts the
+deck on the horizon and a retune of the geometry cannot silently open a gap.
 
 **The blur is on the element and the mask is on its `::before`**, on every
 `.sky__glow`, and that order is load-bearing. A filter is applied *before* the
@@ -742,7 +717,7 @@ Three more things are deliberate:
   crawler however good the picture is.
 - **A cabin film can replace the view.** `AMV_DATA.video` ships empty. Fill it
   in and `hero.js` drops the clip in where the generated sky is, behind the
-  same flight deck and under the same lockup — it changes the **view**, not the
+  same stripes and under the same lockup — it changes the **view**, not the
   hero. The note in `data.js` says what the clip should be and why the poster is
   not optional.
 

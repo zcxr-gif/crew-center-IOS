@@ -59,7 +59,7 @@ def deck(clusters, per, r_range, base, seed, tufts=5, course=3):
     rising out of it.
 
     DETAIL AT TWO SCALES. A first pass used one radius range and drew a row of
-    near-identical bubbles: from inside the flight deck it read as a cartoon,
+    near-identical bubbles: seen from the hero it read as a cartoon,
     because real cloud tops carry small relief on top of large. The tufts are
     that second scale, and they are placed ON a lump already emitted rather
     than at random, so every one of them is guaranteed to overlap the mass it

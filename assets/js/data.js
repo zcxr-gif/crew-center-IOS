@@ -301,11 +301,10 @@ window.AMV_DATA = {
     ],
 
     /* ---- The hero: a video from the cabin ---------------------------------
-       WHAT YOU SEE THROUGH THE GLASS when this is filled in. The home page
-       opens on a window, a move forward into the flight deck and the airline's
-       lockup; what is outside is a generated sunrise. Point `src` at a clip
-       and hero.js puts it there instead — the deck, the glareshield and the
-       lockup are untouched, so this changes the VIEW and not the hero. An
+       WHAT YOU SEE BEHIND THE STRIPES when this is filled in. The home page
+       opens on a generated sunrise, the logo's stripes drawing in from both
+       edges and the airline's lockup. Point `src` at a clip and hero.js puts
+       it where the sunrise is — the stripes and the lockup are untouched, so this changes the VIEW and not the hero. An
        empty `src` changes nothing at all.
 
        It is EMPTY on purpose, and it is the VA's to fill. The clip wanted is
@@ -331,7 +330,7 @@ window.AMV_DATA = {
        first frame decodes.
 
        Keep it short, silent and gentle — it loops, it is muted (a hero that
-       makes noise is a hero people leave), and it sits behind the flight deck
+       makes noise is a hero people leave), and it sits behind the stripes
        and the lockup rather than filling the frame on its own. Twenty
        seconds under about 4 MB is the budget; this is the largest thing on the
        page and it downloads before anyone has decided to stay. */
