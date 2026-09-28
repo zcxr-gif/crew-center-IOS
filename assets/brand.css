@@ -1111,6 +1111,33 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); 
     transition: background .3s var(--ease), box-shadow .35s var(--ease),
                 border-color .3s var(--ease);
 }
+/* THE HERO'S STRIPES, AT THE ENDS OF THE BAR. The same measured rules
+   (stripes.svg, stripes-mirror.svg) flush to each end of the island and ragged
+   inwards, drawn in once as the page opens. At the tile's own height, so the
+   bar shows a slice of about five rules rather than forty squeezed into 64px,
+   and faint: they are the island having the airline's grain in it, not a
+   graphic competing with the links. `overflow: hidden` on the island trims
+   them to its corners. */
+.nav::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    --nav-rule-w: clamp(4rem, 12vw, 10rem);
+    background: var(--nav-rule, var(--ink));
+    opacity: .1;
+    -webkit-mask:
+        url('/assets/img/stripes-mirror.svg') no-repeat left  center / var(--nav-rule-w) var(--stripe-tile),
+        url('/assets/img/stripes.svg')        no-repeat right center / var(--nav-rule-w) var(--stripe-tile);
+            mask:
+        url('/assets/img/stripes-mirror.svg') no-repeat left  center / var(--nav-rule-w) var(--stripe-tile),
+        url('/assets/img/stripes.svg')        no-repeat right center / var(--nav-rule-w) var(--stripe-tile);
+    animation: navRules 1.4s cubic-bezier(.62, 0, .18, 1) .2s both;
+}
+/* Growing the mask's width from nothing: the rules run out from each end. */
+@keyframes navRules {
+    from { -webkit-mask-size: 0 var(--stripe-tile), 0 var(--stripe-tile);
+                   mask-size: 0 var(--stripe-tile), 0 var(--stripe-tile); }
+}
+@media (prefers-reduced-motion: reduce) { .nav::before { animation: none; } }
+
 /* Once the page has moved the island takes on its own weight: near-opaque, so
    the content running under it stops showing through as texture, and lifted
    further off the page. */
@@ -1174,6 +1201,8 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
     box-shadow: 0 10px 34px -22px rgba(7, 20, 38, .75);
 }
 [data-site-nav].is-over-hero .nav__brand { color: #FFF; }
+[data-site-nav].is-over-hero .nav { --nav-rule: #FFF; }
+[data-site-nav].is-over-hero .nav::before { opacity: .2; }
 [data-site-nav].is-over-hero .nav__links a { color: color-mix(in srgb, #FFF 76%, transparent); }
 [data-site-nav].is-over-hero .nav__links a:hover,
 [data-site-nav].is-over-hero .nav__links a[aria-current="page"] { color: #FFF; }
@@ -1275,6 +1304,19 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
     transition: color .2s var(--ease); position: relative; padding-block: .35rem;
 }
 .nav__links a:hover, .nav__links a[aria-current="page"] { color: var(--ink); }
+/* HOVER DRAWS A LINE, the hero's stripes at the size of a link: it runs in
+   from the left and leaves to the right, so a pointer crossing the bar reads
+   as one movement rather than a row of underlines blinking. Not on the current
+   page, which already wears the flag. */
+.nav__links a:not([aria-current="page"])::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -.2rem;
+    height: 2px; border-radius: 2px; background: currentColor;
+    transform: scaleX(0); transform-origin: right center;
+    transition: transform .32s var(--ease);
+}
+.nav__links a:not([aria-current="page"]):hover::after {
+    transform: scaleX(1); transform-origin: left center;
+}
 /* The active tab is marked with the flag, not with a gradient bar. */
 .nav__links a[aria-current="page"]::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: -.2rem; height: 3px; border-radius: 2px;
@@ -3107,13 +3149,52 @@ main > .skyhead:first-child { padding-top: calc(var(--header-h) + clamp(2.5rem, 
                 0 2px 12px rgba(2, 6, 14, .5);
 }
 
+/* THE HERO'S STRIPES, ARRIVING FROM THE RIGHT. The heading sits on the left,
+   so the rules come in from the other edge — stripes.svg, flush RIGHT and
+   ragged towards the type — and stop short of it. A block level with the
+   heading rather than the whole band, so the view above keeps its sky, and at
+   the tile's own pitch so it shows fewer rules rather than squeezed ones. The ramp runs from almost nothing at the
+   edge to the brightest at the ragged ends, and the brightest is still well
+   under the type: the view is the picture, the rules are the airline's grain
+   laid over it. Drawn in once, on the same `--sky-t` switch. */
+.skyhead::before {
+    content: ""; position: absolute; right: 0; z-index: 0;
+    bottom: clamp(1.6rem, 4vw, 2.6rem); height: clamp(7rem, 15vw, 11.5rem);
+    width: clamp(9rem, 40vw, 38rem);
+    pointer-events: none;
+    -webkit-mask: url('/assets/img/stripes.svg') no-repeat right center / 100% var(--stripe-tile);
+            mask: url('/assets/img/stripes.svg') no-repeat right center / 100% var(--stripe-tile);
+    background: linear-gradient(270deg,
+        color-mix(in srgb, #FFF 4%, transparent) 0,
+        color-mix(in srgb, #FFF 18%, transparent) 50%,
+        color-mix(in srgb, #FFF var(--skyhead-rule, 44%), transparent) 100%);
+    animation: skyheadRules calc(1.6s * var(--sky-t)) cubic-bezier(.62, 0, .18, 1)
+               calc(.15s * var(--sky-t)) both;
+}
+@keyframes skyheadRules {
+    from { clip-path: inset(0 0 0 100%); }
+    to   { clip-path: inset(0); }
+}
+/* A phone's heading runs the full width, so the rules are behind it there:
+   narrower, and quieter at the ends that meet the type. */
+@media (max-width: 47.99rem) {
+    .skyhead::before { width: 34vw; --skyhead-rule: 24%; }
+}
+
 /* One stagger, once, on load — the same `--sky-t` switch as the hero, so a
    page opened already scrolled and a reader who asked for stillness both get
    the finished header with no motion and no second set of rules. */
 .skyhead__inner > * { animation: skyRise .7s var(--ease-rise) both; }
 .skyhead .eyebrow { animation-duration: calc(.7s * var(--sky-t)); animation-delay: calc(.12s * var(--sky-t)); }
 .skyhead h1       { animation-duration: calc(.8s * var(--sky-t)); animation-delay: calc(.22s * var(--sky-t)); }
-.skyhead .rule    { animation-duration: calc(.7s * var(--sky-t)); animation-delay: calc(.4s * var(--sky-t)); }
+.skyhead .rule    { animation-duration: calc(.9s * var(--sky-t)); animation-delay: calc(.4s * var(--sky-t)); }
+/* The flag under the heading draws out from its left end, the way the rules
+   draw in from the right — the two meet in the middle of the band. */
+.skyhead .rule { animation-name: skyRuleDraw; transform-origin: left center; }
+@keyframes skyRuleDraw {
+    from { opacity: 0; transform: scaleX(0); }
+    to   { opacity: 1; transform: none; }
+}
 @keyframes skyRise {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: none; }

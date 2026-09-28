@@ -622,6 +622,13 @@ the screen towards the lockup.
 - **Nothing is cropped, because nothing here is a photograph.** The airframe
   photographs are on `/fleet`, uncropped.
 
+**The same stripes carry through the rest of the site.** Every page header
+draws a block of them in from the right edge towards its heading, while the
+flag under the heading draws out from the left; the nav island carries a faint
+slice of them at each end, run out once as the page opens; and a nav link
+draws a line under itself on hover. All of it is the one measured profile —
+see RULED HERO, PAGE HEADERS and NAV in `brand.css`.
+
 **Nothing on screen is drawn.** The standing rule at the head of `brand.css` is
 that no pictorial artwork may be invented, and that geometry emitted from
 parameters is the one exception. All of it is emitted:
