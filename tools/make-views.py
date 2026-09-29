@@ -1,9 +1,8 @@
 """Emit assets/img/view-*.svg — one view out of the aeroplane per page.
 
-The home page opens at a cabin window and goes forward into the flight deck
-(tools/make-flightdeck.py). Every other page opens on a different view from the
-same aeroplane, so the site is one flight rather than one picture reused eight
-times:
+The home page opens on a sunrise at altitude with the logo's stripes drawn
+across it. Every other page opens on a different view from the same aeroplane,
+so the site is one flight rather than one picture reused eight times:
 
     view-wing.svg           /fleet    over the wing at cruise
     view-city.svg           /network  a city under the wing at night

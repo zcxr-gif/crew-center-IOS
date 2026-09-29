@@ -55,83 +55,38 @@
 <main id="main">
 
     <!-- ==================== HERO ====================
-         THE EIGHTH: THE WINDOW, THEN THE FLIGHT DECK, THEN THE EAGLE.
+         THE SKY, THEN THE STRIPES, THEN THE EAGLE.
 
-         The VA asked for an opening screen with no words on it at all — the
-         logo, and a move from a passenger window forward into the flight deck.
-         That is what this is, and it settles an argument the seven heroes
-         before it kept losing.
+         No words on it at all — the airline's lockup, and the ruled lines off
+         Aeroméxico's mark drawing in from both edges of the screen towards it.
+         The flight deck that used to be here went: the move forward into the
+         cockpit was the hero being about an aeroplane, and the stripes are the
+         hero being about the airline.
 
-         Every one of them was the airline TELLING you something over a picture:
-         a tagline, a sub-line, a strip of values, a caption naming an airframe.
-         The copy was the part that kept going wrong — it was navy in both
-         themes because white type needs a dark ground; it cropped the aeroplane
-         on a phone because type over a full-bleed photograph needs the frame
-         filled. Take every word off the screen and both problems stop existing.
-         Nothing here has to stay legible, so nothing here has to be dark for
-         the sake of legibility: it is dark because it is a sunrise at cruise.
+         WHAT IS ON SCREEN IS NOT A DRAWING. The rules are assets/img/stripes.svg
+         and its mirror, whose bar lengths tools/make-stripes.py measures off
+         full-logo.webp; the cloud decks are tools/make-cloudbank.py. Every one
+         is a monochrome mask painted in brand.css. The one image is the lockup.
 
-         WHAT IS ON SCREEN IS NOT A DRAWING. brand.css's standing rule is that
-         nothing pictorial may be invented, and this obeys it. The window, the
-         posts, the glareshield and the cloud deck are emitted by
-         tools/make-flightdeck.py and tools/make-cloudbank.py as monochrome
-         masks, from coordinates — the same footing as the greca and the ruled
-         stripes. The one image is the airline's own lockup. Read the headers of
-         those two scripts before changing any of it by hand.
+         THE MOVE is all CSS — see RULED HERO in brand.css. The sky comes up,
+         the stripes draw in from the sides, the lockup settles between them.
+         It runs ONCE and then holds. Asked for reduced motion it does not run
+         at all: you arrive on the last frame.
 
-         THE MOVE, in three acts, and all of it CSS — see FLIGHT DECK HERO in
-         brand.css. You are at the window; the camera goes through it; you are
-         on the flight deck and the lockup settles on the glass. It runs ONCE
-         and then holds, with the deck drifting. Asked for reduced motion it
-         does not run at all: you arrive on the last frame, which is the frame
-         that matters.
-
-         EVERY LAYER IS OPTIONAL, still. Scripting off, masks unsupported, a
-         file that will not load — and this is the airline's navy with the
-         lockup on it. Nothing below renders a placeholder, and the only thing
-         a reader loses if all of it fails is the weather. -->
-    <section class="hero hero--live hero--deck" data-hero>
-        <!-- THE SEQUENCE. One aria-hidden subtree: it is scenery, and a screen
-             reader should be handed the <h1> below, not a list of empty divs.
-             Order is back to front and that is load-bearing — the sky is behind
-             the cabin wall, which is behind the structure that replaces it. -->
-        <div class="sky sky--dawn deck" aria-hidden="true">
+         EVERY LAYER IS OPTIONAL. Scripting off, masks unsupported, a file that
+         will not load — and this is the airline's navy with the lockup on it. -->
+    <section class="hero hero--live hero--rules" data-hero>
+        <!-- The weather. One aria-hidden subtree: it is scenery, and a screen
+             reader should be handed the <h1> below, not a list of empty divs. -->
+        <div class="sky sky--dawn" aria-hidden="true">
             <!-- ONE FRAME, and everything in the picture is inside it. See THE
-                 SKY in brand.css: a gradient's horizon is a percentage of its
-                 own element and a mask is cropped to the box, and on a box that
-                 is not 1.6:1 those two stop agreeing. -->
+                 SKY in brand.css. -->
             <div class="sky__frame">
-                <!-- Outside. A dawn at altitude: the gradient is the sky, the
-                     sun is a single soft radial low in it, and the two cloud
-                     decks are the same generator at two scales and two speeds,
-                     which is what makes the distance between them read. -->
                 <div class="sky__air">
                     <div class="sky__sun"></div>
                     <div class="sky__cloud sky__cloud--far"></div>
                     <div class="sky__cloud sky__cloud--near"></div>
                 </div>
-
-                <!-- ACT ONE: the cabin. A wall with one window in it, lit only
-                     by what comes through the hole. The bezel is the depth of
-                     the reveal — the single detail that stops the aperture
-                     reading as a shape cut out of a rectangle. -->
-                <div class="deck__cabin"></div>
-                <div class="deck__bezel"></div>
-
-                <!-- ACT TWO: the flight deck, arriving as the wall rushes past —
-                     the push has no element of its own, it is what these two
-                     doing opposite things at the same moment look like. The
-                     glareshield is a second, darker mass over the structure, so
-                     the deck reads as a room rather than a stencil; the glow is
-                     the instruments, which is all you can see of them from this
-                     angle. -->
-                <div class="deck__frame"></div>
-                <div class="deck__glare"></div>
-                <div class="sky__glow deck__glow"></div>
-                <!-- Two rakes of light across the glass. Nothing is masked here
-                     — it is what tells you there is glass between you and the
-                     sky. -->
-                <div class="deck__glass"></div>
             </div>
         </div>
 
@@ -144,15 +99,19 @@
             <h1 class="sr-only">Aeromexico Virtual — an Infinite Flight virtual
                 airline flying the Aeroméxico network from Mexico City</h1>
 
-            <!-- ACT THREE, and the point of the whole thing: the airline's own
-                 lockup, settling on the glass once you are sat in the seat. -->
+            <!-- The rules, one block per side, flush to the screen edge and
+                 ragged towards the lockup. Inside the content box so they
+                 centre on the lockup rather than on a guess at where it is. -->
+            <span class="hero__rule hero__rule--l" aria-hidden="true"></span>
+            <span class="hero__rule hero__rule--r" aria-hidden="true"></span>
+
             <span class="brandmark hero__logo" aria-hidden="true"></span>
         </div>
 
         <!-- Where to go next, with no word on it. The hero is a full screen and
              a full screen with nothing under the fold visible is a screen people
              stop at. -->
-        <a class="deck__next" href="#below" aria-label="Skip to the page"></a>
+        <a class="hero__next" href="#below" aria-label="Skip to the page"></a>
     </section>
 
     <!-- ==================== THE AIRLINE, COUNTED ====================

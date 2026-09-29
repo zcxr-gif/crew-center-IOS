@@ -582,7 +582,7 @@
 
     /* ---- The sky's two switches ---------------------------------------------
        Every page on this site opens on a generated picture — the home page's
-       flight deck, or one of the seven page views. The pictures are entirely
+       sunrise and stripes, or one of the seven page views. The pictures are entirely
        CSS and nothing here starts, times or steps them; this sets the two
        attributes the stylesheet reads, and only ever turns things OFF.
 
@@ -592,8 +592,8 @@
                        anything else, because every frame spent deciding is a
                        frame of a sequence that should not be playing.
          [data-away]   scrolled past, or the tab is in the background, so the
-                       loops that never stop (the cloud drift, the instrument
-                       glow, the float) are parked. A deck drifting behind a
+                       loops that never stop (the cloud drift, the stripes'
+                       glint, the float) are parked. A deck drifting behind a
                        page nobody is looking at is work nobody asked for on a
                        battery nobody is charging.
 

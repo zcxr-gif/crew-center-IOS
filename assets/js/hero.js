@@ -7,10 +7,11 @@
    caption reading the airframe off data.js, a row of dots to steer it. All of
    that went with hero #7.
 
-   What replaced it is a window, a move forward into the flight deck, and the
-   airline's lockup — no words on it at all. Every shape in it is a generated
-   mask (tools/make-flightdeck.py, tools/make-cloudbank.py) and every frame of
-   the move is CSS (FLIGHT DECK HERO in brand.css). Nothing here starts it,
+   What replaced it is a sunrise at altitude, the ruled stripes off the logo
+   drawing in from both edges, and the airline's lockup — no words on it at
+   all. Every shape in it is a generated mask (tools/make-stripes.py,
+   tools/make-cloudbank.py) and every frame of the move is CSS (RULED HERO in
+   brand.css). Nothing here starts it,
    times it or steps it, which means the whole sequence still runs with
    scripting off. That is the point, and it is why this file got small.
 
@@ -23,8 +24,8 @@
 
      1. THE CABIN FILM, if the VA ever shoots one. AMV_DATA.video is still an
         escape hatch: fill it in and the clip becomes what you see through the
-        glass, in place of the generated sky. The flight deck, the glareshield
-        and the lockup are unchanged — the film is the view, not the hero.
+        stripes, in place of the generated sky. The stripes and the lockup
+        are unchanged — the film is the view, not the hero.
      2. WHO HAS BEEN FLYING IT. Approved sectors off the crew centre, under the
         hero on the page's own paper. This is the only part of the home page
         that can honestly say the airline is running today, and it is the one
@@ -50,7 +51,7 @@
 
     /* ---- 1. The cabin film --------------------------------------------------
        AMV_DATA.video, when it is filled in, is THE VIEW: the clip goes where
-       the generated sky is, behind the same flight deck, under the same
+       the generated sky is, behind the same stripes, under the same
        lockup. It replaces the weather and nothing else.
 
        Muted, looped, inline and autoplaying, which is the only combination a
@@ -65,7 +66,7 @@
     if (sky && film && film.src) {
         sky.classList.add('sky__air--film');
         const v = document.createElement('video');
-        v.className = 'deck__film';
+        v.className = 'hero__film';
         v.muted = true;            // property, not attribute: Safari reads this
         v.defaultMuted = true;
         v.loop = true;
